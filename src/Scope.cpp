@@ -69,7 +69,7 @@ Scope* Scope::createUniverse() {
 }
 
 void Scope::acceptVisitor(ScopeVisitor &visitor) {
-    visitor.writeWithIndent("BEGIN SCOPE");
+    visitor.writeWithIndent("SCOPE BEGIN");
     visitor.indent();
 
     vector<string> sortedIdentifiers = getIdentifiersSorted();

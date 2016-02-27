@@ -187,10 +187,22 @@ void Parser::typeDecl() throw(ParseException) {
     processToken("TYPE");
     
     while(match("identifier")) {
-        processToken("identifier");
+        Token identifier = processToken("identifier");
         processToken("=");
-        type();
+        shared_ptr<Type> linkedType = type();
         processToken(";");
+
+        if (!suppressContextErrors) {
+            if (symbolTable.getCurrentScope()->scopeContainsEntry(
+                    identifier.getValue())) {
+                throw ParseException("Context violation: duplicate "
+                                     + identifier.toString());
+            } else {
+                symbolTable.getCurrentScope()->addEntry(
+                        identifier.getValue(), linkedType);
+            }
+
+        }
     }
     
     deindent();

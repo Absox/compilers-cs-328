@@ -1,5 +1,7 @@
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 
+add_definitions(-std=c++11)
+
 add_executable(runUnitTests scopeTest.cpp symbolTableTest.cpp scopeVisitorTest.cpp)
 
 target_link_libraries(runUnitTests gtest gtest_main)
