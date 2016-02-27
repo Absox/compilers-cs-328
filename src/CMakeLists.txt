@@ -1,0 +1,47 @@
+project(compilers4_lib)
+add_definitions(-std=c++11)
+
+set(SOURCE_FILES
+        Array.cpp
+        Constant.cpp
+        Entry.cpp
+        Field.cpp
+        GraphNode.cpp
+        GraphObserver.cpp
+        Observer.cpp
+        ParseException.cpp
+        Parser.cpp
+        ParseState.cpp
+        Record.cpp
+        Scanner.cpp
+        ScannerException.cpp
+        Scope.cpp
+        TextObserver.cpp
+        Token.cpp
+        Type.cpp
+        Variable.cpp
+        SymbolTable.cpp
+)
+
+set(HEADER_FILES
+        Array.h
+        Constant.h
+        Entry.h
+        Field.h
+        GraphNode.h
+        GraphObserver.h
+        Observer.h
+        ParseException.h
+        Parser.h
+        ParseState.h
+        Record.h
+        Scanner.h
+        ScannerException.h
+        Scope.h
+        TextObserver.h
+        Token.h
+        Type.h
+        Variable.h
+        SymbolTable.h)
+
+add_library(compilers4_lib STATIC ${SOURCE_FILES} ${HEADER_FILES})

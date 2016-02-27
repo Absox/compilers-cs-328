@@ -1,0 +1,7 @@
+600.328 Compilers & Intepreters, Homework 4
+Ran Liu (rliu14@jhu.edu)
+
+Finally, smart pointers help us out a lot here.
+Hard to say which pointers are single-instance and which are shared, so
+we use all shared_ptr. Better safe than sorry.
+
