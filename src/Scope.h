@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <vector>
 #include <string>
 
 #include "Entry.h"
@@ -26,9 +27,10 @@ public:
     void setOuter(const std::shared_ptr<Scope>& outer);
 
     void acceptVisitor(ScopeVisitor& visitor);
+    std::vector<std::string> getIdentifiersSorted();
 
     static Scope* createUniverse();
-
+    static bool wayToSort(std::string a, std::string b);
 private:
     std::shared_ptr<Scope> outer;
     std::unordered_map<std::string, std::shared_ptr<Entry>> identifiers;

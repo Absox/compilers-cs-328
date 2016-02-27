@@ -17,6 +17,8 @@ public:
 
     std::shared_ptr<Scope> getScope() const;
     void setScope(const std::shared_ptr<Scope>& scope);
+
+    virtual void acceptVisitor(ScopeVisitor& visitor) override;
 private:
     std::shared_ptr<Scope> scope;
 };

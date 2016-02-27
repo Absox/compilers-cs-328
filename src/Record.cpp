@@ -21,3 +21,13 @@ shared_ptr<Scope> Record::getScope() const {
 void Record::setScope(const shared_ptr<Scope>& scope) {
     this->scope = scope;
 }
+
+void Record::acceptVisitor(ScopeVisitor &visitor) {
+    visitor.writeWithIndent("RECORD BEGIN");
+    visitor.indent();
+
+    scope->acceptVisitor(visitor);
+
+    visitor.deindent();
+    visitor.writeWithIndent("END RECORD");
+}

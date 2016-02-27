@@ -11,8 +11,13 @@
 
 class Variable : public Entry {
 public:
+
     Variable();
     virtual ~Variable();
+
+    virtual std::string getEntryType() const;
+    virtual void acceptVisitor(ScopeVisitor& visitor) override;
+
 private:
     std::shared_ptr<Type> type;
 };

@@ -7,18 +7,24 @@
 
 
 #include "Entry.h"
+#include "Type.h"
+
+#include <string>
+#include <memory>
 
 class Constant : public Entry {
 public:
-    Constant(const int& value);
+    Constant(const int& value, const std::shared_ptr<Type>& type);
     virtual ~Constant();
 
     void setValue(const int& value);
     virtual std::string getEntryType() const override;
+    virtual void acceptVisitor(ScopeVisitor& visitor);
     int getValue();
 
 private:
     int value;
+    std::shared_ptr<Type> type;
 };
 
 

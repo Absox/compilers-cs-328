@@ -4,8 +4,13 @@
 
 #include "Constant.h"
 
-Constant::Constant(const int& value) {
+using std::string;
+using std::to_string;
+using std::shared_ptr;
+
+Constant::Constant(const int& value, const shared_ptr<Type>& type) {
     this->value = value;
+    this->type = type;
 }
 
 Constant::~Constant() {
@@ -20,6 +25,24 @@ int Constant::getValue() {
     return value;
 }
 
-std::string Constant::getEntryType() const {
+string Constant::getEntryType() const {
     return "CONSTANT";
+}
+
+void Constant::acceptVisitor(ScopeVisitor &visitor) {
+    visitor.writeWithIndent("CONST BEGIN");
+    visitor.indent();
+
+    visitor.writeWithIndent("type:");
+    visitor.indent();
+    type->acceptVisitor(visitor);
+    visitor.deindent();
+
+    visitor.writeWithIndent("value:");
+    visitor.indent();
+    visitor.writeWithIndent(to_string(value));
+    visitor.deindent();
+
+    visitor.deindent();
+    visitor.writeWithIndent("END CONST");
 }
