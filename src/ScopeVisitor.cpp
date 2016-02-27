@@ -7,7 +7,7 @@
 using std::endl;
 
 ScopeVisitor::ScopeVisitor() {
-
+    indentLevel = 0;
 }
 
 ScopeVisitor::~ScopeVisitor() {

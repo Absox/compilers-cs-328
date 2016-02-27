@@ -23,7 +23,5 @@ string Type::getEntryType() const {
 }
 
 void Type::acceptVisitor(ScopeVisitor &visitor) {
-    visitor.indent();
-
-    visitor.deindent();
+    visitor.writeWithIndent(name);
 }

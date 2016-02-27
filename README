@@ -5,3 +5,6 @@ Finally, smart pointers help us out a lot here.
 Hard to say which pointers are single-instance and which are shared, so
 we use all shared_ptr. Better safe than sorry.
 
+C++ polymorphism is rather less convenient than Java, at least in the method
+by which you conduct type-checking, and cast pointers from base classes to
+derived classes.

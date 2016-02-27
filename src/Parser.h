@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 
 #include "ParseState.h"
 #include "ParseException.h"
@@ -18,6 +19,7 @@
 #include "Observer.h"
 #include "Token.h"
 #include "SymbolTable.h"
+#include "Type.h"
 
 class Observer;
 
@@ -66,7 +68,7 @@ private:
     void selector() throw(ParseException);
     void expressionList() throw(ParseException);
     void type() throw(ParseException);
-    void identifierList() throw(ParseException);
+    std::vector<Token> identifierList() throw(ParseException);
     void instructions() throw(ParseException);
     void instruction() throw(ParseException);
     void assign() throw(ParseException);
@@ -76,6 +78,8 @@ private:
     void parseWhile() throw(ParseException);
     void read() throw(ParseException);
     void write() throw(ParseException);
+
+    std::shared_ptr<Type> integerType();
     
 };
 

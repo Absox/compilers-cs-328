@@ -197,6 +197,12 @@ int main(int argc, char **argv) {
                 } else {
                     try {
                         parser.parse();
+
+                        ScopeVisitor textVisitor;
+                        parser.getSymbolTable().getCurrentScope()
+                                ->acceptVisitor(textVisitor);
+                        cout << textVisitor.getContent();
+
                     } catch (ParseException& e) {
                         cerr << "error: " << e.getMessage() << endl;
                     }

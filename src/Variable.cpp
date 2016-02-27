@@ -19,5 +19,9 @@ string Variable::getEntryType() const {
 }
 
 void Variable::acceptVisitor(ScopeVisitor &visitor) {
-
+    visitor.writeWithIndent("VAR BEGIN");
+    visitor.indent();
+    type->acceptVisitor(visitor);
+    visitor.deindent();
+    visitor.writeWithIndent("END VAR");
 }

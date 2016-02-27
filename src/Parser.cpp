@@ -8,12 +8,15 @@
 
 #include "Parser.h"
 #include "ScannerException.h"
+#include "Constant.h"
 
 #include <memory>
 
 using std::shared_ptr;
 using std::string;
 using std::to_string;
+using std::vector;
+using std::dynamic_pointer_cast;
 
 Parser::Parser(Scanner* scanner, const bool& suppressContextErrors)
         : state("init"), currentToken("", "", 0, 0) {
@@ -152,7 +155,20 @@ void Parser::constDecl() throw(ParseException) {
     processToken("CONST");
     
     while (match("identifier")) {
-        processToken("identifier");
+        Token identifier = processToken("identifier");
+
+        if (symbolTable.getCurrentScope()->containsEntry(
+                identifier.getValue())) {
+            if (!suppressContextErrors) {
+                throw ParseException("Context violation: duplicate "
+                + identifier.toString());
+            }
+        } else {
+            shared_ptr<Entry> constant(new Constant(5, integerType()));
+            symbolTable.getCurrentScope()->addEntry(
+                    identifier.getValue(), constant);
+        }
+
         processToken("=");
         expression();
         processToken(";");
@@ -329,17 +345,21 @@ void Parser::type() throw(ParseException) {
     deindent();
 }
 
-void Parser::identifierList() throw(ParseException) {
+vector<Token> Parser::identifierList() throw(ParseException) {
     setState("IdentifierList");
     indent();
+
+    vector<Token> result;
     
-    processToken("identifier");
+    result.push_back(processToken("identifier"));
     while (match(",")) {
         processToken(",");
-        processToken("identifier");
+        result.push_back(processToken("identifier"));
     }
     
     deindent();
+
+    return result;
 }
 
 void Parser::instructions() throw(ParseException) {
@@ -484,4 +504,9 @@ void Parser::write() throw(ParseException) {
 
 SymbolTable &Parser::getSymbolTable() {
     return symbolTable;
+}
+
+std::shared_ptr<Type> Parser::integerType() {
+    return dynamic_pointer_cast<Type>(
+            symbolTable.getCurrentScope()->getEntry("INTEGER"));
 }
