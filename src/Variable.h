@@ -12,7 +12,7 @@
 class Variable : public Entry {
 public:
 
-    Variable();
+    Variable(const std::shared_ptr<Type>& type);
     virtual ~Variable();
 
     virtual std::string getEntryType() const;

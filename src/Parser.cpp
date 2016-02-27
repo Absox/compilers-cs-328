@@ -9,6 +9,9 @@
 #include "Parser.h"
 #include "ScannerException.h"
 #include "Constant.h"
+#include "Array.h"
+#include "Variable.h"
+#include "Record.h"
 
 #include <memory>
 
@@ -157,16 +160,16 @@ void Parser::constDecl() throw(ParseException) {
     while (match("identifier")) {
         Token identifier = processToken("identifier");
 
-        if (symbolTable.getCurrentScope()->containsEntry(
-                identifier.getValue())) {
-            if (!suppressContextErrors) {
+        if (!suppressContextErrors) {
+            if (symbolTable.getCurrentScope()->scopeContainsEntry(
+                    identifier.getValue())) {
                 throw ParseException("Context violation: duplicate "
-                + identifier.toString());
+                                     + identifier.toString());
+            } else {
+                shared_ptr<Entry> constant(new Constant(5, findType("INTEGER")));
+                symbolTable.getCurrentScope()->addEntry(
+                        identifier.getValue(), constant);
             }
-        } else {
-            shared_ptr<Entry> constant(new Constant(5, integerType()));
-            symbolTable.getCurrentScope()->addEntry(
-                    identifier.getValue(), constant);
         }
 
         processToken("=");
@@ -200,10 +203,25 @@ void Parser::varDecl() throw(ParseException) {
     processToken("VAR");
 
     while (match("identifier")) {
-        identifierList();
+        vector<Token> identifiers = identifierList();
         processToken(":");
-        type();
+        shared_ptr<Type> varType = type();
         processToken(";");
+
+        if (!suppressContextErrors) {
+            for (unsigned int c = 0; c < identifiers.size(); c++) {
+                if (symbolTable.getCurrentScope()->scopeContainsEntry(
+                        identifiers[c].getValue())) {
+                    throw ParseException("Context violation: duplicate "
+                                         + identifiers[c].toString());
+                } else {
+                    shared_ptr<Entry> varEntry(new Variable(varType));
+                    symbolTable.getCurrentScope()->addEntry(
+                            identifiers[c].getValue(), varEntry);
+                }
+
+            }
+        }
     }
     
     
@@ -316,33 +334,79 @@ void Parser::expressionList() throw(ParseException) {
     deindent();
 }
 
-void Parser::type() throw(ParseException) {
+shared_ptr<Type> Parser::type() throw(ParseException) {
+    shared_ptr<Type> result;
+
     setState("Type");
     indent();
     
     if (match("identifier")) {
-        processToken("identifier");
+        Token identifier = processToken("identifier");
+
+        if (!suppressContextErrors) {
+            result = findType(identifier.getValue());
+            if (result == 0) {
+                throw ParseException("Context violation: type "
+                                     + identifier.toString()
+                                     + " not declared!");
+            }
+        }
     } else if (match("ARRAY")) {
         processToken("ARRAY");
         expression();
         processToken("OF");
-        type();
+        shared_ptr<Type> arrayType = type();
+
+        if (!suppressContextErrors) {
+            result = shared_ptr<Type>(new Array(arrayType, 5));
+        }
+
     } else if (match("RECORD")) {
+
+        shared_ptr<Scope> recordScope(new Scope(symbolTable.getCurrentScope()));
+        if (!suppressContextErrors) {
+            symbolTable.setCurrentScope(recordScope);
+        }
+
         processToken("RECORD");
         while (match("identifier")) {
-            identifierList();
+            vector<Token> identifiers = identifierList();
             processToken(":");
-            type();
+            shared_ptr<Type> fieldType = type();
             processToken(";");
+
+            if (!suppressContextErrors) {
+                for (unsigned int c = 0; c < identifiers.size(); c++) {
+                    if (symbolTable.getCurrentScope()->scopeContainsEntry(
+                            identifiers[c].getValue())) {
+                        throw ParseException("Context violation: duplicate "
+                                             + identifiers[c].toString());
+                    } else {
+                        shared_ptr<Variable> entry(new Variable(fieldType));
+                        symbolTable.getCurrentScope()->addEntry(
+                                identifiers[c].getValue(), entry);
+                    }
+                }
+            }
+
         }
         processToken("END");
-        
+
+        if (!suppressContextErrors) {
+            symbolTable.setCurrentScope(recordScope->getOuter());
+            recordScope->setOuter(0); // Set outer to null.
+
+            result = shared_ptr<Record>(new Record(recordScope));
+        }
+
     } else {
         throw ParseException("Type expected; actual: "
                 + currentToken.toString());
     }
     
     deindent();
+
+    return result;
 }
 
 vector<Token> Parser::identifierList() throw(ParseException) {
@@ -506,7 +570,7 @@ SymbolTable &Parser::getSymbolTable() {
     return symbolTable;
 }
 
-std::shared_ptr<Type> Parser::integerType() {
+std::shared_ptr<Type> Parser::findType(const string& identifier) {
     return dynamic_pointer_cast<Type>(
-            symbolTable.getCurrentScope()->getEntry("INTEGER"));
+            symbolTable.getCurrentScope()->getEntry(identifier));
 }

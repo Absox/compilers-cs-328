@@ -5,7 +5,6 @@ set(SOURCE_FILES
         Array.cpp
         Constant.cpp
         Entry.cpp
-        Field.cpp
         GraphNode.cpp
         GraphObserver.cpp
         Observer.cpp
@@ -28,7 +27,6 @@ set(HEADER_FILES
         Array.h
         Constant.h
         Entry.h
-        Field.h
         GraphNode.h
         GraphObserver.h
         Observer.h

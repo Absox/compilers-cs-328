@@ -67,7 +67,7 @@ private:
     void designator() throw(ParseException);
     void selector() throw(ParseException);
     void expressionList() throw(ParseException);
-    void type() throw(ParseException);
+    std::shared_ptr<Type> type() throw(ParseException);
     std::vector<Token> identifierList() throw(ParseException);
     void instructions() throw(ParseException);
     void instruction() throw(ParseException);
@@ -79,7 +79,7 @@ private:
     void read() throw(ParseException);
     void write() throw(ParseException);
 
-    std::shared_ptr<Type> integerType();
+    std::shared_ptr<Type> findType(const std::string& identifier);
     
 };
 

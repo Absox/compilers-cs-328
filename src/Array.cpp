@@ -8,7 +8,8 @@
 using std::to_string;
 using std::shared_ptr;
 
-Array::Array(const std::shared_ptr<Type> &type, const int &length) : Type("ARRAY") {
+Array::Array(const std::shared_ptr<Type> &type, const int &length)
+        : Type("ARRAY") {
     this->type = type;
     this->length = length;
 }

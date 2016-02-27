@@ -5,9 +5,10 @@
 #include "Variable.h"
 
 using std::string;
+using std::shared_ptr;
 
-Variable::Variable() {
-
+Variable::Variable(const shared_ptr<Type>& type) {
+    this->type = type;
 }
 
 Variable::~Variable() {
@@ -21,7 +22,10 @@ string Variable::getEntryType() const {
 void Variable::acceptVisitor(ScopeVisitor &visitor) {
     visitor.writeWithIndent("VAR BEGIN");
     visitor.indent();
+    visitor.writeWithIndent("type:");
+    visitor.indent();
     type->acceptVisitor(visitor);
+    visitor.deindent();
     visitor.deindent();
     visitor.writeWithIndent("END VAR");
 }
