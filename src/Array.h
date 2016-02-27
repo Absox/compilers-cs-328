@@ -16,6 +16,8 @@ public:
 
     std::shared_ptr<Type> getType() const;
     int getLength() const;
+
+    virtual void acceptVisitor(ScopeVisitor& visitor) override;
 private:
     std::shared_ptr<Type> type;
     int length;

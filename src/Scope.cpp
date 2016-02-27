@@ -11,8 +11,8 @@ using std::cout;
 using std::shared_ptr;
 using std::string;
 
-Scope::Scope() {
-
+Scope::Scope(const shared_ptr<Scope>& outer) {
+    this->outer = outer;
 }
 
 Scope::~Scope() {
@@ -56,7 +56,7 @@ std::shared_ptr<Scope> Scope::getOuter() const {
     return outer;
 }
 
-void Scope::setOuter(const std::shared_ptr<Scope> outer) {
+void Scope::setOuter(const std::shared_ptr<Scope>& outer) {
     this->outer = outer;
 }
 
@@ -64,4 +64,18 @@ Scope* Scope::createUniverse() {
     Scope* universe = new Scope;
     universe->addEntry("INTEGER", shared_ptr<Entry>(new Type("INTEGER")));
     return universe;
+}
+
+void Scope::acceptVisitor(ScopeVisitor &visitor) {
+    visitor.writeWithIndent("BEGIN SCOPE");
+    visitor.indent();
+
+    for (auto iterator = identifiers.begin();
+         iterator != identifiers.end(); ++iterator) {
+        shared_ptr<Entry> currentEntry = iterator->second;
+        currentEntry->acceptVisitor(visitor);
+    }
+
+    visitor.deindent();
+    visitor.writeWithIndent("END SCOPE");
 }

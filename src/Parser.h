@@ -52,7 +52,7 @@ private:
     
     Token& nextToken() throw(ParseException);
     bool match(const std::string& type);
-    Token& processToken(const std::string& type) throw(ParseException);
+    Token processToken(const std::string& type) throw(ParseException);
     
     void program() throw(ParseException);
     void declarations() throw(ParseException);

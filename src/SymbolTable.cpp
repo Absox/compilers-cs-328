@@ -16,3 +16,7 @@ SymbolTable::~SymbolTable() {
 shared_ptr<Scope> SymbolTable::getCurrentScope() const {
     return currentScope;
 }
+
+void SymbolTable::setCurrentScope(std::shared_ptr<Scope> currentScope) {
+    this->currentScope = currentScope;
+}

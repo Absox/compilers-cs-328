@@ -21,6 +21,7 @@ set(SOURCE_FILES
         Type.cpp
         Variable.cpp
         SymbolTable.cpp
+        ScopeVisitor.cpp
 )
 
 set(HEADER_FILES
@@ -42,6 +43,8 @@ set(HEADER_FILES
         Token.h
         Type.h
         Variable.h
-        SymbolTable.h)
+        SymbolTable.h
+        ScopeVisitor.h
+)
 
 add_library(compilers4_lib STATIC ${SOURCE_FILES} ${HEADER_FILES})

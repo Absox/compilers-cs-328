@@ -9,7 +9,7 @@
 
 #include "Type.h"
 
-class Variable {
+class Variable : public Entry {
 public:
     Variable();
     virtual ~Variable();

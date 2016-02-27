@@ -21,3 +21,9 @@ string Type::getName() const {
 string Type::getEntryType() const {
     return getName();
 }
+
+void Type::acceptVisitor(ScopeVisitor &visitor) {
+    visitor.indent();
+
+    visitor.deindent();
+}

@@ -77,6 +77,9 @@ int main(int argc, char **argv) {
         if (argc < 2) throw NO_OPTIONS;
         
         char* option = argv[1];
+
+        // TODO refactor driver code to be more DRY
+
         if (option[0] == '-') {
             if (option[1] == 's') {
                 
@@ -154,6 +157,51 @@ int main(int argc, char **argv) {
                     }
                 }
                 
+            } else if (option[1] == 't') {
+
+                bool graphical = false;
+                if (argc > 2) {
+                    option = argv[2];
+                    if (option[0] == '-' && option[1] == 'g') {
+                        graphical = true;
+
+                        if (argc > 3) {
+                            filename = argv[3];
+                        }
+
+                    } else {
+                        filename = argv[2];
+                    }
+
+                }
+
+                if (filename != 0) {
+                    if (fileExists(filename)) {
+                        readFileContents(filename, content);
+                    } else {
+                        throw NONEXISTENT_FILE;
+                    }
+                } else {
+                    readFromConsole(content);
+                }
+
+                Scanner scanner(content);
+                Parser parser(&scanner, false);
+
+                if (graphical) {
+                    try {
+                        parser.parse();
+                    } catch (ParseException& e) {
+                        cerr << "error: " << e.getMessage() << endl;
+                    }
+                } else {
+                    try {
+                        parser.parse();
+                    } catch (ParseException& e) {
+                        cerr << "error: " << e.getMessage() << endl;
+                    }
+                }
+
             } else {
                 throw INVALID_OPTIONS;
             }
@@ -175,6 +223,6 @@ int main(int argc, char **argv) {
                 cerr << "error: file does not exist" << endl;
         }
     }
-    
+
     return 0;
 }

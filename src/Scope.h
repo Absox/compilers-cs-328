@@ -13,7 +13,7 @@
 
 class Scope {
 public:
-    Scope();
+    Scope(const std::shared_ptr<Scope>& outer = 0);
     virtual ~Scope();
 
     bool scopeContainsEntry(const std::string& identifier) const;
@@ -23,7 +23,9 @@ public:
     std::shared_ptr<Entry> getEntry(const std::string& identifier) const;
 
     std::shared_ptr<Scope> getOuter() const;
-    void setOuter(const std::shared_ptr<Scope> outer);
+    void setOuter(const std::shared_ptr<Scope>& outer);
+
+    void acceptVisitor(ScopeVisitor& visitor);
 
     static Scope* createUniverse();
 

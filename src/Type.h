@@ -16,6 +16,7 @@ public:
 
     std::string getName() const;
     virtual std::string getEntryType() const override;
+    virtual void acceptVisitor(ScopeVisitor& visitor) override;
 private:
     std::string name;
 };

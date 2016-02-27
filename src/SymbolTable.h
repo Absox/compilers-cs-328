@@ -15,6 +15,7 @@ public:
     virtual ~SymbolTable();
 
     std::shared_ptr<Scope> getCurrentScope() const;
+    void setCurrentScope(std::shared_ptr<Scope> currentScope);
 private:
     std::shared_ptr<Scope> currentScope;
 };

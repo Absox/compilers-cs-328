@@ -9,6 +9,9 @@
 #include "Parser.h"
 #include "ScannerException.h"
 
+#include <memory>
+
+using std::shared_ptr;
 using std::string;
 using std::to_string;
 
@@ -70,15 +73,17 @@ Token& Parser::nextToken() throw(ParseException) {
 }
 
 bool Parser::match(const string& type) {
-    if (currentToken.getType() == type) return true;
-    return false;
+    return currentToken.getType() == type;
 }
 
-Token& Parser::processToken(const string& type) throw(ParseException) {
+Token Parser::processToken(const string& type) throw(ParseException) {
     if (currentToken.getType() == type) {
         state = ParseState("terminal", &currentToken);
         notifyObservers();
-        return nextToken();
+
+        Token result = currentToken;
+        nextToken();
+        return result;
     } else {
         throw ParseException("Token '" + type + "' expected; actual: "
                 + currentToken.toString());
@@ -86,6 +91,9 @@ Token& Parser::processToken(const string& type) throw(ParseException) {
 }
 
 void Parser::program() throw(ParseException) {
+    shared_ptr<Scope> programScope(new Scope(symbolTable.getCurrentScope()));
+    symbolTable.setCurrentScope(programScope);
+
     setState("Program");
     indent();
     
@@ -103,8 +111,15 @@ void Parser::program() throw(ParseException) {
     }
     
     processToken("END");
-    Token endProgramName =  processToken("identifier");
+    Token endProgramName = processToken("identifier");
     processToken(".");
+
+    if (!suppressContextErrors
+        && programName.getValue() != endProgramName.getValue()) {
+        throw ParseException("Context violation: "
+                             + programName.toString() + " expected; actual: "
+                             + endProgramName.toString());
+    }
     
     if (!currentToken.isEof()) {
         throw ParseException("End of file expected, actual: "
@@ -112,10 +127,6 @@ void Parser::program() throw(ParseException) {
     }
     
     deindent();
-
-    if (!suppressContextErrors) {
-        throw ParseException("Context violation: ");
-    }
 }
 
 void Parser::declarations() throw(ParseException) {
