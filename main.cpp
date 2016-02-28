@@ -11,6 +11,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <memory>
 #include <vector>
 
 #include "Scanner.h"
@@ -26,23 +27,20 @@ using std::cin;
 using std::cerr;
 using std::endl;
 using std::vector;
+using std::unique_ptr;
+using std::shared_ptr;
 
 bool fileExists(const char* filename) {
     ifstream file(filename);
-    if (file.good()) {
-        file.close();
-        return true;
-    } else {
-        file.close();
-        return false;
-    }
+    file.close();
+    return file.good();
 }
 
 string &readFileContents(const char* filename, string& target) {
     ifstream file(filename);
 
     file.seekg(0, file.end);
-    int length = file.tellg();
+    long length = file.tellg();
     file.seekg(0, file.beg);
 
     target = string(length, ' ');
@@ -68,153 +66,118 @@ int main(int argc, char **argv) {
     const int NO_OPTIONS = 0;
     const int INVALID_OPTIONS = 1;
     const int NONEXISTENT_FILE = 2;
-    
+
+    const int SCANNER = 3;
+    const int PARSER = 4;
+    const int SYMBOL_TABLE = 5;
+
     try {
-        
+
+        int option = 0;
         char* filename = 0;
         string content;
-        
+        bool graphical = false;
+
         if (argc < 2) throw NO_OPTIONS;
-        
-        char* option = argv[1];
 
-        // TODO refactor driver code to be more DRY
-
-        if (option[0] == '-') {
-            if (option[1] == 's') {
-                
-                if (argc > 2) {
-                    filename = argv[2];
-                }
-                
-                if (filename != 0) {
-                    if (fileExists(filename)) {
-                        readFileContents(filename, content);
-                    } else {
-                        throw NONEXISTENT_FILE;
-                    }
-                } else {
-                    readFromConsole(content);
-                }
-                
-                Scanner scanner(content);
-                vector<Token> tokens = scanner.all();
-                
-                for (unsigned int c = 0; c < tokens.size(); c++) {
-                    cout << tokens[c] << endl;
-                }
-                
-            } else if (option[1] == 'c') {
-                
-                bool graphical = false;
-                
-                if (argc > 2) {
-                    option = argv[2];
-                    if (option[0] == '-' && option[1] == 'g') {
-                        graphical = true;
-                        
-                        if (argc > 3) {
-                            filename = argv[3];
-                        }
-                        
-                    } else {
-                        filename = argv[2];
-                    }
-                    
-                }
-                
-                if (filename != 0) {
-                    if (fileExists(filename)) {
-                        readFileContents(filename, content);
-                    } else {
-                        throw NONEXISTENT_FILE;
-                    }
-                } else {
-                    readFromConsole(content);
-                }
-
-                Scanner scanner(content);
-                Parser parser(&scanner);
-                if (graphical) {
-                    GraphObserver observer;
-                    parser.addObserver(&observer);
-                    
-                    try {
-                        parser.parse();
-                        cout << observer.getContent();
-                    } catch (ParseException& e) {
-                        cerr << "error: " << e.getMessage() << endl;
-                    }
-                } else {
-                    TextObserver observer;
-                    parser.addObserver(&observer);
-                    
-                    try {
-                        parser.parse();
-                        cout << observer.getContent();
-                    } catch (ParseException& e) {
-                        cerr << "error: " << e.getMessage() << endl;
-                    }
-                }
-                
-            } else if (option[1] == 't') {
-
-                bool graphical = false;
-                if (argc > 2) {
-                    option = argv[2];
-                    if (option[0] == '-' && option[1] == 'g') {
-                        graphical = true;
-
-                        if (argc > 3) {
-                            filename = argv[3];
-                        }
-
-                    } else {
-                        filename = argv[2];
-                    }
-
-                }
-
-                if (filename != 0) {
-                    if (fileExists(filename)) {
-                        readFileContents(filename, content);
-                    } else {
-                        throw NONEXISTENT_FILE;
-                    }
-                } else {
-                    readFromConsole(content);
-                }
-
-                Scanner scanner(content);
-                Parser parser(&scanner, false);
-
-                if (graphical) {
-                    try {
-                        parser.parse();
-                    } catch (ParseException& e) {
-                        cerr << "error: " << e.getMessage() << endl;
-                    }
-                } else {
-                    try {
-                        parser.parse();
-
-                        ScopeVisitor textVisitor;
-                        parser.getSymbolTable().getCurrentScope()
-                                ->acceptVisitor(textVisitor);
-                        cout << textVisitor.getContent();
-
-                    } catch (ParseException& e) {
-                        cerr << "error: " << e.getMessage() << endl;
-                    }
-                }
-
+        if (argv[1][0] == '-') {
+            if (argv[1][1] == 's') {
+                option = SCANNER;
+            } else if (argv[1][1] == 'c') {
+                option = PARSER;
+            } else if (argv[1][1] == 't') {
+                option = SYMBOL_TABLE;
             } else {
                 throw INVALID_OPTIONS;
             }
         } else {
             throw NO_OPTIONS;
         }
-        
+
+        if (argc > 2) {
+            if (argv[2][0] == '-') {
+                if (argv[2][1] == 'g' && option != SCANNER) {
+                    graphical = true;
+
+                    if (argc > 3) {
+                        filename = argv[3];
+                    }
+
+                } else {
+                    throw INVALID_OPTIONS;
+                }
+            } else {
+                filename = argv[2];
+            }
+        }
+
+        if (filename != 0) {
+            if (fileExists(filename)) {
+                readFileContents(filename, content);
+            } else {
+                throw NONEXISTENT_FILE;
+            }
+        } else {
+            readFromConsole(content);
+        }
+
+        Scanner scanner(content);
+        unique_ptr<Parser> parser;
+        vector<Token> tokens;
+
+        switch (option) {
+            case SCANNER:
+                tokens = scanner.all();
+                for (unsigned int c = 0; c < tokens.size(); c++) {
+                    cout << tokens[c] << endl;
+                }
+                break;
+            case PARSER:
+                parser = unique_ptr<Parser>(new Parser(&scanner));
+                if (graphical) {
+                    GraphObserver observer;
+                    parser->addObserver(&observer);
+
+                    try {
+                        parser->parse();
+                        cout << observer.getContent();
+                    } catch (ParseException& e) {
+                        cerr << "error: " << e.getMessage() << endl;
+                    }
+                } else {
+                    TextObserver observer;
+                    parser->addObserver(&observer);
+
+                    try {
+                        parser->parse();
+                        cout << observer.getContent();
+                    } catch (ParseException& e) {
+                        cerr << "error: " << e.getMessage() << endl;
+                    }
+                }
+                break;
+            case SYMBOL_TABLE:
+                parser = unique_ptr<Parser>(new Parser(&scanner, false));
+                if (graphical) {
+                    try {
+                        parser->parse();
+                    } catch (ParseException& e) {
+
+                    }
+                } else {
+                    try {
+                        parser->parse();
+                        ScopeVisitor visitor;
+                        parser->getSymbolTable().getCurrentScope()
+                                ->acceptVisitor(visitor);
+                        cout << visitor.getContent();
+                    } catch (ParseException& e) {
+                        cerr << "error: " << e.getMessage() << endl;
+                    }
+                }
+
+                break;
+        }
         
         
     } catch (int& e) {

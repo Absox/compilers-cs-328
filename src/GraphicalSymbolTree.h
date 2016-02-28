@@ -1,0 +1,14 @@
+//
+// Created by Ran on 2/27/2016.
+//
+
+#ifndef COMPILERS_HWK4_GRAPHICALSYMBOLTREE_H
+#define COMPILERS_HWK4_GRAPHICALSYMBOLTREE_H
+
+
+class GraphicalSymbolTree {
+
+};
+
+
+#endif //COMPILERS_HWK4_GRAPHICALSYMBOLTREE_H

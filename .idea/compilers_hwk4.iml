@@ -28,6 +28,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/GraphObserver.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Variable.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/GraphicalSymbolTree.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Record.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/GraphNode.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/TextObserver.h" isTestSource="false" />

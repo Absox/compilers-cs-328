@@ -6,9 +6,10 @@
 #define COMPILERS_HWK4_ENTRY_H
 
 #include <string>
+#include <memory>
 #include "ScopeVisitor.h"
 
-class Entry {
+class Entry : public std::enable_shared_from_this<Entry> {
 public:
     Entry();
     virtual ~Entry();
