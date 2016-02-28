@@ -164,7 +164,6 @@ int main(int argc, char **argv) {
                         parser->parse();
                         GraphicalSymbolTree treeBuilder(
                                 parser->getSymbolTable());
-
                         cout << treeBuilder.getContent();
                     } catch (ParseException& e) {
 

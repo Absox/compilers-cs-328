@@ -36,15 +36,6 @@ string GraphicalSymbolTree::getContent() {
 void GraphicalSymbolTree::buildTree(const SymbolTable &symbolTable) {
     shared_ptr<Scope> programScope = symbolTable.getCurrentScope();
     addScope(programScope);
-
-    /*
-    shared_ptr<Scope> universeScope = programScope->getOuter();
-
-    vector<string> identifiers = universeScope->getIdentifiersSorted();
-    for (unsigned int c = 0; c < identifiers.size(); c++) {
-        addEntry(universeScope->getEntry(identifiers[c]));
-    }
-     */
 }
 
 int GraphicalSymbolTree::addEntry(const shared_ptr<Entry>& entry) {
@@ -78,7 +69,7 @@ int GraphicalSymbolTree::addEntry(const shared_ptr<Entry>& entry) {
         if (dynamic_pointer_cast<Array>(entry) != 0) {
             shared_ptr<Array> array = dynamic_pointer_cast<Array>(entry);
             stream << nodeId << "[shape=rectangle style=rounded label=\""
-                << "Array\nlength: " << array->getLength() << "\"]"<< endl;
+                << "Array\\nlength: " << array->getLength() << "\"]"<< endl;
 
             if (nodeMapping.find(array->getType()) == nodeMapping.end()) {
                 addEntry(array->getType());
@@ -97,7 +88,6 @@ int GraphicalSymbolTree::addEntry(const shared_ptr<Entry>& entry) {
             stream << nodeId << "[shape=rectangle style=rounded label=\""
                 << type->getName() << "\"]" << endl;
         }
-
     }
 
     return nodeId;
