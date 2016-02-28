@@ -35,12 +35,16 @@ string GraphicalSymbolTree::getContent() {
 
 void GraphicalSymbolTree::buildTree(const SymbolTable &symbolTable) {
     shared_ptr<Scope> programScope = symbolTable.getCurrentScope();
+    addScope(programScope);
+
+    /*
     shared_ptr<Scope> universeScope = programScope->getOuter();
 
     vector<string> identifiers = universeScope->getIdentifiersSorted();
     for (unsigned int c = 0; c < identifiers.size(); c++) {
         addEntry(universeScope->getEntry(identifiers[c]));
     }
+     */
 }
 
 int GraphicalSymbolTree::addEntry(const shared_ptr<Entry>& entry) {
@@ -51,7 +55,7 @@ int GraphicalSymbolTree::addEntry(const shared_ptr<Entry>& entry) {
         // Create new constant object : diamond
         shared_ptr<Constant> constant = dynamic_pointer_cast<Constant>(entry);
         stream << nodeId << "[shape=diamond, label=\"" << constant->getValue()
-            << "\"" << endl;
+            << "\"]" << endl;
 
         if (nodeMapping.find(constant->getType()) == nodeMapping.end()) {
             addEntry(constant->getType());
@@ -73,7 +77,7 @@ int GraphicalSymbolTree::addEntry(const shared_ptr<Entry>& entry) {
         // Now, we have to check if we're an array, record, or just a type.
         if (dynamic_pointer_cast<Array>(entry) != 0) {
             shared_ptr<Array> array = dynamic_pointer_cast<Array>(entry);
-            stream << nodeId << "[shape=rectangle style=rounded label=\"
+            stream << nodeId << "[shape=rectangle style=rounded label=\""
                 << "Array\nlength: " << array->getLength() << "\"]"<< endl;
 
             if (nodeMapping.find(array->getType()) == nodeMapping.end()) {
@@ -82,15 +86,52 @@ int GraphicalSymbolTree::addEntry(const shared_ptr<Entry>& entry) {
             stream << nodeId << " -> " << nodeMapping[array->getType()] << endl;
 
         } else if (dynamic_pointer_cast<Record>(entry) != 0) {
+            shared_ptr<Record> record = dynamic_pointer_cast<Record>(entry);
+            stream << nodeId << "[shape=rectangle style=rounded label=\""
+                << "Record" << "\"]";
+            int scopeNodeId = addScope(record->getScope());
+            stream << nodeId << " -> " << scopeNodeId << endl;
 
         } else {
             shared_ptr<Type> type = dynamic_pointer_cast<Type>(entry);
             stream << nodeId << "[shape=rectangle style=rounded label=\""
                 << type->getName() << "\"]" << endl;
-
         }
 
     }
 
     return nodeId;
+}
+
+int GraphicalSymbolTree::addScope(const shared_ptr<Scope>& scope) {
+    int scopeClusterId = clusterCounter++;
+    int scopeNodeId = nodeCounter++;
+    stream << "subgraph cluster" << scopeClusterId << " {" << endl;
+    stream << "shape=rectangle" << endl;
+    stream << "node[style=filled color=white]" << endl;
+    stream << scopeNodeId << "[label=\"\"]" << endl;
+
+    vector<string> identifiers = scope->getIdentifiersSorted();
+    for (unsigned int c = 0; c < identifiers.size(); c++) {
+        int currentNodeId = nodeCounter++;
+        stream << currentNodeId << "[label=\"" << identifiers[c] << "\"]"
+            << endl;
+    }
+
+    stream << "{" << endl << "rank=same" << endl;
+    for (unsigned int c = 0; c < identifiers.size(); c++) {
+        stream << scopeNodeId + c << " -> " << scopeNodeId + c + 1
+            << "[style=invis]" << endl;
+    }
+    stream << "}" << endl;
+    stream << "}" << endl;
+
+    for (unsigned int c = 0; c < identifiers.size(); c++) {
+        shared_ptr<Entry> entry = scope->getEntry(identifiers[c]);
+        if (nodeMapping.find(entry) == nodeMapping.end()) {
+            addEntry(entry);
+        }
+        stream << scopeNodeId + 1 + c << " -> " << nodeMapping[entry] << endl;
+    }
+    return scopeNodeId;
 }
