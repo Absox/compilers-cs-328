@@ -46,3 +46,7 @@ void Constant::acceptVisitor(ScopeVisitor &visitor) {
     visitor.deindent();
     visitor.writeWithIndent("END CONST");
 }
+
+std::shared_ptr<Type> Constant::getType() const {
+    return type;
+}

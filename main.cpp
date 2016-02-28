@@ -13,6 +13,7 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <GraphicalSymbolTree.h>
 
 #include "Scanner.h"
 #include "Parser.h"
@@ -161,6 +162,10 @@ int main(int argc, char **argv) {
                 if (graphical) {
                     try {
                         parser->parse();
+                        GraphicalSymbolTree treeBuilder(
+                                parser->getSymbolTable());
+
+                        cout << treeBuilder.getContent();
                     } catch (ParseException& e) {
 
                     }

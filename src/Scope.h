@@ -20,8 +20,10 @@ public:
     bool scopeContainsEntry(const std::string& identifier) const;
     bool containsEntry(const std::string& identifier) const;
 
-    void addEntry(const std::string& identifier, const std::shared_ptr<Entry>& entry);
+    void addEntry(const std::string& identifier,
+                  const std::shared_ptr<Entry>& entry);
     std::shared_ptr<Entry> getEntry(const std::string& identifier) const;
+    std::shared_ptr<Entry> getEntryInScope(const std::string& identifier) const;
 
     std::shared_ptr<Scope> getOuter() const;
     void setOuter(const std::shared_ptr<Scope>& outer);

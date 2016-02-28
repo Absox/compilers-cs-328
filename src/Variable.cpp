@@ -29,3 +29,7 @@ void Variable::acceptVisitor(ScopeVisitor &visitor) {
     visitor.deindent();
     visitor.writeWithIndent("END VAR");
 }
+
+std::shared_ptr<Type> Variable::getType() {
+    return type;
+}

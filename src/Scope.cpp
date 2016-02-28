@@ -54,6 +54,14 @@ std::shared_ptr<Entry> Scope::getEntry(const string &identifier) const {
     }
 }
 
+std::shared_ptr<Entry> Scope::getEntryInScope(const string& identifier) const {
+    if (scopeContainsEntry(identifier)) {
+        return identifiers.at(identifier);
+    } else {
+        return 0;
+    }
+}
+
 std::shared_ptr<Scope> Scope::getOuter() const {
     return outer;
 }

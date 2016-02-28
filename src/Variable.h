@@ -17,6 +17,7 @@ public:
 
     virtual std::string getEntryType() const;
     virtual void acceptVisitor(ScopeVisitor& visitor) override;
+    std::shared_ptr<Type> getType();
 
 private:
     std::shared_ptr<Type> type;
