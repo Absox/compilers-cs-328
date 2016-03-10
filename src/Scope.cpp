@@ -83,7 +83,7 @@ void Scope::acceptVisitor(ScopeVisitor &visitor) {
     vector<string> sortedIdentifiers = getIdentifiersSorted();
     for (unsigned int c = 0; c < sortedIdentifiers.size(); c++) {
 
-        visitor.writeWithIndent(sortedIdentifiers[c] + "=>");
+        visitor.writeWithIndent(sortedIdentifiers[c] + " =>");
         visitor.indent();
         shared_ptr<Entry> currentEntry = identifiers[sortedIdentifiers[c]];
         currentEntry->acceptVisitor(visitor);

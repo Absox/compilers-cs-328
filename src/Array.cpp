@@ -37,7 +37,7 @@ void Array::acceptVisitor(ScopeVisitor &visitor) {
     type->acceptVisitor(visitor);
     visitor.deindent();
 
-    visitor.writeWithIndent("length");
+    visitor.writeWithIndent("length:");
     visitor.indent();
     visitor.writeWithIndent(to_string(length));
     visitor.deindent();
