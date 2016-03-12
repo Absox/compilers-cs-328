@@ -1,28 +1,3 @@
-600.328 Compilers & Intepreters, Homework 4
+600.328 Compilers & Intepreters, Homework 5
 Ran Liu (rliu14@jhu.edu)
 
-Smart pointers help us out a lot here, saving a lot of time and effort.
-Hard to say which pointers are single-instance and which are shared, so
-we use all shared_ptr. Better safe than sorry.
-
-C++ polymorphism is rather less convenient than Java, at least in the method
-by which you conduct type-checking, and cast pointers from base classes to
-derived classes. At the very least, the mechanisms by which we cast and
-check types are a little bit more verbose.
-
-I added a flag within the parser, suppressContextErrors. That way,
-when the program is run with the -c option, context errors from the symbol
-tree builder aren't thrown. Though this ultimately turned out to not be
-necessary, the reply came after I'd already implemented it.
-
-I don't think I quite implemented the Visitor pattern the way it's described.
-Rather than making use of double-dispatching, I wrote a virtual function in
-my abstract Entry class, virtual void acceptVisitor(ScopeVisitor& visitor)-
-The ScopeVisitor object itself would keep track of indents, but the entry
-would write text to the visitor object; because the function was virtual,
-I could override its behavior for each derived type.
-
-The "no directories" rule for submissions is slightly annoying. In my
-development environment, I have a project directory structure that separates
-source and test files. I also use CMake. For the purposes of this submission,
-I've copied all my files into one directory and written a Makefile.

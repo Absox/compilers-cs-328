@@ -1,4 +1,4 @@
-project(compilers4_lib)
+project(compilers5_lib)
 add_definitions(-std=c++11)
 
 set(SOURCE_FILES
@@ -22,6 +22,8 @@ set(SOURCE_FILES
         SymbolTable.cpp
         ScopeVisitor.cpp
         GraphicalSymbolTree.cpp
+        AbstractSyntaxTreeNode.cpp
+        AbstractSyntaxTree.cpp
 )
 
 set(HEADER_FILES
@@ -45,6 +47,8 @@ set(HEADER_FILES
         SymbolTable.h
         ScopeVisitor.h
         GraphicalSymbolTree.h
+        AbstractSyntaxTreeNode.h
+        AbstractSyntaxTree.h
 )
 
-add_library(compilers4_lib STATIC ${SOURCE_FILES} ${HEADER_FILES})
+add_library(compilers5_lib STATIC ${SOURCE_FILES} ${HEADER_FILES})

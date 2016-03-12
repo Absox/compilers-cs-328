@@ -582,6 +582,10 @@ SymbolTable &Parser::getSymbolTable() {
     return symbolTable;
 }
 
+AbstractSyntaxTree &Parser::getAbstractSyntaxTree() {
+    return ast;
+}
+
 std::shared_ptr<Type> Parser::findType(const string& identifier) {
     return dynamic_pointer_cast<Type>(
             symbolTable.getCurrentScope()->getEntry(identifier));

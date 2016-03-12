@@ -20,6 +20,7 @@
 #include "Token.h"
 #include "SymbolTable.h"
 #include "Type.h"
+#include "AbstractSyntaxTree.h"
 
 class Observer;
 
@@ -36,10 +37,12 @@ public:
     unsigned int getIndentLevel() const;
 
     SymbolTable& getSymbolTable();
+    AbstractSyntaxTree& getAbstractSyntaxTree();
     
 private:
     bool suppressContextErrors;
     SymbolTable symbolTable;
+    AbstractSyntaxTree ast;
 
     ParseState state;
     Token currentToken;

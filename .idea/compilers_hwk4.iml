@@ -4,26 +4,28 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src/ScannerException.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/SymbolTable.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/Entry.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Token.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Constant.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Observer.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/GraphObserver.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/Scanner.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/AbstractSyntaxTreeNode.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Variable.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/ParseException.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/GraphNode.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/AbstractSyntaxTree.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Scanner.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Constant.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Parser.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Type.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Array.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/AbstractSyntaxTreeNode.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Type.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Parser.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Scope.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/ParseException.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/TextObserver.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/ScopeVisitor.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/TextObserver.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Entry.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Scanner.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/ScannerException.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/CMakeLists.txt" isTestSource="false" />
@@ -32,11 +34,13 @@
       <sourceFolder url="file://$MODULE_DIR$/src/GraphicalSymbolTree.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Record.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/GraphNode.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/SymbolTable.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/TextObserver.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/ParseState.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/AbstractSyntaxTree.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Token.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/ParseState.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Observer.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/SymbolTable.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Array.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Scope.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/ScopeVisitor.h" isTestSource="false" />
