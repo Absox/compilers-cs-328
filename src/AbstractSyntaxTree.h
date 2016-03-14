@@ -7,8 +7,9 @@
 #define COMPILERS_HWK5_ABSTRACTSYNTAXTREE_H
 
 #include <memory>
+#include <vector>
 
-#include "AbstractSyntaxTreeNode.h"
+#include "Instruction.h"
 
 class AbstractSyntaxTree {
 public:
@@ -16,7 +17,7 @@ public:
     virtual ~AbstractSyntaxTree();
 
 private:
-    std::shared_ptr<AbstractSyntaxTreeNode> root;
+    std::vector<std::shared_ptr<Instruction>> instructions;
 };
 
 

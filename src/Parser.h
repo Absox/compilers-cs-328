@@ -38,7 +38,7 @@ public:
 
     SymbolTable& getSymbolTable();
     AbstractSyntaxTree& getAbstractSyntaxTree();
-    
+
 private:
     bool suppressContextErrors;
     SymbolTable symbolTable;

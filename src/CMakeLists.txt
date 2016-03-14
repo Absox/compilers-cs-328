@@ -24,7 +24,15 @@ set(SOURCE_FILES
         GraphicalSymbolTree.cpp
         AbstractSyntaxTreeNode.cpp
         AbstractSyntaxTree.cpp
-)
+        Instruction.cpp
+        Expression.cpp
+        Condition.cpp
+        Assign.cpp
+        IfInstruction.cpp
+        Repeat.cpp
+        Location.cpp
+        Read.cpp
+        Write.cpp)
 
 set(HEADER_FILES
         Array.h
@@ -49,6 +57,14 @@ set(HEADER_FILES
         GraphicalSymbolTree.h
         AbstractSyntaxTreeNode.h
         AbstractSyntaxTree.h
-)
+        Instruction.h
+        Expression.h
+        Condition.h
+        Assign.h
+        IfInstruction.h
+        Repeat.h
+        Location.h
+        Read.h
+        Write.h)
 
 add_library(compilers5_lib STATIC ${SOURCE_FILES} ${HEADER_FILES})
