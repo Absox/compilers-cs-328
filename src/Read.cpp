@@ -3,3 +3,15 @@
 //
 
 #include "Read.h"
+
+Read::Read() {
+
+}
+
+Read::~Read() {
+
+}
+
+std::string Read::getType() {
+    return "Read";
+}

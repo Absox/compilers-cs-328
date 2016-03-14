@@ -3,3 +3,15 @@
 //
 
 #include "Repeat.h"
+
+Repeat::Repeat() {
+
+}
+
+Repeat::~Repeat() {
+
+}
+
+std::string Repeat::getType() {
+    return "Repeat";
+}

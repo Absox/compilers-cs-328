@@ -9,6 +9,12 @@
 #include "Instruction.h"
 
 class Read : public Instruction {
+public:
+    Read();
+    virtual ~Read();
+    virtual std::string getType();
+private:
+    std::shared_ptr<Expression> expression;
 
 };
 

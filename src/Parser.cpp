@@ -21,10 +21,12 @@ using std::to_string;
 using std::vector;
 using std::dynamic_pointer_cast;
 
-Parser::Parser(Scanner* scanner, const bool& suppressContextErrors)
+Parser::Parser(Scanner* scanner, const bool& suppressContextErrors,
+               const bool& suppressAbstractSyntaxErrors)
         : state("init"), currentToken("", "", 0, 0) {
     this->scanner = scanner;
     this->suppressContextErrors = suppressContextErrors;
+    this->suppressAbstractSyntaxErrors = suppressAbstractSyntaxErrors;
     indentLevel = 0;
 }
 

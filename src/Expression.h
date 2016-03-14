@@ -8,6 +8,10 @@
 #include "AbstractSyntaxTreeNode.h"
 
 class Expression : public AbstractSyntaxTreeNode {
+public:
+    Expression();
+    virtual ~Expression();
+    virtual std::string getType() = 0;
 
 };
 

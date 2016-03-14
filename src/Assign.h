@@ -7,12 +7,16 @@
 
 
 #include "Instruction.h"
+#include "Location.h"
 
 class Assign : public Instruction {
 public:
     Assign();
     virtual ~Assign();
     virtual std::string getType();
+private:
+    std::shared_ptr<Location> location;
+    std::shared_ptr<Expression> expression;
 };
 
 

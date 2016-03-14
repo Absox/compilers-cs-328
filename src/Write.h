@@ -6,7 +6,15 @@
 #define COMPILERS_HWK5_WRITE_H
 
 
+#include "Instruction.h"
+
 class Write : public Instruction {
+public:
+    Write();
+    virtual ~Write();
+    virtual std::string getType();
+private:
+    std::shared_ptr<Expression> expression;
 
 };
 

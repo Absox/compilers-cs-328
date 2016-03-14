@@ -26,7 +26,8 @@ class Observer;
 
 class Parser {
 public:
-    Parser(Scanner* scanner, const bool& suppressContextErrors = true);
+    Parser(Scanner* scanner, const bool& suppressContextErrors = true,
+           const bool& suppressAbstractSyntaxErrors = true);
     virtual ~Parser();
     
     void parse() throw(ParseException);
@@ -41,6 +42,7 @@ public:
 
 private:
     bool suppressContextErrors;
+    bool suppressAbstractSyntaxErrors;
     SymbolTable symbolTable;
     AbstractSyntaxTree ast;
 
