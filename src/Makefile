@@ -42,10 +42,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /media/sf_workspace/compilers_hwk4
+CMAKE_SOURCE_DIR = /media/sf_workspace/compilers_hwk5
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /media/sf_workspace/compilers_hwk4
+CMAKE_BINARY_DIR = /media/sf_workspace/compilers_hwk5
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -62,8 +62,8 @@ install/strip/fast: install/strip
 
 # Special rule for the target edit_cache
 edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
-	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
+	/usr/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -113,14 +113,14 @@ install/local/fast: install/local
 
 # The main all target
 all: cmake_check_build_system
-	cd /media/sf_workspace/compilers_hwk4 && $(CMAKE_COMMAND) -E cmake_progress_start /media/sf_workspace/compilers_hwk4/CMakeFiles /media/sf_workspace/compilers_hwk4/src/CMakeFiles/progress.marks
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f CMakeFiles/Makefile2 src/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /media/sf_workspace/compilers_hwk4/CMakeFiles 0
+	cd /media/sf_workspace/compilers_hwk5 && $(CMAKE_COMMAND) -E cmake_progress_start /media/sf_workspace/compilers_hwk5/CMakeFiles /media/sf_workspace/compilers_hwk5/src/CMakeFiles/progress.marks
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f CMakeFiles/Makefile2 src/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /media/sf_workspace/compilers_hwk5/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f CMakeFiles/Makefile2 src/clean
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f CMakeFiles/Makefile2 src/clean
 .PHONY : clean
 
 # The main clean target
@@ -129,39 +129,87 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f CMakeFiles/Makefile2 src/preinstall
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f CMakeFiles/Makefile2 src/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f CMakeFiles/Makefile2 src/preinstall
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f CMakeFiles/Makefile2 src/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /media/sf_workspace/compilers_hwk4 && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /media/sf_workspace/compilers_hwk5 && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
-src/CMakeFiles/compilers4_lib.dir/rule:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f CMakeFiles/Makefile2 src/CMakeFiles/compilers4_lib.dir/rule
-.PHONY : src/CMakeFiles/compilers4_lib.dir/rule
+src/CMakeFiles/compilers5_lib.dir/rule:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f CMakeFiles/Makefile2 src/CMakeFiles/compilers5_lib.dir/rule
+.PHONY : src/CMakeFiles/compilers5_lib.dir/rule
 
 # Convenience name for target.
-compilers4_lib: src/CMakeFiles/compilers4_lib.dir/rule
-.PHONY : compilers4_lib
+compilers5_lib: src/CMakeFiles/compilers5_lib.dir/rule
+.PHONY : compilers5_lib
 
 # fast build rule for target.
-compilers4_lib/fast:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/build
-.PHONY : compilers4_lib/fast
+compilers5_lib/fast:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/build
+.PHONY : compilers5_lib/fast
+
+AbstractSyntaxTree.o: AbstractSyntaxTree.cpp.o
+.PHONY : AbstractSyntaxTree.o
+
+# target to build an object file
+AbstractSyntaxTree.cpp.o:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/AbstractSyntaxTree.cpp.o
+.PHONY : AbstractSyntaxTree.cpp.o
+
+AbstractSyntaxTree.i: AbstractSyntaxTree.cpp.i
+.PHONY : AbstractSyntaxTree.i
+
+# target to preprocess a source file
+AbstractSyntaxTree.cpp.i:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/AbstractSyntaxTree.cpp.i
+.PHONY : AbstractSyntaxTree.cpp.i
+
+AbstractSyntaxTree.s: AbstractSyntaxTree.cpp.s
+.PHONY : AbstractSyntaxTree.s
+
+# target to generate assembly for a file
+AbstractSyntaxTree.cpp.s:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/AbstractSyntaxTree.cpp.s
+.PHONY : AbstractSyntaxTree.cpp.s
+
+AbstractSyntaxTreeNode.o: AbstractSyntaxTreeNode.cpp.o
+.PHONY : AbstractSyntaxTreeNode.o
+
+# target to build an object file
+AbstractSyntaxTreeNode.cpp.o:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/AbstractSyntaxTreeNode.cpp.o
+.PHONY : AbstractSyntaxTreeNode.cpp.o
+
+AbstractSyntaxTreeNode.i: AbstractSyntaxTreeNode.cpp.i
+.PHONY : AbstractSyntaxTreeNode.i
+
+# target to preprocess a source file
+AbstractSyntaxTreeNode.cpp.i:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/AbstractSyntaxTreeNode.cpp.i
+.PHONY : AbstractSyntaxTreeNode.cpp.i
+
+AbstractSyntaxTreeNode.s: AbstractSyntaxTreeNode.cpp.s
+.PHONY : AbstractSyntaxTreeNode.s
+
+# target to generate assembly for a file
+AbstractSyntaxTreeNode.cpp.s:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/AbstractSyntaxTreeNode.cpp.s
+.PHONY : AbstractSyntaxTreeNode.cpp.s
 
 Array.o: Array.cpp.o
 .PHONY : Array.o
 
 # target to build an object file
 Array.cpp.o:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Array.cpp.o
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Array.cpp.o
 .PHONY : Array.cpp.o
 
 Array.i: Array.cpp.i
@@ -169,7 +217,7 @@ Array.i: Array.cpp.i
 
 # target to preprocess a source file
 Array.cpp.i:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Array.cpp.i
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Array.cpp.i
 .PHONY : Array.cpp.i
 
 Array.s: Array.cpp.s
@@ -177,15 +225,87 @@ Array.s: Array.cpp.s
 
 # target to generate assembly for a file
 Array.cpp.s:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Array.cpp.s
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Array.cpp.s
 .PHONY : Array.cpp.s
+
+Assign.o: Assign.cpp.o
+.PHONY : Assign.o
+
+# target to build an object file
+Assign.cpp.o:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Assign.cpp.o
+.PHONY : Assign.cpp.o
+
+Assign.i: Assign.cpp.i
+.PHONY : Assign.i
+
+# target to preprocess a source file
+Assign.cpp.i:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Assign.cpp.i
+.PHONY : Assign.cpp.i
+
+Assign.s: Assign.cpp.s
+.PHONY : Assign.s
+
+# target to generate assembly for a file
+Assign.cpp.s:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Assign.cpp.s
+.PHONY : Assign.cpp.s
+
+BinaryExpression.o: BinaryExpression.cpp.o
+.PHONY : BinaryExpression.o
+
+# target to build an object file
+BinaryExpression.cpp.o:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/BinaryExpression.cpp.o
+.PHONY : BinaryExpression.cpp.o
+
+BinaryExpression.i: BinaryExpression.cpp.i
+.PHONY : BinaryExpression.i
+
+# target to preprocess a source file
+BinaryExpression.cpp.i:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/BinaryExpression.cpp.i
+.PHONY : BinaryExpression.cpp.i
+
+BinaryExpression.s: BinaryExpression.cpp.s
+.PHONY : BinaryExpression.s
+
+# target to generate assembly for a file
+BinaryExpression.cpp.s:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/BinaryExpression.cpp.s
+.PHONY : BinaryExpression.cpp.s
+
+Condition.o: Condition.cpp.o
+.PHONY : Condition.o
+
+# target to build an object file
+Condition.cpp.o:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Condition.cpp.o
+.PHONY : Condition.cpp.o
+
+Condition.i: Condition.cpp.i
+.PHONY : Condition.i
+
+# target to preprocess a source file
+Condition.cpp.i:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Condition.cpp.i
+.PHONY : Condition.cpp.i
+
+Condition.s: Condition.cpp.s
+.PHONY : Condition.s
+
+# target to generate assembly for a file
+Condition.cpp.s:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Condition.cpp.s
+.PHONY : Condition.cpp.s
 
 Constant.o: Constant.cpp.o
 .PHONY : Constant.o
 
 # target to build an object file
 Constant.cpp.o:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Constant.cpp.o
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Constant.cpp.o
 .PHONY : Constant.cpp.o
 
 Constant.i: Constant.cpp.i
@@ -193,7 +313,7 @@ Constant.i: Constant.cpp.i
 
 # target to preprocess a source file
 Constant.cpp.i:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Constant.cpp.i
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Constant.cpp.i
 .PHONY : Constant.cpp.i
 
 Constant.s: Constant.cpp.s
@@ -201,7 +321,7 @@ Constant.s: Constant.cpp.s
 
 # target to generate assembly for a file
 Constant.cpp.s:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Constant.cpp.s
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Constant.cpp.s
 .PHONY : Constant.cpp.s
 
 Entry.o: Entry.cpp.o
@@ -209,7 +329,7 @@ Entry.o: Entry.cpp.o
 
 # target to build an object file
 Entry.cpp.o:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Entry.cpp.o
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Entry.cpp.o
 .PHONY : Entry.cpp.o
 
 Entry.i: Entry.cpp.i
@@ -217,7 +337,7 @@ Entry.i: Entry.cpp.i
 
 # target to preprocess a source file
 Entry.cpp.i:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Entry.cpp.i
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Entry.cpp.i
 .PHONY : Entry.cpp.i
 
 Entry.s: Entry.cpp.s
@@ -225,39 +345,39 @@ Entry.s: Entry.cpp.s
 
 # target to generate assembly for a file
 Entry.cpp.s:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Entry.cpp.s
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Entry.cpp.s
 .PHONY : Entry.cpp.s
 
-Field.o: Field.cpp.o
-.PHONY : Field.o
+Expression.o: Expression.cpp.o
+.PHONY : Expression.o
 
 # target to build an object file
-Field.cpp.o:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Field.cpp.o
-.PHONY : Field.cpp.o
+Expression.cpp.o:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Expression.cpp.o
+.PHONY : Expression.cpp.o
 
-Field.i: Field.cpp.i
-.PHONY : Field.i
+Expression.i: Expression.cpp.i
+.PHONY : Expression.i
 
 # target to preprocess a source file
-Field.cpp.i:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Field.cpp.i
-.PHONY : Field.cpp.i
+Expression.cpp.i:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Expression.cpp.i
+.PHONY : Expression.cpp.i
 
-Field.s: Field.cpp.s
-.PHONY : Field.s
+Expression.s: Expression.cpp.s
+.PHONY : Expression.s
 
 # target to generate assembly for a file
-Field.cpp.s:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Field.cpp.s
-.PHONY : Field.cpp.s
+Expression.cpp.s:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Expression.cpp.s
+.PHONY : Expression.cpp.s
 
 GraphNode.o: GraphNode.cpp.o
 .PHONY : GraphNode.o
 
 # target to build an object file
 GraphNode.cpp.o:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/GraphNode.cpp.o
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/GraphNode.cpp.o
 .PHONY : GraphNode.cpp.o
 
 GraphNode.i: GraphNode.cpp.i
@@ -265,7 +385,7 @@ GraphNode.i: GraphNode.cpp.i
 
 # target to preprocess a source file
 GraphNode.cpp.i:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/GraphNode.cpp.i
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/GraphNode.cpp.i
 .PHONY : GraphNode.cpp.i
 
 GraphNode.s: GraphNode.cpp.s
@@ -273,7 +393,7 @@ GraphNode.s: GraphNode.cpp.s
 
 # target to generate assembly for a file
 GraphNode.cpp.s:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/GraphNode.cpp.s
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/GraphNode.cpp.s
 .PHONY : GraphNode.cpp.s
 
 GraphObserver.o: GraphObserver.cpp.o
@@ -281,7 +401,7 @@ GraphObserver.o: GraphObserver.cpp.o
 
 # target to build an object file
 GraphObserver.cpp.o:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/GraphObserver.cpp.o
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/GraphObserver.cpp.o
 .PHONY : GraphObserver.cpp.o
 
 GraphObserver.i: GraphObserver.cpp.i
@@ -289,7 +409,7 @@ GraphObserver.i: GraphObserver.cpp.i
 
 # target to preprocess a source file
 GraphObserver.cpp.i:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/GraphObserver.cpp.i
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/GraphObserver.cpp.i
 .PHONY : GraphObserver.cpp.i
 
 GraphObserver.s: GraphObserver.cpp.s
@@ -297,15 +417,135 @@ GraphObserver.s: GraphObserver.cpp.s
 
 # target to generate assembly for a file
 GraphObserver.cpp.s:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/GraphObserver.cpp.s
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/GraphObserver.cpp.s
 .PHONY : GraphObserver.cpp.s
+
+GraphicalSymbolTree.o: GraphicalSymbolTree.cpp.o
+.PHONY : GraphicalSymbolTree.o
+
+# target to build an object file
+GraphicalSymbolTree.cpp.o:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/GraphicalSymbolTree.cpp.o
+.PHONY : GraphicalSymbolTree.cpp.o
+
+GraphicalSymbolTree.i: GraphicalSymbolTree.cpp.i
+.PHONY : GraphicalSymbolTree.i
+
+# target to preprocess a source file
+GraphicalSymbolTree.cpp.i:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/GraphicalSymbolTree.cpp.i
+.PHONY : GraphicalSymbolTree.cpp.i
+
+GraphicalSymbolTree.s: GraphicalSymbolTree.cpp.s
+.PHONY : GraphicalSymbolTree.s
+
+# target to generate assembly for a file
+GraphicalSymbolTree.cpp.s:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/GraphicalSymbolTree.cpp.s
+.PHONY : GraphicalSymbolTree.cpp.s
+
+IfInstruction.o: IfInstruction.cpp.o
+.PHONY : IfInstruction.o
+
+# target to build an object file
+IfInstruction.cpp.o:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/IfInstruction.cpp.o
+.PHONY : IfInstruction.cpp.o
+
+IfInstruction.i: IfInstruction.cpp.i
+.PHONY : IfInstruction.i
+
+# target to preprocess a source file
+IfInstruction.cpp.i:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/IfInstruction.cpp.i
+.PHONY : IfInstruction.cpp.i
+
+IfInstruction.s: IfInstruction.cpp.s
+.PHONY : IfInstruction.s
+
+# target to generate assembly for a file
+IfInstruction.cpp.s:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/IfInstruction.cpp.s
+.PHONY : IfInstruction.cpp.s
+
+Instruction.o: Instruction.cpp.o
+.PHONY : Instruction.o
+
+# target to build an object file
+Instruction.cpp.o:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Instruction.cpp.o
+.PHONY : Instruction.cpp.o
+
+Instruction.i: Instruction.cpp.i
+.PHONY : Instruction.i
+
+# target to preprocess a source file
+Instruction.cpp.i:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Instruction.cpp.i
+.PHONY : Instruction.cpp.i
+
+Instruction.s: Instruction.cpp.s
+.PHONY : Instruction.s
+
+# target to generate assembly for a file
+Instruction.cpp.s:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Instruction.cpp.s
+.PHONY : Instruction.cpp.s
+
+Location.o: Location.cpp.o
+.PHONY : Location.o
+
+# target to build an object file
+Location.cpp.o:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Location.cpp.o
+.PHONY : Location.cpp.o
+
+Location.i: Location.cpp.i
+.PHONY : Location.i
+
+# target to preprocess a source file
+Location.cpp.i:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Location.cpp.i
+.PHONY : Location.cpp.i
+
+Location.s: Location.cpp.s
+.PHONY : Location.s
+
+# target to generate assembly for a file
+Location.cpp.s:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Location.cpp.s
+.PHONY : Location.cpp.s
+
+NumberExpression.o: NumberExpression.cpp.o
+.PHONY : NumberExpression.o
+
+# target to build an object file
+NumberExpression.cpp.o:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/NumberExpression.cpp.o
+.PHONY : NumberExpression.cpp.o
+
+NumberExpression.i: NumberExpression.cpp.i
+.PHONY : NumberExpression.i
+
+# target to preprocess a source file
+NumberExpression.cpp.i:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/NumberExpression.cpp.i
+.PHONY : NumberExpression.cpp.i
+
+NumberExpression.s: NumberExpression.cpp.s
+.PHONY : NumberExpression.s
+
+# target to generate assembly for a file
+NumberExpression.cpp.s:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/NumberExpression.cpp.s
+.PHONY : NumberExpression.cpp.s
 
 Observer.o: Observer.cpp.o
 .PHONY : Observer.o
 
 # target to build an object file
 Observer.cpp.o:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Observer.cpp.o
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Observer.cpp.o
 .PHONY : Observer.cpp.o
 
 Observer.i: Observer.cpp.i
@@ -313,7 +553,7 @@ Observer.i: Observer.cpp.i
 
 # target to preprocess a source file
 Observer.cpp.i:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Observer.cpp.i
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Observer.cpp.i
 .PHONY : Observer.cpp.i
 
 Observer.s: Observer.cpp.s
@@ -321,7 +561,7 @@ Observer.s: Observer.cpp.s
 
 # target to generate assembly for a file
 Observer.cpp.s:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Observer.cpp.s
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Observer.cpp.s
 .PHONY : Observer.cpp.s
 
 ParseException.o: ParseException.cpp.o
@@ -329,7 +569,7 @@ ParseException.o: ParseException.cpp.o
 
 # target to build an object file
 ParseException.cpp.o:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/ParseException.cpp.o
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/ParseException.cpp.o
 .PHONY : ParseException.cpp.o
 
 ParseException.i: ParseException.cpp.i
@@ -337,7 +577,7 @@ ParseException.i: ParseException.cpp.i
 
 # target to preprocess a source file
 ParseException.cpp.i:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/ParseException.cpp.i
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/ParseException.cpp.i
 .PHONY : ParseException.cpp.i
 
 ParseException.s: ParseException.cpp.s
@@ -345,7 +585,7 @@ ParseException.s: ParseException.cpp.s
 
 # target to generate assembly for a file
 ParseException.cpp.s:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/ParseException.cpp.s
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/ParseException.cpp.s
 .PHONY : ParseException.cpp.s
 
 ParseState.o: ParseState.cpp.o
@@ -353,7 +593,7 @@ ParseState.o: ParseState.cpp.o
 
 # target to build an object file
 ParseState.cpp.o:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/ParseState.cpp.o
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/ParseState.cpp.o
 .PHONY : ParseState.cpp.o
 
 ParseState.i: ParseState.cpp.i
@@ -361,7 +601,7 @@ ParseState.i: ParseState.cpp.i
 
 # target to preprocess a source file
 ParseState.cpp.i:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/ParseState.cpp.i
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/ParseState.cpp.i
 .PHONY : ParseState.cpp.i
 
 ParseState.s: ParseState.cpp.s
@@ -369,7 +609,7 @@ ParseState.s: ParseState.cpp.s
 
 # target to generate assembly for a file
 ParseState.cpp.s:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/ParseState.cpp.s
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/ParseState.cpp.s
 .PHONY : ParseState.cpp.s
 
 Parser.o: Parser.cpp.o
@@ -377,7 +617,7 @@ Parser.o: Parser.cpp.o
 
 # target to build an object file
 Parser.cpp.o:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Parser.cpp.o
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Parser.cpp.o
 .PHONY : Parser.cpp.o
 
 Parser.i: Parser.cpp.i
@@ -385,7 +625,7 @@ Parser.i: Parser.cpp.i
 
 # target to preprocess a source file
 Parser.cpp.i:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Parser.cpp.i
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Parser.cpp.i
 .PHONY : Parser.cpp.i
 
 Parser.s: Parser.cpp.s
@@ -393,15 +633,39 @@ Parser.s: Parser.cpp.s
 
 # target to generate assembly for a file
 Parser.cpp.s:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Parser.cpp.s
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Parser.cpp.s
 .PHONY : Parser.cpp.s
+
+Read.o: Read.cpp.o
+.PHONY : Read.o
+
+# target to build an object file
+Read.cpp.o:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Read.cpp.o
+.PHONY : Read.cpp.o
+
+Read.i: Read.cpp.i
+.PHONY : Read.i
+
+# target to preprocess a source file
+Read.cpp.i:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Read.cpp.i
+.PHONY : Read.cpp.i
+
+Read.s: Read.cpp.s
+.PHONY : Read.s
+
+# target to generate assembly for a file
+Read.cpp.s:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Read.cpp.s
+.PHONY : Read.cpp.s
 
 Record.o: Record.cpp.o
 .PHONY : Record.o
 
 # target to build an object file
 Record.cpp.o:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Record.cpp.o
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Record.cpp.o
 .PHONY : Record.cpp.o
 
 Record.i: Record.cpp.i
@@ -409,7 +673,7 @@ Record.i: Record.cpp.i
 
 # target to preprocess a source file
 Record.cpp.i:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Record.cpp.i
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Record.cpp.i
 .PHONY : Record.cpp.i
 
 Record.s: Record.cpp.s
@@ -417,15 +681,39 @@ Record.s: Record.cpp.s
 
 # target to generate assembly for a file
 Record.cpp.s:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Record.cpp.s
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Record.cpp.s
 .PHONY : Record.cpp.s
+
+Repeat.o: Repeat.cpp.o
+.PHONY : Repeat.o
+
+# target to build an object file
+Repeat.cpp.o:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Repeat.cpp.o
+.PHONY : Repeat.cpp.o
+
+Repeat.i: Repeat.cpp.i
+.PHONY : Repeat.i
+
+# target to preprocess a source file
+Repeat.cpp.i:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Repeat.cpp.i
+.PHONY : Repeat.cpp.i
+
+Repeat.s: Repeat.cpp.s
+.PHONY : Repeat.s
+
+# target to generate assembly for a file
+Repeat.cpp.s:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Repeat.cpp.s
+.PHONY : Repeat.cpp.s
 
 Scanner.o: Scanner.cpp.o
 .PHONY : Scanner.o
 
 # target to build an object file
 Scanner.cpp.o:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Scanner.cpp.o
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Scanner.cpp.o
 .PHONY : Scanner.cpp.o
 
 Scanner.i: Scanner.cpp.i
@@ -433,7 +721,7 @@ Scanner.i: Scanner.cpp.i
 
 # target to preprocess a source file
 Scanner.cpp.i:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Scanner.cpp.i
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Scanner.cpp.i
 .PHONY : Scanner.cpp.i
 
 Scanner.s: Scanner.cpp.s
@@ -441,7 +729,7 @@ Scanner.s: Scanner.cpp.s
 
 # target to generate assembly for a file
 Scanner.cpp.s:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Scanner.cpp.s
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Scanner.cpp.s
 .PHONY : Scanner.cpp.s
 
 ScannerException.o: ScannerException.cpp.o
@@ -449,7 +737,7 @@ ScannerException.o: ScannerException.cpp.o
 
 # target to build an object file
 ScannerException.cpp.o:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/ScannerException.cpp.o
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/ScannerException.cpp.o
 .PHONY : ScannerException.cpp.o
 
 ScannerException.i: ScannerException.cpp.i
@@ -457,7 +745,7 @@ ScannerException.i: ScannerException.cpp.i
 
 # target to preprocess a source file
 ScannerException.cpp.i:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/ScannerException.cpp.i
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/ScannerException.cpp.i
 .PHONY : ScannerException.cpp.i
 
 ScannerException.s: ScannerException.cpp.s
@@ -465,7 +753,7 @@ ScannerException.s: ScannerException.cpp.s
 
 # target to generate assembly for a file
 ScannerException.cpp.s:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/ScannerException.cpp.s
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/ScannerException.cpp.s
 .PHONY : ScannerException.cpp.s
 
 Scope.o: Scope.cpp.o
@@ -473,7 +761,7 @@ Scope.o: Scope.cpp.o
 
 # target to build an object file
 Scope.cpp.o:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Scope.cpp.o
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Scope.cpp.o
 .PHONY : Scope.cpp.o
 
 Scope.i: Scope.cpp.i
@@ -481,7 +769,7 @@ Scope.i: Scope.cpp.i
 
 # target to preprocess a source file
 Scope.cpp.i:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Scope.cpp.i
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Scope.cpp.i
 .PHONY : Scope.cpp.i
 
 Scope.s: Scope.cpp.s
@@ -489,15 +777,39 @@ Scope.s: Scope.cpp.s
 
 # target to generate assembly for a file
 Scope.cpp.s:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Scope.cpp.s
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Scope.cpp.s
 .PHONY : Scope.cpp.s
+
+ScopeVisitor.o: ScopeVisitor.cpp.o
+.PHONY : ScopeVisitor.o
+
+# target to build an object file
+ScopeVisitor.cpp.o:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/ScopeVisitor.cpp.o
+.PHONY : ScopeVisitor.cpp.o
+
+ScopeVisitor.i: ScopeVisitor.cpp.i
+.PHONY : ScopeVisitor.i
+
+# target to preprocess a source file
+ScopeVisitor.cpp.i:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/ScopeVisitor.cpp.i
+.PHONY : ScopeVisitor.cpp.i
+
+ScopeVisitor.s: ScopeVisitor.cpp.s
+.PHONY : ScopeVisitor.s
+
+# target to generate assembly for a file
+ScopeVisitor.cpp.s:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/ScopeVisitor.cpp.s
+.PHONY : ScopeVisitor.cpp.s
 
 SymbolTable.o: SymbolTable.cpp.o
 .PHONY : SymbolTable.o
 
 # target to build an object file
 SymbolTable.cpp.o:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/SymbolTable.cpp.o
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/SymbolTable.cpp.o
 .PHONY : SymbolTable.cpp.o
 
 SymbolTable.i: SymbolTable.cpp.i
@@ -505,7 +817,7 @@ SymbolTable.i: SymbolTable.cpp.i
 
 # target to preprocess a source file
 SymbolTable.cpp.i:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/SymbolTable.cpp.i
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/SymbolTable.cpp.i
 .PHONY : SymbolTable.cpp.i
 
 SymbolTable.s: SymbolTable.cpp.s
@@ -513,7 +825,7 @@ SymbolTable.s: SymbolTable.cpp.s
 
 # target to generate assembly for a file
 SymbolTable.cpp.s:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/SymbolTable.cpp.s
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/SymbolTable.cpp.s
 .PHONY : SymbolTable.cpp.s
 
 TextObserver.o: TextObserver.cpp.o
@@ -521,7 +833,7 @@ TextObserver.o: TextObserver.cpp.o
 
 # target to build an object file
 TextObserver.cpp.o:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/TextObserver.cpp.o
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/TextObserver.cpp.o
 .PHONY : TextObserver.cpp.o
 
 TextObserver.i: TextObserver.cpp.i
@@ -529,7 +841,7 @@ TextObserver.i: TextObserver.cpp.i
 
 # target to preprocess a source file
 TextObserver.cpp.i:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/TextObserver.cpp.i
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/TextObserver.cpp.i
 .PHONY : TextObserver.cpp.i
 
 TextObserver.s: TextObserver.cpp.s
@@ -537,7 +849,7 @@ TextObserver.s: TextObserver.cpp.s
 
 # target to generate assembly for a file
 TextObserver.cpp.s:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/TextObserver.cpp.s
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/TextObserver.cpp.s
 .PHONY : TextObserver.cpp.s
 
 Token.o: Token.cpp.o
@@ -545,7 +857,7 @@ Token.o: Token.cpp.o
 
 # target to build an object file
 Token.cpp.o:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Token.cpp.o
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Token.cpp.o
 .PHONY : Token.cpp.o
 
 Token.i: Token.cpp.i
@@ -553,7 +865,7 @@ Token.i: Token.cpp.i
 
 # target to preprocess a source file
 Token.cpp.i:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Token.cpp.i
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Token.cpp.i
 .PHONY : Token.cpp.i
 
 Token.s: Token.cpp.s
@@ -561,7 +873,7 @@ Token.s: Token.cpp.s
 
 # target to generate assembly for a file
 Token.cpp.s:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Token.cpp.s
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Token.cpp.s
 .PHONY : Token.cpp.s
 
 Type.o: Type.cpp.o
@@ -569,7 +881,7 @@ Type.o: Type.cpp.o
 
 # target to build an object file
 Type.cpp.o:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Type.cpp.o
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Type.cpp.o
 .PHONY : Type.cpp.o
 
 Type.i: Type.cpp.i
@@ -577,7 +889,7 @@ Type.i: Type.cpp.i
 
 # target to preprocess a source file
 Type.cpp.i:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Type.cpp.i
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Type.cpp.i
 .PHONY : Type.cpp.i
 
 Type.s: Type.cpp.s
@@ -585,7 +897,7 @@ Type.s: Type.cpp.s
 
 # target to generate assembly for a file
 Type.cpp.s:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Type.cpp.s
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Type.cpp.s
 .PHONY : Type.cpp.s
 
 Variable.o: Variable.cpp.o
@@ -593,7 +905,7 @@ Variable.o: Variable.cpp.o
 
 # target to build an object file
 Variable.cpp.o:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Variable.cpp.o
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Variable.cpp.o
 .PHONY : Variable.cpp.o
 
 Variable.i: Variable.cpp.i
@@ -601,7 +913,7 @@ Variable.i: Variable.cpp.i
 
 # target to preprocess a source file
 Variable.cpp.i:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Variable.cpp.i
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Variable.cpp.i
 .PHONY : Variable.cpp.i
 
 Variable.s: Variable.cpp.s
@@ -609,8 +921,32 @@ Variable.s: Variable.cpp.s
 
 # target to generate assembly for a file
 Variable.cpp.s:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f src/CMakeFiles/compilers4_lib.dir/build.make src/CMakeFiles/compilers4_lib.dir/Variable.cpp.s
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Variable.cpp.s
 .PHONY : Variable.cpp.s
+
+Write.o: Write.cpp.o
+.PHONY : Write.o
+
+# target to build an object file
+Write.cpp.o:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Write.cpp.o
+.PHONY : Write.cpp.o
+
+Write.i: Write.cpp.i
+.PHONY : Write.i
+
+# target to preprocess a source file
+Write.cpp.i:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Write.cpp.i
+.PHONY : Write.cpp.i
+
+Write.s: Write.cpp.s
+.PHONY : Write.s
+
+# target to generate assembly for a file
+Write.cpp.s:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Write.cpp.s
+.PHONY : Write.cpp.s
 
 # Help Target
 help:
@@ -618,31 +954,61 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
+	@echo "... compilers5_lib"
 	@echo "... install/strip"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... install"
 	@echo "... list_install_components"
-	@echo "... compilers4_lib"
 	@echo "... install/local"
+	@echo "... AbstractSyntaxTree.o"
+	@echo "... AbstractSyntaxTree.i"
+	@echo "... AbstractSyntaxTree.s"
+	@echo "... AbstractSyntaxTreeNode.o"
+	@echo "... AbstractSyntaxTreeNode.i"
+	@echo "... AbstractSyntaxTreeNode.s"
 	@echo "... Array.o"
 	@echo "... Array.i"
 	@echo "... Array.s"
+	@echo "... Assign.o"
+	@echo "... Assign.i"
+	@echo "... Assign.s"
+	@echo "... BinaryExpression.o"
+	@echo "... BinaryExpression.i"
+	@echo "... BinaryExpression.s"
+	@echo "... Condition.o"
+	@echo "... Condition.i"
+	@echo "... Condition.s"
 	@echo "... Constant.o"
 	@echo "... Constant.i"
 	@echo "... Constant.s"
 	@echo "... Entry.o"
 	@echo "... Entry.i"
 	@echo "... Entry.s"
-	@echo "... Field.o"
-	@echo "... Field.i"
-	@echo "... Field.s"
+	@echo "... Expression.o"
+	@echo "... Expression.i"
+	@echo "... Expression.s"
 	@echo "... GraphNode.o"
 	@echo "... GraphNode.i"
 	@echo "... GraphNode.s"
 	@echo "... GraphObserver.o"
 	@echo "... GraphObserver.i"
 	@echo "... GraphObserver.s"
+	@echo "... GraphicalSymbolTree.o"
+	@echo "... GraphicalSymbolTree.i"
+	@echo "... GraphicalSymbolTree.s"
+	@echo "... IfInstruction.o"
+	@echo "... IfInstruction.i"
+	@echo "... IfInstruction.s"
+	@echo "... Instruction.o"
+	@echo "... Instruction.i"
+	@echo "... Instruction.s"
+	@echo "... Location.o"
+	@echo "... Location.i"
+	@echo "... Location.s"
+	@echo "... NumberExpression.o"
+	@echo "... NumberExpression.i"
+	@echo "... NumberExpression.s"
 	@echo "... Observer.o"
 	@echo "... Observer.i"
 	@echo "... Observer.s"
@@ -655,9 +1021,15 @@ help:
 	@echo "... Parser.o"
 	@echo "... Parser.i"
 	@echo "... Parser.s"
+	@echo "... Read.o"
+	@echo "... Read.i"
+	@echo "... Read.s"
 	@echo "... Record.o"
 	@echo "... Record.i"
 	@echo "... Record.s"
+	@echo "... Repeat.o"
+	@echo "... Repeat.i"
+	@echo "... Repeat.s"
 	@echo "... Scanner.o"
 	@echo "... Scanner.i"
 	@echo "... Scanner.s"
@@ -667,6 +1039,9 @@ help:
 	@echo "... Scope.o"
 	@echo "... Scope.i"
 	@echo "... Scope.s"
+	@echo "... ScopeVisitor.o"
+	@echo "... ScopeVisitor.i"
+	@echo "... ScopeVisitor.s"
 	@echo "... SymbolTable.o"
 	@echo "... SymbolTable.i"
 	@echo "... SymbolTable.s"
@@ -682,6 +1057,9 @@ help:
 	@echo "... Variable.o"
 	@echo "... Variable.i"
 	@echo "... Variable.s"
+	@echo "... Write.o"
+	@echo "... Write.i"
+	@echo "... Write.s"
 .PHONY : help
 
 
@@ -693,6 +1071,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /media/sf_workspace/compilers_hwk4 && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /media/sf_workspace/compilers_hwk5 && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

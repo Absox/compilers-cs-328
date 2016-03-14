@@ -12,12 +12,15 @@
 #include "Array.h"
 #include "Variable.h"
 #include "Record.h"
+#include "NumberExpression.h"
+#include "BinaryExpression.h"
 
 #include <memory>
 
 using std::shared_ptr;
 using std::string;
 using std::to_string;
+using std::stoi;
 using std::vector;
 using std::dynamic_pointer_cast;
 
@@ -161,6 +164,8 @@ void Parser::constDecl() throw(ParseException) {
     
     while (match("identifier")) {
         Token identifier = processToken("identifier");
+        processToken("=");
+        auto value = dynamic_pointer_cast<NumberExpression>(expression());
 
         if (!suppressContextErrors) {
             if (symbolTable.getCurrentScope()->scopeContainsEntry(
@@ -168,14 +173,21 @@ void Parser::constDecl() throw(ParseException) {
                 throw ParseException("Context violation: duplicate "
                                      + identifier.toString());
             } else {
-                shared_ptr<Entry> constant(new Constant(5, findType("INTEGER")));
-                symbolTable.getCurrentScope()->addEntry(
-                        identifier.getValue(), constant);
+
+                if (value != 0) {
+                    shared_ptr<Entry> constant(new Constant(value->getValue(), findType("INTEGER")));
+                    symbolTable.getCurrentScope()->addEntry(
+                            identifier.getValue(), constant);
+                } else {
+                    throw ParseException(
+                            "Context violation: const declaration beginning at "
+                            + identifier.toString()
+                            + " does not evaluate to a constant!");
+                }
+
             }
         }
 
-        processToken("=");
-        expression();
         processToken(";");
     }
     
@@ -242,7 +254,10 @@ void Parser::varDecl() throw(ParseException) {
     deindent();
 }
 
-void Parser::expression() throw(ParseException) {
+shared_ptr<Expression> Parser::expression() throw(ParseException) {
+    shared_ptr<Expression> result;
+    bool negate = false;
+
     setState("Expression");
     indent();
     
@@ -250,53 +265,92 @@ void Parser::expression() throw(ParseException) {
         processToken("+");
     } else if (match("-")) {
         processToken("-");
+        negate = true;
     }
     
-    term();
+    result = term();
     
     while (match("+") || match("-")) {
+        string operation;
         if (match("+")) {
-            processToken("+");
+            operation = processToken("+").getValue();
         } else if (match("-")) {
-            processToken("-");
+            operation = processToken("-").getValue();
         }
-        
-        term();
+
+        auto right = term();
+        auto binary = shared_ptr<BinaryExpression>(
+                new BinaryExpression(operation, result, right));
+        auto folded = binary->fold();
+        if (folded != 0) {
+            result = folded;
+        } else {
+            result = binary;
+        }
     }
     
     deindent();
+
+    if (negate) {
+        auto zero = shared_ptr<NumberExpression>(new NumberExpression(0));
+        auto negatedExpression = shared_ptr<BinaryExpression>(
+                new BinaryExpression("-", zero, result));
+        auto folded = negatedExpression->fold();
+        if (folded != 0) {
+            result = folded;
+        } else {
+            result = negatedExpression;
+        }
+    }
+    return result;
 }
 
-void Parser::term() throw(ParseException) {
+shared_ptr<Expression> Parser::term() throw(ParseException) {
+    shared_ptr<Expression> result;
     setState("Term");
     indent();
     
-    factor();
+    result = factor();
     while (match("*") || match("DIV") || match("MOD")) {
+        string operation;
         if (match("*")) {
-            processToken("*");
+            operation = processToken("*").getValue();
         } else if (match("DIV")) {
-            processToken("DIV");
+            operation = processToken("DIV").getValue();
         } else {
-            processToken("MOD");
+            operation = processToken("MOD").getValue();
         }
-        factor();
+
+        auto right = factor();
+        auto binary = shared_ptr<BinaryExpression>(
+                new BinaryExpression(operation, result, right));
+        auto folded = binary->fold();
+        if (folded != 0) {
+            result = folded;
+        } else {
+            result = binary;
+        }
     }
     
     deindent();
+    return result;
 }
 
-void Parser::factor() throw(ParseException) {
+shared_ptr<Expression> Parser::factor() throw(ParseException) {
+    shared_ptr<Expression> result;
     setState("Factor");
     indent();
     
     if (match("integer")) {
-        processToken("integer");
+        int value = stoi(processToken("integer").getValue());
+        result = shared_ptr<NumberExpression>(new NumberExpression(value));
+
     } else if (match("identifier")) {
+        // TODO
         designator();
     } else if (match("(")) {
         processToken("(");
-        expression();
+        result = expression();
         processToken(")");
         
     } else {
@@ -305,6 +359,7 @@ void Parser::factor() throw(ParseException) {
     }
     
     deindent();
+    return result;
 }
 
 void Parser::designator() throw(ParseException) {

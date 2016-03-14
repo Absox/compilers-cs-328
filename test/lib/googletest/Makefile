@@ -42,10 +42,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /media/sf_workspace/compilers_hwk4
+CMAKE_SOURCE_DIR = /media/sf_workspace/compilers_hwk5
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /media/sf_workspace/compilers_hwk4
+CMAKE_BINARY_DIR = /media/sf_workspace/compilers_hwk5
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -62,8 +62,8 @@ install/strip/fast: install/strip
 
 # Special rule for the target edit_cache
 edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
-	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
+	/usr/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -113,14 +113,14 @@ install/local/fast: install/local
 
 # The main all target
 all: cmake_check_build_system
-	cd /media/sf_workspace/compilers_hwk4 && $(CMAKE_COMMAND) -E cmake_progress_start /media/sf_workspace/compilers_hwk4/CMakeFiles /media/sf_workspace/compilers_hwk4/test/lib/googletest/CMakeFiles/progress.marks
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f CMakeFiles/Makefile2 test/lib/googletest/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /media/sf_workspace/compilers_hwk4/CMakeFiles 0
+	cd /media/sf_workspace/compilers_hwk5 && $(CMAKE_COMMAND) -E cmake_progress_start /media/sf_workspace/compilers_hwk5/CMakeFiles /media/sf_workspace/compilers_hwk5/test/lib/googletest/CMakeFiles/progress.marks
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f CMakeFiles/Makefile2 test/lib/googletest/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /media/sf_workspace/compilers_hwk5/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f CMakeFiles/Makefile2 test/lib/googletest/clean
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f CMakeFiles/Makefile2 test/lib/googletest/clean
 .PHONY : clean
 
 # The main clean target
@@ -129,22 +129,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f CMakeFiles/Makefile2 test/lib/googletest/preinstall
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f CMakeFiles/Makefile2 test/lib/googletest/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f CMakeFiles/Makefile2 test/lib/googletest/preinstall
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f CMakeFiles/Makefile2 test/lib/googletest/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /media/sf_workspace/compilers_hwk4 && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /media/sf_workspace/compilers_hwk5 && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 test/lib/googletest/CMakeFiles/gtest.dir/rule:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f CMakeFiles/Makefile2 test/lib/googletest/CMakeFiles/gtest.dir/rule
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f CMakeFiles/Makefile2 test/lib/googletest/CMakeFiles/gtest.dir/rule
 .PHONY : test/lib/googletest/CMakeFiles/gtest.dir/rule
 
 # Convenience name for target.
@@ -153,12 +153,12 @@ gtest: test/lib/googletest/CMakeFiles/gtest.dir/rule
 
 # fast build rule for target.
 gtest/fast:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f test/lib/googletest/CMakeFiles/gtest.dir/build.make test/lib/googletest/CMakeFiles/gtest.dir/build
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f test/lib/googletest/CMakeFiles/gtest.dir/build.make test/lib/googletest/CMakeFiles/gtest.dir/build
 .PHONY : gtest/fast
 
 # Convenience name for target.
 test/lib/googletest/CMakeFiles/gtest_main.dir/rule:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f CMakeFiles/Makefile2 test/lib/googletest/CMakeFiles/gtest_main.dir/rule
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f CMakeFiles/Makefile2 test/lib/googletest/CMakeFiles/gtest_main.dir/rule
 .PHONY : test/lib/googletest/CMakeFiles/gtest_main.dir/rule
 
 # Convenience name for target.
@@ -167,7 +167,7 @@ gtest_main: test/lib/googletest/CMakeFiles/gtest_main.dir/rule
 
 # fast build rule for target.
 gtest_main/fast:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f test/lib/googletest/CMakeFiles/gtest_main.dir/build.make test/lib/googletest/CMakeFiles/gtest_main.dir/build
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f test/lib/googletest/CMakeFiles/gtest_main.dir/build.make test/lib/googletest/CMakeFiles/gtest_main.dir/build
 .PHONY : gtest_main/fast
 
 src/gtest-all.o: src/gtest-all.cc.o
@@ -175,7 +175,7 @@ src/gtest-all.o: src/gtest-all.cc.o
 
 # target to build an object file
 src/gtest-all.cc.o:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f test/lib/googletest/CMakeFiles/gtest.dir/build.make test/lib/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f test/lib/googletest/CMakeFiles/gtest.dir/build.make test/lib/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o
 .PHONY : src/gtest-all.cc.o
 
 src/gtest-all.i: src/gtest-all.cc.i
@@ -183,7 +183,7 @@ src/gtest-all.i: src/gtest-all.cc.i
 
 # target to preprocess a source file
 src/gtest-all.cc.i:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f test/lib/googletest/CMakeFiles/gtest.dir/build.make test/lib/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.i
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f test/lib/googletest/CMakeFiles/gtest.dir/build.make test/lib/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.i
 .PHONY : src/gtest-all.cc.i
 
 src/gtest-all.s: src/gtest-all.cc.s
@@ -191,7 +191,7 @@ src/gtest-all.s: src/gtest-all.cc.s
 
 # target to generate assembly for a file
 src/gtest-all.cc.s:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f test/lib/googletest/CMakeFiles/gtest.dir/build.make test/lib/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.s
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f test/lib/googletest/CMakeFiles/gtest.dir/build.make test/lib/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.s
 .PHONY : src/gtest-all.cc.s
 
 src/gtest_main.o: src/gtest_main.cc.o
@@ -199,7 +199,7 @@ src/gtest_main.o: src/gtest_main.cc.o
 
 # target to build an object file
 src/gtest_main.cc.o:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f test/lib/googletest/CMakeFiles/gtest_main.dir/build.make test/lib/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.o
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f test/lib/googletest/CMakeFiles/gtest_main.dir/build.make test/lib/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.o
 .PHONY : src/gtest_main.cc.o
 
 src/gtest_main.i: src/gtest_main.cc.i
@@ -207,7 +207,7 @@ src/gtest_main.i: src/gtest_main.cc.i
 
 # target to preprocess a source file
 src/gtest_main.cc.i:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f test/lib/googletest/CMakeFiles/gtest_main.dir/build.make test/lib/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.i
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f test/lib/googletest/CMakeFiles/gtest_main.dir/build.make test/lib/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.i
 .PHONY : src/gtest_main.cc.i
 
 src/gtest_main.s: src/gtest_main.cc.s
@@ -215,7 +215,7 @@ src/gtest_main.s: src/gtest_main.cc.s
 
 # target to generate assembly for a file
 src/gtest_main.cc.s:
-	cd /media/sf_workspace/compilers_hwk4 && $(MAKE) -f test/lib/googletest/CMakeFiles/gtest_main.dir/build.make test/lib/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.s
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f test/lib/googletest/CMakeFiles/gtest_main.dir/build.make test/lib/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.s
 .PHONY : src/gtest_main.cc.s
 
 # Help Target
@@ -249,6 +249,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /media/sf_workspace/compilers_hwk4 && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /media/sf_workspace/compilers_hwk5 && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 
