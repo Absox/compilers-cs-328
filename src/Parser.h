@@ -69,7 +69,7 @@ private:
     std::shared_ptr<Expression> expression() throw(ParseException);
     std::shared_ptr<Expression> term() throw(ParseException);
     std::shared_ptr<Expression> factor() throw(ParseException);
-    void designator() throw(ParseException);
+    std::shared_ptr<Expression> designator() throw(ParseException);
     void selector() throw(ParseException);
     void expressionList() throw(ParseException);
     std::shared_ptr<Type> type() throw(ParseException);

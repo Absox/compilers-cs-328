@@ -1,4 +1,10 @@
 600.328 Compilers & Intepreters, Homework 5
 Ran Liu (rliu14@jhu.edu)
 
-Type inference (auto) is pretty good.
+Type inference (auto keyword) is pretty nice in C++. I was hoping for
+something similar to the diamond operator in Java, but the auto keyword is
+even better than that. Supposedly a similar feature is coming to Java 9.
+
+Unfortunately, separating your source files into different directories
+when they're interdependent is a little bit harder than in Java. I'm sure
+there's some way to do it with CMake.

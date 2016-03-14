@@ -53,15 +53,15 @@ test/lib/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o: test/lib/googletest
 test/lib/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o: test/lib/googletest/src/gtest-all.cc
 	$(CMAKE_COMMAND) -E cmake_progress_report /media/sf_workspace/compilers_hwk5/CMakeFiles $(CMAKE_PROGRESS_1)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object test/lib/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o"
-	cd /media/sf_workspace/compilers_hwk5/test/lib/googletest && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/gtest.dir/src/gtest-all.cc.o -c /media/sf_workspace/compilers_hwk5/test/lib/googletest/src/gtest-all.cc
+	cd /media/sf_workspace/compilers_hwk5/test/lib/googletest && /usr/bin/clang++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/gtest.dir/src/gtest-all.cc.o -c /media/sf_workspace/compilers_hwk5/test/lib/googletest/src/gtest-all.cc
 
 test/lib/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/gtest.dir/src/gtest-all.cc.i"
-	cd /media/sf_workspace/compilers_hwk5/test/lib/googletest && /usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /media/sf_workspace/compilers_hwk5/test/lib/googletest/src/gtest-all.cc > CMakeFiles/gtest.dir/src/gtest-all.cc.i
+	cd /media/sf_workspace/compilers_hwk5/test/lib/googletest && /usr/bin/clang++  $(CXX_DEFINES) $(CXX_FLAGS) -E /media/sf_workspace/compilers_hwk5/test/lib/googletest/src/gtest-all.cc > CMakeFiles/gtest.dir/src/gtest-all.cc.i
 
 test/lib/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/gtest.dir/src/gtest-all.cc.s"
-	cd /media/sf_workspace/compilers_hwk5/test/lib/googletest && /usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /media/sf_workspace/compilers_hwk5/test/lib/googletest/src/gtest-all.cc -o CMakeFiles/gtest.dir/src/gtest-all.cc.s
+	cd /media/sf_workspace/compilers_hwk5/test/lib/googletest && /usr/bin/clang++  $(CXX_DEFINES) $(CXX_FLAGS) -S /media/sf_workspace/compilers_hwk5/test/lib/googletest/src/gtest-all.cc -o CMakeFiles/gtest.dir/src/gtest-all.cc.s
 
 test/lib/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o.requires:
 .PHONY : test/lib/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o.requires

@@ -7,15 +7,12 @@
  */
 
 #include "Parser.h"
-#include "ScannerException.h"
 #include "Constant.h"
 #include "Array.h"
 #include "Variable.h"
 #include "Record.h"
 #include "NumberExpression.h"
 #include "BinaryExpression.h"
-
-#include <memory>
 
 using std::shared_ptr;
 using std::string;
@@ -346,8 +343,7 @@ shared_ptr<Expression> Parser::factor() throw(ParseException) {
         result = shared_ptr<NumberExpression>(new NumberExpression(value));
 
     } else if (match("identifier")) {
-        // TODO
-        designator();
+        result = designator();
     } else if (match("(")) {
         processToken("(");
         result = expression();
@@ -362,14 +358,16 @@ shared_ptr<Expression> Parser::factor() throw(ParseException) {
     return result;
 }
 
-void Parser::designator() throw(ParseException) {
+shared_ptr<Expression> Parser::designator() throw(ParseException) {
+    shared_ptr<Expression> result;
     setState("Designator");
     indent();
     
-    processToken("identifier");
+    processToken("identifier"); // TODO
     selector();
     
     deindent();
+    return result;
 }
 
 void Parser::selector() throw(ParseException) {
