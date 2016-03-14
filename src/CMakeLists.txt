@@ -32,7 +32,9 @@ set(SOURCE_FILES
         Repeat.cpp
         Location.cpp
         Read.cpp
-        Write.cpp)
+        Write.cpp
+        NumberExpression.cpp
+        BinaryExpression.cpp)
 
 set(HEADER_FILES
         Array.h
@@ -65,6 +67,8 @@ set(HEADER_FILES
         Repeat.h
         Location.h
         Read.h
-        Write.h)
+        Write.h
+        NumberExpression.h
+        BinaryExpression.h)
 
 add_library(compilers5_lib STATIC ${SOURCE_FILES} ${HEADER_FILES})

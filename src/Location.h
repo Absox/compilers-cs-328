@@ -6,9 +6,9 @@
 #define COMPILERS_HWK5_LOCATION_H
 
 
-#include "AbstractSyntaxTreeNode.h"
+#include "Expression.h"
 
-class Location : public AbstractSyntaxTreeNode {
+class Location : public Expression {
 public:
     Location();
     virtual ~Location();
