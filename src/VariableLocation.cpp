@@ -14,6 +14,10 @@ VariableLocation::~VariableLocation() {
 
 }
 
-std::string VariableLocation::getLabel() {
+string VariableLocation::getLabel() {
+    return identifier;
+}
+
+string VariableLocation::getIdentifier() const {
     return identifier;
 }

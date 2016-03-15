@@ -6,6 +6,8 @@
  * Created on February 20, 2016, 5:27 PM
  */
 
+#include <iostream>
+
 #include "Parser.h"
 #include "Constant.h"
 #include "Array.h"
@@ -15,6 +17,9 @@
 #include "BinaryExpression.h"
 #include "Index.h"
 #include "Field.h"
+
+using std::cout;
+using std::endl;
 
 using std::shared_ptr;
 using std::string;
@@ -414,8 +419,6 @@ shared_ptr<Location> Parser::selector(
         if (var != 0) currentType = var->getType();
     }
 
-    // TODO context checking (concurrent)
-
 
     while (match("[") || match(".")) {
         if (match("[")) {
@@ -456,6 +459,16 @@ shared_ptr<Location> Parser::selector(
                     throw ParseException("Context violation: selector at "
                     + identifier.toString() + " does not denote a record!");
                 }
+                // Check existence of field
+                auto field = dynamic_pointer_cast<Variable>(
+                        record->getScope()->getEntry(
+                        variableLocation->getIdentifier()));
+                if (field == 0) {
+                    throw ParseException("Context violation: selector at "
+                    + identifier.toString() + " denotes a nonexistent field!");
+                }
+                currentType = field->getType();
+
                 result = shared_ptr<Field>(new Field(result, variableLocation));
             }
         }
@@ -481,7 +494,7 @@ vector<shared_ptr<Expression>> Parser::expressionList() throw(ParseException) {
     setState("ExpressionList");
     indent();
 
-    expression();
+    result.push_back(expression());
     while (match(",")) {
         processToken(",");
         result.push_back(expression());
@@ -510,12 +523,15 @@ shared_ptr<Type> Parser::type() throw(ParseException) {
         }
     } else if (match("ARRAY")) {
         processToken("ARRAY");
-        expression();
+        auto length = dynamic_pointer_cast<NumberExpression>(expression());
         processToken("OF");
         shared_ptr<Type> arrayType = type();
 
         if (!suppressContextErrors) {
-            result = shared_ptr<Type>(new Array(arrayType, 5));
+            if (length == 0) {
+                throw ParseException("Context error: array length non const!");
+            }
+            result = shared_ptr<Type>(new Array(arrayType, length->getValue()));
         }
 
     } else if (match("RECORD")) {

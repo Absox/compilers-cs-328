@@ -13,6 +13,8 @@ public:
     VariableLocation(const std::string& identifier);
     virtual ~VariableLocation();
     virtual std::string getLabel();
+
+    std::string getIdentifier() const;
 private:
     std::string identifier;
 
