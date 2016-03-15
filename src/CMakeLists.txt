@@ -34,7 +34,10 @@ set(SOURCE_FILES
         Read.cpp
         Write.cpp
         NumberExpression.cpp
-        BinaryExpression.cpp)
+        BinaryExpression.cpp
+        Index.cpp
+        VariableLocation.cpp
+        Field.cpp)
 
 set(HEADER_FILES
         Array.h
@@ -69,6 +72,9 @@ set(HEADER_FILES
         Read.h
         Write.h
         NumberExpression.h
-        BinaryExpression.h)
+        BinaryExpression.h
+        Index.h
+        VariableLocation.h
+        Field.h)
 
 add_library(compilers5_lib STATIC ${SOURCE_FILES} ${HEADER_FILES})

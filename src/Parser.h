@@ -21,6 +21,7 @@
 #include "SymbolTable.h"
 #include "Type.h"
 #include "AbstractSyntaxTree.h"
+#include "VariableLocation.h"
 
 class Observer;
 
@@ -69,9 +70,12 @@ private:
     std::shared_ptr<Expression> expression() throw(ParseException);
     std::shared_ptr<Expression> term() throw(ParseException);
     std::shared_ptr<Expression> factor() throw(ParseException);
-    std::shared_ptr<Expression> designator() throw(ParseException);
-    void selector() throw(ParseException);
-    void expressionList() throw(ParseException);
+    std::shared_ptr<Location> designator() throw(ParseException);
+    std::shared_ptr<Location> selector(
+            const std::shared_ptr<VariableLocation>& variable)
+            throw(ParseException);
+    std::vector<std::shared_ptr<Expression>> expressionList()
+            throw(ParseException);
     std::shared_ptr<Type> type() throw(ParseException);
     std::vector<Token> identifierList() throw(ParseException);
     void instructions() throw(ParseException);

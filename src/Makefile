@@ -50,16 +50,6 @@ CMAKE_BINARY_DIR = /media/sf_workspace/compilers_hwk5
 #=============================================================================
 # Targets provided globally by CMake.
 
-# Special rule for the target install/strip
-install/strip: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
-.PHONY : install/strip
-
-# Special rule for the target install/strip
-install/strip/fast: install/strip
-.PHONY : install/strip/fast
-
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
@@ -372,6 +362,30 @@ Expression.cpp.s:
 	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Expression.cpp.s
 .PHONY : Expression.cpp.s
 
+Field.o: Field.cpp.o
+.PHONY : Field.o
+
+# target to build an object file
+Field.cpp.o:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Field.cpp.o
+.PHONY : Field.cpp.o
+
+Field.i: Field.cpp.i
+.PHONY : Field.i
+
+# target to preprocess a source file
+Field.cpp.i:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Field.cpp.i
+.PHONY : Field.cpp.i
+
+Field.s: Field.cpp.s
+.PHONY : Field.s
+
+# target to generate assembly for a file
+Field.cpp.s:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Field.cpp.s
+.PHONY : Field.cpp.s
+
 GraphNode.o: GraphNode.cpp.o
 .PHONY : GraphNode.o
 
@@ -467,6 +481,30 @@ IfInstruction.s: IfInstruction.cpp.s
 IfInstruction.cpp.s:
 	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/IfInstruction.cpp.s
 .PHONY : IfInstruction.cpp.s
+
+Index.o: Index.cpp.o
+.PHONY : Index.o
+
+# target to build an object file
+Index.cpp.o:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Index.cpp.o
+.PHONY : Index.cpp.o
+
+Index.i: Index.cpp.i
+.PHONY : Index.i
+
+# target to preprocess a source file
+Index.cpp.i:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Index.cpp.i
+.PHONY : Index.cpp.i
+
+Index.s: Index.cpp.s
+.PHONY : Index.s
+
+# target to generate assembly for a file
+Index.cpp.s:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Index.cpp.s
+.PHONY : Index.cpp.s
 
 Instruction.o: Instruction.cpp.o
 .PHONY : Instruction.o
@@ -924,6 +962,30 @@ Variable.cpp.s:
 	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/Variable.cpp.s
 .PHONY : Variable.cpp.s
 
+VariableLocation.o: VariableLocation.cpp.o
+.PHONY : VariableLocation.o
+
+# target to build an object file
+VariableLocation.cpp.o:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/VariableLocation.cpp.o
+.PHONY : VariableLocation.cpp.o
+
+VariableLocation.i: VariableLocation.cpp.i
+.PHONY : VariableLocation.i
+
+# target to preprocess a source file
+VariableLocation.cpp.i:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/VariableLocation.cpp.i
+.PHONY : VariableLocation.cpp.i
+
+VariableLocation.s: VariableLocation.cpp.s
+.PHONY : VariableLocation.s
+
+# target to generate assembly for a file
+VariableLocation.cpp.s:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/VariableLocation.cpp.s
+.PHONY : VariableLocation.cpp.s
+
 Write.o: Write.cpp.o
 .PHONY : Write.o
 
@@ -955,7 +1017,6 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... compilers5_lib"
-	@echo "... install/strip"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... install"
@@ -988,6 +1049,9 @@ help:
 	@echo "... Expression.o"
 	@echo "... Expression.i"
 	@echo "... Expression.s"
+	@echo "... Field.o"
+	@echo "... Field.i"
+	@echo "... Field.s"
 	@echo "... GraphNode.o"
 	@echo "... GraphNode.i"
 	@echo "... GraphNode.s"
@@ -1000,6 +1064,9 @@ help:
 	@echo "... IfInstruction.o"
 	@echo "... IfInstruction.i"
 	@echo "... IfInstruction.s"
+	@echo "... Index.o"
+	@echo "... Index.i"
+	@echo "... Index.s"
 	@echo "... Instruction.o"
 	@echo "... Instruction.i"
 	@echo "... Instruction.s"
@@ -1057,6 +1124,9 @@ help:
 	@echo "... Variable.o"
 	@echo "... Variable.i"
 	@echo "... Variable.s"
+	@echo "... VariableLocation.o"
+	@echo "... VariableLocation.i"
+	@echo "... VariableLocation.s"
 	@echo "... Write.o"
 	@echo "... Write.i"
 	@echo "... Write.s"

@@ -341,9 +341,20 @@ shared_ptr<Expression> Parser::factor() throw(ParseException) {
     if (match("integer")) {
         int value = stoi(processToken("integer").getValue());
         result = shared_ptr<NumberExpression>(new NumberExpression(value));
-
     } else if (match("identifier")) {
         result = designator();
+        // Check if we can do constant folding with this designator.
+        auto variable = dynamic_pointer_cast<VariableLocation>(result);
+        if (variable != 0) {
+            auto entry = symbolTable.getCurrentScope()
+                    ->getEntry(variable->getType());
+            auto constant = dynamic_pointer_cast<Constant>(entry);
+            if (constant != 0) {
+                result = shared_ptr<NumberExpression>(
+                        new NumberExpression(constant->getValue()));
+            }
+        }
+
     } else if (match("(")) {
         processToken("(");
         result = expression();
@@ -358,22 +369,25 @@ shared_ptr<Expression> Parser::factor() throw(ParseException) {
     return result;
 }
 
-shared_ptr<Expression> Parser::designator() throw(ParseException) {
-    shared_ptr<Expression> result;
+shared_ptr<Location> Parser::designator() throw(ParseException) {
+    shared_ptr<Location> result;
     setState("Designator");
     indent();
-    
-    processToken("identifier"); // TODO
-    selector();
-    
+
+    result = selector(shared_ptr<VariableLocation>(
+            new VariableLocation(processToken("identifier").getValue())));
+
     deindent();
     return result;
 }
 
-void Parser::selector() throw(ParseException) {
+shared_ptr<Location> Parser::selector(
+        const shared_ptr<VariableLocation>& variable) throw(ParseException) {
+    shared_ptr<Location> result = variable;
     setState("Selector");
     indent();
-    
+
+    // TODO
     while (match("[") || match(".")) {
         if (match("[")) {
             processToken("[");
@@ -386,19 +400,22 @@ void Parser::selector() throw(ParseException) {
     }
     
     deindent();
+    return result;
 }
 
-void Parser::expressionList() throw(ParseException) {
+vector<shared_ptr<Expression>> Parser::expressionList() throw(ParseException) {
+    vector<shared_ptr<Expression>> result;
     setState("ExpressionList");
     indent();
 
     expression();
     while (match(",")) {
         processToken(",");
-        expression();
+        result.push_back(expression());
     }
     
     deindent();
+    return result;
 }
 
 shared_ptr<Type> Parser::type() throw(ParseException) {
