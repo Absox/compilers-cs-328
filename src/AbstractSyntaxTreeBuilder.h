@@ -29,7 +29,7 @@ public:
     std::string getContent();
 private:
     const SymbolTable& symbolTable;
-    int indentLevel;
+    unsigned int indentLevel;
     std::stringstream stream;
 
     void processInstructions(

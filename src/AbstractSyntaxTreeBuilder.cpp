@@ -38,7 +38,7 @@ string AbstractSyntaxTreeBuilder::getContent() {
 
 void AbstractSyntaxTreeBuilder::processInstructions(
         const vector<shared_ptr<Instruction>> &instructions) {
-    for (int c = 0; c < instructions.size(); c++) {
+    for (unsigned long c = 0; c < instructions.size(); c++) {
         processInstruction(instructions[c]);
     }
 }
@@ -195,8 +195,7 @@ void AbstractSyntaxTreeBuilder::processLocation(
 
 void AbstractSyntaxTreeBuilder::processBinary(
         const shared_ptr<BinaryExpression> &binary) {
-    // TODO verify formatting
-    writeWithIndent("Binary (" + binary->getOperation() + ")");
+    writeWithIndent("Binary (" + binary->getOperation() + "):");
     writeWithIndent("left =>");
     indent();
     processExpression(binary->getExpressionLeft());

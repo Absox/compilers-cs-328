@@ -17,4 +17,5 @@ I suppose it could be done somewhat easily with the aid of smart pointers.
 Actually, this program is already growing a bit too complex for my liking.
 I really hope that there won't be too many further modifications to the Parser.
 
-The code could probably also be a bit more DRY.
+The code could probably also be a bit more DRY, especially when it comes to
+the output generators..

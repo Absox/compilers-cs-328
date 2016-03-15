@@ -14,6 +14,7 @@
 #include <vector>
 #include <GraphicalSymbolTree.h>
 #include <AbstractSyntaxTreeBuilder.h>
+#include <GraphicalAbstractSyntaxTreeBuilder.h>
 
 #include "Scanner.h"
 #include "Parser.h"
@@ -186,6 +187,10 @@ int main(int argc, char **argv) {
                 if (graphical) {
                     try {
                         parser->parse();
+                        GraphicalAbstractSyntaxTreeBuilder astBuilder(
+                                parser->getSymbolTable(),
+                                parser->getAbstractSyntaxTree());
+                        cout << astBuilder.getContent();
                     } catch (ParseException& e) {
                         cerr << "error: " << e.getMessage() << endl;
                     }

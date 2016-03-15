@@ -8,7 +8,6 @@ include_directories(src)
 set(SOURCE_FILES main.cpp)
 add_executable(sc ${SOURCE_FILES})
 
-add_subdirectory(test)
 add_subdirectory(src)
 
 target_link_libraries(sc compilers5_lib)

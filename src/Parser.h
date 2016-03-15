@@ -47,7 +47,6 @@ public:
 
 private:
     bool suppressContextErrors;
-    bool suppressAbstractSyntaxErrors;
     SymbolTable symbolTable;
     std::vector<std::shared_ptr<Instruction>> ast;
 

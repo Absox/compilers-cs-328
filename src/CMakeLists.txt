@@ -1,5 +1,5 @@
 project(compilers5_lib)
-add_definitions(-std=c++11)
+add_definitions(-std=c++11 -g -Wall -Wextra -pedantic)
 
 set(SOURCE_FILES
         Array.cpp
@@ -37,7 +37,8 @@ set(SOURCE_FILES
         Index.cpp
         VariableLocation.cpp
         Field.cpp
-        AbstractSyntaxTreeBuilder.cpp)
+        AbstractSyntaxTreeBuilder.cpp
+        GraphicalAbstractSyntaxTreeBuilder.cpp)
 
 set(HEADER_FILES
         Array.h
@@ -75,6 +76,7 @@ set(HEADER_FILES
         Index.h
         VariableLocation.h
         Field.h
-        AbstractSyntaxTreeBuilder.h)
+        AbstractSyntaxTreeBuilder.h
+        GraphicalAbstractSyntaxTreeBuilder.h)
 
 add_library(compilers5_lib STATIC ${SOURCE_FILES} ${HEADER_FILES})

@@ -30,7 +30,7 @@ using std::stoi;
 using std::vector;
 using std::dynamic_pointer_cast;
 
-Parser::Parser(Scanner* scanner, const bool& suppressContextErrors)
+Parser::Parser(Scanner *scanner, const bool &suppressContextErrors)
         : state("init"), currentToken("", "", 0, 0) {
     this->scanner = scanner;
     this->suppressContextErrors = suppressContextErrors;
@@ -44,7 +44,7 @@ void Parser::parse() throw(ParseException) {
     program();
 }
 
-void Parser::addObserver(Observer* o) {
+void Parser::addObserver(Observer *o) {
     o->setSubject(this);
     observers.push_back(o);
 }
@@ -71,27 +71,27 @@ void Parser::deindent() {
     indentLevel--;
 }
 
-void Parser::setState(const string& value) {
+void Parser::setState(const string &value) {
     state = ParseState(value);
     notifyObservers();
 }
 
-Token& Parser::nextToken() throw(ParseException) {
+Token &Parser::nextToken() throw(ParseException) {
     try {
         currentToken = scanner->next();
         return currentToken;
-    } catch(ScannerException& e) {
+    } catch (ScannerException &e) {
         throw ParseException("Scanner terminated with error: "
-                + e.getMessage() + " at position "
-                + to_string(e.getPosition()));
+                             + e.getMessage() + " at position "
+                             + to_string(e.getPosition()));
     }
 }
 
-bool Parser::match(const string& type) {
+bool Parser::match(const string &type) {
     return currentToken.getType() == type;
 }
 
-Token Parser::processToken(const string& type) throw(ParseException) {
+Token Parser::processToken(const string &type) throw(ParseException) {
     if (currentToken.getType() == type) {
         state = ParseState("terminal", &currentToken);
         notifyObservers();
@@ -101,7 +101,7 @@ Token Parser::processToken(const string& type) throw(ParseException) {
         return result;
     } else {
         throw ParseException("Token '" + type + "' expected; actual: "
-                + currentToken.toString());
+                             + currentToken.toString());
     }
 }
 
@@ -111,20 +111,20 @@ void Parser::program() throw(ParseException) {
 
     setState("Program");
     indent();
-    
+
     nextToken();
-    
+
     processToken("PROGRAM");
     Token programName = processToken("identifier");
     processToken(";");
-    
+
     declarations();
-    
+
     if (match("BEGIN")) {
         processToken("BEGIN");
         ast = instructions();
     }
-    
+
     processToken("END");
     Token endProgramName = processToken("identifier");
     processToken(".");
@@ -135,19 +135,19 @@ void Parser::program() throw(ParseException) {
                              + programName.toString() + " expected; actual: "
                              + endProgramName.toString());
     }
-    
+
     if (!currentToken.isEof()) {
         throw ParseException("End of file expected, actual: "
-                + currentToken.toString());
+                             + currentToken.toString());
     }
-    
+
     deindent();
 }
 
 void Parser::declarations() throw(ParseException) {
     setState("Declarations");
     indent();
-    
+
     while (match("CONST") || match("TYPE") || match("VAR")) {
         if (match("CONST")) {
             constDecl();
@@ -163,9 +163,9 @@ void Parser::declarations() throw(ParseException) {
 void Parser::constDecl() throw(ParseException) {
     setState("ConstDecl");
     indent();
-    
+
     processToken("CONST");
-    
+
     while (match("identifier")) {
         Token identifier = processToken("identifier");
         processToken("=");
@@ -179,7 +179,9 @@ void Parser::constDecl() throw(ParseException) {
             } else {
 
                 if (value != 0) {
-                    shared_ptr<Entry> constant(new Constant(value->getValue(), findType("INTEGER")));
+                    shared_ptr<Entry> constant(new Constant(value->getValue(),
+                                                            findType(
+                                                                    "INTEGER")));
                     symbolTable.getCurrentScope()->addEntry(
                             identifier.getValue(), constant);
                 } else {
@@ -194,17 +196,17 @@ void Parser::constDecl() throw(ParseException) {
 
         processToken(";");
     }
-    
+
     deindent();
 }
 
 void Parser::typeDecl() throw(ParseException) {
     setState("TypeDecl");
     indent();
-    
+
     processToken("TYPE");
-    
-    while(match("identifier")) {
+
+    while (match("identifier")) {
         Token identifier = processToken("identifier");
         processToken("=");
         shared_ptr<Type> linkedType = type();
@@ -222,14 +224,14 @@ void Parser::typeDecl() throw(ParseException) {
 
         }
     }
-    
+
     deindent();
 }
 
 void Parser::varDecl() throw(ParseException) {
     setState("VarDecl");
     indent();
-    
+
     processToken("VAR");
 
     while (match("identifier")) {
@@ -253,8 +255,8 @@ void Parser::varDecl() throw(ParseException) {
             }
         }
     }
-    
-    
+
+
     deindent();
 }
 
@@ -279,9 +281,9 @@ shared_ptr<Expression> Parser::expression() throw(ParseException) {
                     "Context violation: non-int expression used with operator");
         }
     }
-    
+
     result = term();
-    
+
     while (match("+") || match("-")) {
         string operation;
         if (match("+")) {
@@ -294,7 +296,7 @@ shared_ptr<Expression> Parser::expression() throw(ParseException) {
         auto right = term();
 
         if (!suppressContextErrors &&
-                (!isExpressionNumeric(result) || !isExpressionNumeric(right))) {
+            (!isExpressionNumeric(result) || !isExpressionNumeric(right))) {
             throw ParseException(
                     "Context violation: non-int expression used with operator");
         }
@@ -307,7 +309,7 @@ shared_ptr<Expression> Parser::expression() throw(ParseException) {
             result = binary;
         }
     }
-    
+
     deindent();
 
     if (negate) {
@@ -342,7 +344,7 @@ shared_ptr<Expression> Parser::term() throw(ParseException) {
 
         auto right = factor();
         if (!suppressContextErrors &&
-                (!isExpressionNumeric(result) || !isExpressionNumeric(right))) {
+            (!isExpressionNumeric(result) || !isExpressionNumeric(right))) {
             throw ParseException(
                     "Context violation: non-int expression used with operator");
         }
@@ -356,7 +358,7 @@ shared_ptr<Expression> Parser::term() throw(ParseException) {
             result = binary;
         }
     }
-    
+
     deindent();
     return result;
 }
@@ -365,7 +367,7 @@ shared_ptr<Expression> Parser::factor() throw(ParseException) {
     shared_ptr<Expression> result;
     setState("Factor");
     indent();
-    
+
     if (match("integer")) {
         int value = stoi(processToken("integer").getValue());
         result = shared_ptr<NumberExpression>(new NumberExpression(value));
@@ -404,12 +406,12 @@ shared_ptr<Expression> Parser::factor() throw(ParseException) {
                     "Context violation: non-int expression used with operator");
         }
         processToken(")");
-        
+
     } else {
         throw ParseException("Factor expected; actual: "
-                + currentToken.toString());
+                             + currentToken.toString());
     }
-    
+
     deindent();
     return result;
 }
@@ -426,7 +428,7 @@ shared_ptr<Location> Parser::designator() throw(ParseException) {
 }
 
 shared_ptr<Location> Parser::selector(
-        const Token& identifier) throw(ParseException) {
+        const Token &identifier) throw(ParseException) {
     shared_ptr<Location> result;
     shared_ptr<Entry> currentEntry;
     shared_ptr<Type> currentType;
@@ -472,13 +474,15 @@ shared_ptr<Location> Parser::selector(
                     // Check that each expression in list is numeric
                     if (!isExpressionNumeric(indices[c])) {
                         throw ParseException("Context violation: indices at "
-                        + identifier.toString() + " must be numeric!");
+                                             + identifier.toString() +
+                                             " must be numeric!");
                     }
 
                     auto array = dynamic_pointer_cast<Array>(currentType);
                     if (array == 0) {
                         throw ParseException("Context violation: selector at "
-                        + identifier.toString() + " does not denote an array!");
+                                             + identifier.toString() +
+                                             " does not denote an array!");
                     }
                     currentType = array->getType();
 
@@ -500,15 +504,17 @@ shared_ptr<Location> Parser::selector(
                 auto record = dynamic_pointer_cast<Record>(currentType);
                 if (record == 0) {
                     throw ParseException("Context violation: selector at "
-                    + identifier.toString() + " does not denote a record!");
+                                         + identifier.toString() +
+                                         " does not denote a record!");
                 }
                 // Check existence of field
                 auto field = dynamic_pointer_cast<Variable>(
                         record->getScope()->getEntry(
-                        variableLocation->getIdentifier()));
+                                variableLocation->getIdentifier()));
                 if (field == 0) {
                     throw ParseException("Context violation: selector at "
-                    + identifier.toString() + " denotes a nonexistent field!");
+                                         + identifier.toString() +
+                                         " denotes a nonexistent field!");
                 }
                 currentType = field->getType();
 
@@ -520,14 +526,14 @@ shared_ptr<Location> Parser::selector(
     if (!suppressContextErrors) {
 
         if (dynamic_pointer_cast<Variable>(currentEntry) == 0
-                && dynamic_pointer_cast<Constant>(currentEntry) == 0) {
+            && dynamic_pointer_cast<Constant>(currentEntry) == 0) {
             throw ParseException("Context violation: designator beginning at "
                                  + identifier.toString()
                                  + "must specify either variable or constant!");
         }
 
     }
-    
+
     deindent();
     return result;
 }
@@ -542,7 +548,7 @@ vector<shared_ptr<Expression>> Parser::expressionList() throw(ParseException) {
         processToken(",");
         result.push_back(expression());
     }
-    
+
     deindent();
     return result;
 }
@@ -552,7 +558,7 @@ shared_ptr<Type> Parser::type() throw(ParseException) {
 
     setState("Type");
     indent();
-    
+
     if (match("identifier")) {
         Token identifier = processToken("identifier");
 
@@ -621,9 +627,9 @@ shared_ptr<Type> Parser::type() throw(ParseException) {
 
     } else {
         throw ParseException("Type expected; actual: "
-                + currentToken.toString());
+                             + currentToken.toString());
     }
-    
+
     deindent();
 
     return result;
@@ -634,13 +640,13 @@ vector<Token> Parser::identifierList() throw(ParseException) {
     indent();
 
     vector<Token> result;
-    
+
     result.push_back(processToken("identifier"));
     while (match(",")) {
         processToken(",");
         result.push_back(processToken("identifier"));
     }
-    
+
     deindent();
 
     return result;
@@ -650,14 +656,14 @@ vector<shared_ptr<Instruction>> Parser::instructions() throw(ParseException) {
     vector<shared_ptr<Instruction>> result;
     setState("Instructions");
     indent();
-    
+
     result.push_back(instruction());
-    
+
     while (match(";")) {
         processToken(";");
         result.push_back(instruction());
     }
-    
+
     deindent();
     return result;
 }
@@ -666,7 +672,7 @@ shared_ptr<Instruction> Parser::instruction() throw(ParseException) {
     shared_ptr<Instruction> result;
     setState("Instruction");
     indent();
-    
+
     if (match("identifier")) {
         result = assign();
     } else if (match("IF")) {
@@ -681,9 +687,9 @@ shared_ptr<Instruction> Parser::instruction() throw(ParseException) {
         result = write();
     } else {
         throw ParseException("Instruction expected; actual: "
-                + currentToken.toString());
+                             + currentToken.toString());
     }
-    
+
     deindent();
     return result;
 }
@@ -692,7 +698,7 @@ shared_ptr<Assign> Parser::assign() throw(ParseException) {
     shared_ptr<Assign> result;
     setState("Assign");
     indent();
-    
+
     auto assignmentLocation = designator();
     processToken(":=");
     auto assignmentExpression = expression();
@@ -710,7 +716,7 @@ shared_ptr<Assign> Parser::assign() throw(ParseException) {
         result = shared_ptr<Assign>(
                 new Assign(assignmentLocation, assignmentExpression));
     }
-    
+
     deindent();
     return result;
 }
@@ -720,14 +726,14 @@ shared_ptr<IfInstruction> Parser::parseIf() throw(ParseException) {
 
     setState("If");
     indent();
-    
+
     processToken("IF");
     auto ifCondition = condition();
     processToken("THEN");
     auto trueInstructions = instructions();
 
     vector<shared_ptr<Instruction>> falseInstructions;
-    
+
     if (match("ELSE")) {
         processToken("ELSE");
         falseInstructions = instructions();
@@ -736,9 +742,9 @@ shared_ptr<IfInstruction> Parser::parseIf() throw(ParseException) {
     result = shared_ptr<IfInstruction>(
             new IfInstruction(
                     ifCondition, trueInstructions, falseInstructions));
-    
+
     processToken("END");
-    
+
     deindent();
 
     return result;
@@ -749,7 +755,7 @@ shared_ptr<Condition> Parser::condition() throw(ParseException) {
 
     setState("Condition");
     indent();
-    
+
     auto left = expression();
     string relation;
     if (match("=")) {
@@ -766,7 +772,7 @@ shared_ptr<Condition> Parser::condition() throw(ParseException) {
         relation = processToken(">=").getValue();
     } else {
         throw ParseException("Operator expected in condition; actual: "
-                + currentToken.toString());
+                             + currentToken.toString());
     }
     auto right = expression();
 
@@ -777,7 +783,7 @@ shared_ptr<Condition> Parser::condition() throw(ParseException) {
         }
         result = shared_ptr<Condition>(new Condition(relation, left, right));
     }
-    
+
     deindent();
     return result;
 }
@@ -786,7 +792,7 @@ shared_ptr<Repeat> Parser::repeat() throw(ParseException) {
     shared_ptr<Repeat> result;
     setState("Repeat");
     indent();
-    
+
     processToken("REPEAT");
     auto repeatInstructions = instructions();
     processToken("UNTIL");
@@ -819,8 +825,9 @@ shared_ptr<IfInstruction> Parser::parseWhile() throw(ParseException) {
     ifInstructions.push_back(repeatClause);
     vector<shared_ptr<Instruction>> falseInstructions;
     result = shared_ptr<IfInstruction>(
-            new IfInstruction(whileCondition, ifInstructions, falseInstructions));
-    
+            new IfInstruction(whileCondition, ifInstructions,
+                              falseInstructions));
+
     deindent();
     return result;
 }
@@ -829,7 +836,7 @@ shared_ptr<Read> Parser::read() throw(ParseException) {
     shared_ptr<Read> result;
     setState("Read");
     indent();
-    
+
     processToken("READ");
     auto location = designator();
 
@@ -850,7 +857,7 @@ shared_ptr<Write> Parser::write() throw(ParseException) {
     shared_ptr<Write> result;
     setState("Write");
     indent();
-    
+
     processToken("WRITE");
     auto writeExpression = expression();
     if (!suppressContextErrors) {
@@ -862,7 +869,7 @@ shared_ptr<Write> Parser::write() throw(ParseException) {
 
         result = shared_ptr<Write>(new Write(writeExpression));
     }
-    
+
     deindent();
     return result;
 }
@@ -875,7 +882,7 @@ vector<shared_ptr<Instruction>> &Parser::getAbstractSyntaxTree() {
     return ast;
 }
 
-std::shared_ptr<Type> Parser::findType(const string& identifier) {
+std::shared_ptr<Type> Parser::findType(const string &identifier) {
     return dynamic_pointer_cast<Type>(
             symbolTable.getCurrentScope()->getEntry(identifier));
 }
@@ -885,7 +892,7 @@ std::shared_ptr<Type> Parser::findType(const string& identifier) {
  * that location denotes an integer. Otherwise we assume true, because
  * operators can only be worked on integers.
  */
-bool Parser::isExpressionNumeric(const shared_ptr<Expression>& expression) {
+bool Parser::isExpressionNumeric(const shared_ptr<Expression> &expression) {
     static auto universalInt = dynamic_pointer_cast<Type>(
             symbolTable.getCurrentScope()->getOuter()->getEntry("INTEGER"));
     return getExpressionType(expression) == universalInt;
@@ -907,7 +914,7 @@ std::shared_ptr<Type> Parser::getExpressionType(
 }
 
 // Gets the type associated with a location, recursively.
-shared_ptr<Type> Parser::getLocationType(const shared_ptr<Location>& location) {
+shared_ptr<Type> Parser::getLocationType(const shared_ptr<Location> &location) {
     auto variable = dynamic_pointer_cast<VariableLocation>(location);
     auto index = dynamic_pointer_cast<Index>(location);
     auto field = dynamic_pointer_cast<Field>(location);

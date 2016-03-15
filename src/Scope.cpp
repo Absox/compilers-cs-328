@@ -28,7 +28,7 @@ bool Scope::scopeContainsEntry(const string &identifier) const {
 
 bool Scope::containsEntry(const string &identifier) const {
     return scopeContainsEntry(identifier) ||
-           outer != 0 && outer->containsEntry(identifier);
+            (outer != 0 && outer->containsEntry(identifier));
 }
 
 void Scope::addEntry(const string &identifier, const std::shared_ptr<Entry> &entry) {
