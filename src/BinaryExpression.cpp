@@ -21,7 +21,7 @@ BinaryExpression::~BinaryExpression() {
 
 }
 
-string BinaryExpression::getType() {
+string BinaryExpression::getLabel() {
     return operation;
 }
 

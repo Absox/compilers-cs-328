@@ -13,6 +13,8 @@
 #include "Record.h"
 #include "NumberExpression.h"
 #include "BinaryExpression.h"
+#include "Index.h"
+#include "Field.h"
 
 using std::shared_ptr;
 using std::string;
@@ -343,11 +345,12 @@ shared_ptr<Expression> Parser::factor() throw(ParseException) {
         result = shared_ptr<NumberExpression>(new NumberExpression(value));
     } else if (match("identifier")) {
         result = designator();
+
         // Check if we can do constant folding with this designator.
         auto variable = dynamic_pointer_cast<VariableLocation>(result);
         if (variable != 0) {
             auto entry = symbolTable.getCurrentScope()
-                    ->getEntry(variable->getType());
+                    ->getEntry(variable->getLabel());
             auto constant = dynamic_pointer_cast<Constant>(entry);
             if (constant != 0) {
                 result = shared_ptr<NumberExpression>(
@@ -374,29 +377,99 @@ shared_ptr<Location> Parser::designator() throw(ParseException) {
     setState("Designator");
     indent();
 
-    result = selector(shared_ptr<VariableLocation>(
-            new VariableLocation(processToken("identifier").getValue())));
+    result = selector(processToken("identifier"));
 
     deindent();
     return result;
 }
 
 shared_ptr<Location> Parser::selector(
-        const shared_ptr<VariableLocation>& variable) throw(ParseException) {
-    shared_ptr<Location> result = variable;
+        const Token& identifier) throw(ParseException) {
+    shared_ptr<Location> result;
+    shared_ptr<Entry> currentEntry;
+    shared_ptr<Type> currentType;
+
     setState("Selector");
     indent();
 
-    // TODO
+    if (!suppressContextErrors) {
+        result = shared_ptr<VariableLocation>(
+                new VariableLocation(identifier.getValue()));
+        currentEntry = symbolTable.getCurrentScope()->getEntry(
+                identifier.getValue());
+
+        if (currentEntry == 0) {
+            throw ParseException("Context violation: "
+                                 + identifier.toString() + " not declared!");
+        }
+
+        // If var, we should get the type.
+        auto var = dynamic_pointer_cast<Variable>(currentEntry);
+
+        // Type checking: must be variable or a constant
+        if (var == 0 && dynamic_pointer_cast<Constant>(currentEntry) == 0) {
+            throw ParseException("Context violation: " + identifier.toString()
+                                 + " is not a constant or a variable!");
+        }
+        if (var != 0) currentType = var->getType();
+    }
+
+    // TODO context checking (concurrent)
+
+
     while (match("[") || match(".")) {
         if (match("[")) {
+
+            // Bracket operator only applicable to arrays.
+
             processToken("[");
-            expressionList();
+
+            auto indices = expressionList();
+
+            if (!suppressContextErrors) {
+                for (unsigned int c = 0; c < indices.size(); c++) {
+
+                    auto array = dynamic_pointer_cast<Array>(currentType);
+                    if (array == 0) {
+                        throw ParseException("Context violation: selector at "
+                        + identifier.toString() + " does not denote an array!");
+                    }
+                    currentType = array->getType();
+
+                    result = shared_ptr<Index>(new Index(result, indices[c]));
+                }
+            }
+
+
             processToken("]");
         } else {
+
+            // Selector operator only applicable to records.
             processToken(".");
-            processToken("identifier");
+            auto variableLocation = shared_ptr<VariableLocation>(
+                    new VariableLocation(
+                            processToken("identifier").getValue()));
+
+            if (!suppressContextErrors) {
+                auto record = dynamic_pointer_cast<Record>(currentType);
+                if (record == 0) {
+                    throw ParseException("Context violation: selector at "
+                    + identifier.toString() + " does not denote a record!");
+                }
+                result = shared_ptr<Field>(new Field(result, variableLocation));
+            }
         }
+    }
+
+    if (!suppressContextErrors) {
+
+        if (dynamic_pointer_cast<Variable>(currentEntry) == 0
+                && dynamic_pointer_cast<Constant>(currentEntry) == 0) {
+            throw ParseException("Context violation: designator beginning at "
+                                 + identifier.toString()
+                                 + "must specify either variable or constant!");
+        }
+
     }
     
     deindent();

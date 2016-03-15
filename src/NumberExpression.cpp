@@ -11,7 +11,7 @@ NumberExpression::NumberExpression(const int &value) {
 NumberExpression::~NumberExpression() {
 }
 
-std::string NumberExpression::getType() {
+std::string NumberExpression::getLabel() {
     return "Number";
 }
 

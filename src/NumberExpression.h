@@ -12,7 +12,7 @@ class NumberExpression : public Expression {
 public:
     NumberExpression(const int& value);
     virtual ~NumberExpression();
-    virtual std::string getType();
+    virtual std::string getLabel();
 
     int getValue() const;
 private:

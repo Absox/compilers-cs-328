@@ -71,8 +71,7 @@ private:
     std::shared_ptr<Expression> term() throw(ParseException);
     std::shared_ptr<Expression> factor() throw(ParseException);
     std::shared_ptr<Location> designator() throw(ParseException);
-    std::shared_ptr<Location> selector(
-            const std::shared_ptr<VariableLocation>& variable)
+    std::shared_ptr<Location> selector(const Token& identifier)
             throw(ParseException);
     std::vector<std::shared_ptr<Expression>> expressionList()
             throw(ParseException);

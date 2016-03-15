@@ -14,6 +14,6 @@ VariableLocation::~VariableLocation() {
 
 }
 
-std::string VariableLocation::getType() {
+std::string VariableLocation::getLabel() {
     return identifier;
 }

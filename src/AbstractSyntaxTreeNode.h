@@ -12,7 +12,7 @@ class AbstractSyntaxTreeNode {
 public:
     AbstractSyntaxTreeNode();
     virtual ~AbstractSyntaxTreeNode();
-    virtual std::string getType() = 0;
+    virtual std::string getLabel() = 0;
 private:
 
 };

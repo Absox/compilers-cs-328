@@ -4,14 +4,18 @@
 
 #include "Index.h"
 
-Index::Index() {
+using std::shared_ptr;
 
+Index::Index(const shared_ptr<Location>& location,
+             const shared_ptr<Expression>& expression) {
+    this->location = location;
+    this->expression = expression;
 }
 
 Index::~Index() {
 
 }
 
-std::string Index::getType() {
+std::string Index::getLabel() {
     return "Index";
 }

@@ -12,9 +12,10 @@
 
 class Field : public Location {
 public:
-    Field();
+    Field(const std::shared_ptr<Location>& location,
+          const std::shared_ptr<VariableLocation>& variable);
     virtual ~Field();
-    virtual std::string getType();
+    virtual std::string getLabel();
 private:
     std::shared_ptr<Location> location;
     std::shared_ptr<VariableLocation> variable;

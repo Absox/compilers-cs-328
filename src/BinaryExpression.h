@@ -16,7 +16,7 @@ public:
                      const std::shared_ptr<Expression>& expression_left,
                      const std::shared_ptr<Expression>& expression_right);
     virtual ~BinaryExpression();
-    virtual std::string getType();
+    virtual std::string getLabel();
 
     std::shared_ptr<NumberExpression> fold();
     std::string getOperation() const;

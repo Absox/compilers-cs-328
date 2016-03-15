@@ -4,14 +4,19 @@
 
 #include "Field.h"
 
-Field::Field() {
+using std::shared_ptr;
 
+Field::Field(const shared_ptr<Location>& location,
+             const shared_ptr<VariableLocation>& variable) {
+    this->location = location;
+    this->variable = variable;
 }
 
 Field::~Field() {
 
 }
 
-std::string Field::getType() {
+std::string Field::getLabel() {
     return "Field";
 }
+

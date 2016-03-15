@@ -11,7 +11,7 @@ class Expression : public AbstractSyntaxTreeNode {
 public:
     Expression();
     virtual ~Expression();
-    virtual std::string getType() = 0;
+    virtual std::string getLabel() = 0;
 
 };
 

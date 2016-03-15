@@ -12,7 +12,7 @@ class VariableLocation : public Location {
 public:
     VariableLocation(const std::string& identifier);
     virtual ~VariableLocation();
-    virtual std::string getType();
+    virtual std::string getLabel();
 private:
     std::string identifier;
 

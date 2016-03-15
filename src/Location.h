@@ -12,7 +12,7 @@ class Location : public Expression {
 public:
     Location();
     virtual ~Location();
-    virtual std::string getType() = 0;
+    virtual std::string getLabel() = 0;
 };
 
 
