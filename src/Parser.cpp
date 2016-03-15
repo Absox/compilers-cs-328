@@ -658,7 +658,8 @@ void Parser::instructions() throw(ParseException) {
     deindent();
 }
 
-void Parser::instruction() throw(ParseException) {
+shared_ptr<Instruction> Parser::instruction() throw(ParseException) {
+    shared_ptr<Instruction> result;
     setState("Instruction");
     indent();
     
@@ -671,26 +672,43 @@ void Parser::instruction() throw(ParseException) {
     } else if (match("WHILE")) {
         parseWhile();
     } else if (match("READ")) {
-        read();
+        result = read();
     } else if (match("WRITE")) {
-        write();
+        result = write();
     } else {
         throw ParseException("Instruction expected; actual: "
                 + currentToken.toString());
     }
     
     deindent();
+    return result;
 }
 
-void Parser::assign() throw(ParseException) {
+shared_ptr<Assign> Parser::assign() throw(ParseException) {
+    shared_ptr<Assign> result;
     setState("Assign");
     indent();
     
-    designator();
+    auto assignmentLocation = designator();
     processToken(":=");
-    expression();
+    auto assignmentExpression = expression();
+
+    if (!suppressContextErrors) {
+
+        auto locationType = getLocationType(assignmentLocation);
+        auto expressionType = getExpressionType(assignmentExpression);
+
+        if (locationType != expressionType) {
+            throw ParseException(
+                    "Context error: assignment with incompatible types!");
+        }
+
+        result = shared_ptr<Assign>(
+                new Assign(assignmentLocation, assignmentExpression));
+    }
     
     deindent();
+    return result;
 }
 
 void Parser::parseIf() throw(ParseException) {
@@ -757,7 +775,7 @@ void Parser::repeat() throw(ParseException) {
     processToken("REPEAT");
     instructions();
     processToken("UNTIL");
-    condition();
+    auto repeatCondition = condition();
     processToken("END");
 
     deindent();
@@ -837,11 +855,21 @@ std::shared_ptr<Type> Parser::findType(const string& identifier) {
  * operators can only be worked on integers.
  */
 bool Parser::isExpressionNumeric(const shared_ptr<Expression>& expression) {
+    static auto universalInt = dynamic_pointer_cast<Type>(
+            symbolTable.getCurrentScope()->getOuter()->getEntry("INTEGER"));
+    return getExpressionType(expression) == universalInt;
+}
+
+
+std::shared_ptr<Type> Parser::getExpressionType(
+        const std::shared_ptr<Expression> &expression) {
+    static auto universalInt = dynamic_pointer_cast<Type>(
+            symbolTable.getCurrentScope()->getOuter()->getEntry("INTEGER"));
     auto location = dynamic_pointer_cast<Location>(expression);
     if (location != 0) {
-        return getLocationType(location)->getEntryType() == "INTEGER";
+        return getLocationType(location);
     }
-    return true;
+    return universalInt;
 }
 
 // Gets the type associated with a location, recursively.

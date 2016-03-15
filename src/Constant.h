@@ -19,7 +19,7 @@ public:
 
     void setValue(const int& value);
     virtual std::string getEntryType() const override;
-    virtual void acceptVisitor(ScopeVisitor& visitor);
+    virtual void acceptVisitor(ScopeVisitor& visitor) override;
     int getValue();
     std::shared_ptr<Type> getType() const;
 

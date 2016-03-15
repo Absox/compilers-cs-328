@@ -9,7 +9,7 @@
 #include <memory>
 #include "ScopeVisitor.h"
 
-class Entry : public std::enable_shared_from_this<Entry> {
+class Entry {
 public:
     Entry();
     virtual ~Entry();

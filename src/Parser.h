@@ -25,6 +25,7 @@
 #include "Condition.h"
 #include "Write.h"
 #include "Read.h"
+#include "Assign.h"
 
 class Observer;
 
@@ -80,8 +81,8 @@ private:
     std::shared_ptr<Type> type() throw(ParseException);
     std::vector<Token> identifierList() throw(ParseException);
     void instructions() throw(ParseException);
-    void instruction() throw(ParseException);
-    void assign() throw(ParseException);
+    std::shared_ptr<Instruction> instruction() throw(ParseException);
+    std::shared_ptr<Assign> assign() throw(ParseException);
     void parseIf() throw(ParseException);
     std::shared_ptr<Condition> condition() throw(ParseException);
     void repeat() throw(ParseException);
@@ -91,6 +92,8 @@ private:
 
     std::shared_ptr<Type> findType(const std::string& identifier);
     bool isExpressionNumeric(const std::shared_ptr<Expression>& expression);
+    std::shared_ptr<Type> getExpressionType(
+            const std::shared_ptr<Expression>& expression);
     std::shared_ptr<Type> getLocationType(
             const std::shared_ptr<Location>& location);
     
