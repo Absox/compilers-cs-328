@@ -16,6 +16,9 @@ public:
           const std::shared_ptr<VariableLocation>& variable);
     virtual ~Field();
     virtual std::string getLabel();
+
+    std::shared_ptr<Location> getLocation() const;
+    std::shared_ptr<VariableLocation> getVariable() const;
 private:
     std::shared_ptr<Location> location;
     std::shared_ptr<VariableLocation> variable;

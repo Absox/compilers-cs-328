@@ -20,3 +20,10 @@ std::string Field::getLabel() {
     return "Field";
 }
 
+std::shared_ptr<Location> Field::getLocation() const {
+    return location;
+}
+
+std::shared_ptr<VariableLocation> Field::getVariable() const {
+    return variable;
+}

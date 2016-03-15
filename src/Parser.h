@@ -88,6 +88,9 @@ private:
     void write() throw(ParseException);
 
     std::shared_ptr<Type> findType(const std::string& identifier);
+    bool isExpressionNumeric(const std::shared_ptr<Expression>& expression);
+    std::shared_ptr<Type> getLocationType(
+            const std::shared_ptr<Location>& location);
     
 };
 

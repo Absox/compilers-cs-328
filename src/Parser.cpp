@@ -7,6 +7,7 @@
  */
 
 #include <iostream>
+#include <stack>
 
 #include "Parser.h"
 #include "Constant.h"
@@ -21,6 +22,7 @@
 using std::cout;
 using std::endl;
 
+using std::stack;
 using std::shared_ptr;
 using std::string;
 using std::to_string;
@@ -264,7 +266,8 @@ shared_ptr<Expression> Parser::expression() throw(ParseException) {
 
     setState("Expression");
     indent();
-    
+
+    // TODO Check that expression is numeric
     if (match("+")) {
         processToken("+");
     } else if (match("-")) {
@@ -313,6 +316,8 @@ shared_ptr<Expression> Parser::term() throw(ParseException) {
     shared_ptr<Expression> result;
     setState("Term");
     indent();
+
+    // TODO check that expression is numeric
     
     result = factor();
     while (match("*") || match("DIV") || match("MOD")) {
@@ -365,6 +370,8 @@ shared_ptr<Expression> Parser::factor() throw(ParseException) {
 
     } else if (match("(")) {
         processToken("(");
+
+        // TODO check that expression is numeric
         result = expression();
         processToken(")");
         
@@ -750,4 +757,56 @@ AbstractSyntaxTree &Parser::getAbstractSyntaxTree() {
 std::shared_ptr<Type> Parser::findType(const string& identifier) {
     return dynamic_pointer_cast<Type>(
             symbolTable.getCurrentScope()->getEntry(identifier));
+}
+
+/*
+ * If we have an expression that indicates a location, we check if
+ * that location denotes an integer. Otherwise we assume true, because
+ * operators can only be worked on integers.
+ */
+bool Parser::isExpressionNumeric(const shared_ptr<Expression>& expression) {
+    auto location = dynamic_pointer_cast<Location>(expression);
+    if (location != 0) {
+        return getLocationType(location)->getEntryType() == "INTEGER";
+    }
+    return true;
+}
+
+// Gets the type associated with a location, recursively.
+shared_ptr<Type> Parser::getLocationType(const shared_ptr<Location>& location) {
+    auto variable = dynamic_pointer_cast<VariableLocation>(location);
+    auto index = dynamic_pointer_cast<Index>(location);
+    auto field = dynamic_pointer_cast<Field>(location);
+
+    if (variable != 0) {
+        auto entry = symbolTable.getCurrentScope()->getEntry(
+                variable->getIdentifier());
+        auto variableEntry = dynamic_pointer_cast<Variable>(entry);
+        auto constEntry = dynamic_pointer_cast<Constant>(entry);
+        if (variableEntry != 0) {
+            return variableEntry->getType();
+        } else if (constEntry != 0) {
+            return constEntry->getType();
+        }
+    } else if (index != 0) {
+        auto parentArray = dynamic_pointer_cast<Array>(
+                getLocationType(index->getLocation()));
+        if (parentArray != 0) {
+            return parentArray->getType();
+        }
+
+    } else if (field != 0) {
+        auto parentRecord = dynamic_pointer_cast<Record>(
+                getLocationType(field->getLocation()));
+        if (parentRecord != 0) {
+            auto fieldEntry = dynamic_pointer_cast<Variable>(
+                    parentRecord->getScope()->getEntry(
+                            field->getVariable()->getIdentifier()));
+            if (fieldEntry != 0) {
+                return fieldEntry->getType();
+            }
+        }
+    }
+
+    return 0;
 }
