@@ -1,6 +1,6 @@
 //
 // Created by Ran on 2/27/2016.
-//
+// rliu14@jhu.edu
 
 #ifndef COMPILERS_HWK4_GRAPHICALSYMBOLTREE_H
 #define COMPILERS_HWK4_GRAPHICALSYMBOLTREE_H

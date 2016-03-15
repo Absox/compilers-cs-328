@@ -1,6 +1,6 @@
 //
 // Created by Ran on 2/26/2016.
-//
+// rliu14@jhu.edu
 
 #ifndef COMPILERS_HWK4_SYMBOLTABLE_H
 #define COMPILERS_HWK4_SYMBOLTABLE_H

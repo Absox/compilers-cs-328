@@ -1,10 +1,9 @@
 //
 // Created by Ran on 2/26/2016.
-//
+// rliu14@jhu.edu
 
 #include "Array.h"
 
-#include <string>
 using std::to_string;
 using std::shared_ptr;
 

@@ -267,12 +267,19 @@ shared_ptr<Expression> Parser::expression() throw(ParseException) {
     setState("Expression");
     indent();
 
-    // TODO Check that expression is numeric
     if (match("+")) {
         processToken("+");
+        if (!suppressContextErrors && !isExpressionNumeric(result)) {
+            throw ParseException(
+                    "Context violation: non-int expression used with operator");
+        }
     } else if (match("-")) {
         processToken("-");
         negate = true;
+        if (!suppressContextErrors && !isExpressionNumeric(result)) {
+            throw ParseException(
+                    "Context violation: non-int expression used with operator");
+        }
     }
     
     result = term();
@@ -285,7 +292,14 @@ shared_ptr<Expression> Parser::expression() throw(ParseException) {
             operation = processToken("-").getValue();
         }
 
+
         auto right = term();
+
+        if (!suppressContextErrors &&
+                (!isExpressionNumeric(result) || !isExpressionNumeric(right))) {
+            throw ParseException(
+                    "Context violation: non-int expression used with operator");
+        }
         auto binary = shared_ptr<BinaryExpression>(
                 new BinaryExpression(operation, result, right));
         auto folded = binary->fold();
@@ -317,8 +331,6 @@ shared_ptr<Expression> Parser::term() throw(ParseException) {
     setState("Term");
     indent();
 
-    // TODO check that expression is numeric
-    
     result = factor();
     while (match("*") || match("DIV") || match("MOD")) {
         string operation;
@@ -331,6 +343,12 @@ shared_ptr<Expression> Parser::term() throw(ParseException) {
         }
 
         auto right = factor();
+        if (!suppressContextErrors &&
+                (!isExpressionNumeric(result) || !isExpressionNumeric(right))) {
+            throw ParseException(
+                    "Context violation: non-int expression used with operator");
+        }
+
         auto binary = shared_ptr<BinaryExpression>(
                 new BinaryExpression(operation, result, right));
         auto folded = binary->fold();
@@ -354,7 +372,20 @@ shared_ptr<Expression> Parser::factor() throw(ParseException) {
         int value = stoi(processToken("integer").getValue());
         result = shared_ptr<NumberExpression>(new NumberExpression(value));
     } else if (match("identifier")) {
-        result = designator();
+
+        auto designatorLocation = designator();
+        auto type = getLocationType(designatorLocation);
+
+        result = designatorLocation;
+
+        /*
+         * For now, this seems to be an unreachable case.
+        // Check that this denotes either a constant or variable.
+        if (!suppressContextErrors && type == 0) {
+            throw ParseException(
+                    "Context error: designator must denote var or const!");
+        }
+         */
 
         // Check if we can do constant folding with this designator.
         auto variable = dynamic_pointer_cast<VariableLocation>(result);
@@ -371,8 +402,11 @@ shared_ptr<Expression> Parser::factor() throw(ParseException) {
     } else if (match("(")) {
         processToken("(");
 
-        // TODO check that expression is numeric
         result = expression();
+        if (!suppressContextErrors && !isExpressionNumeric(result)) {
+            throw ParseException(
+                    "Context violation: non-int expression used with operator");
+        }
         processToken(")");
         
     } else {
@@ -438,6 +472,12 @@ shared_ptr<Location> Parser::selector(
 
             if (!suppressContextErrors) {
                 for (unsigned int c = 0; c < indices.size(); c++) {
+
+                    // Check that each expression in list is numeric
+                    if (!isExpressionNumeric(indices[c])) {
+                        throw ParseException("Context violation: indices at "
+                        + identifier.toString() + " must be numeric!");
+                    }
 
                     auto array = dynamic_pointer_cast<Array>(currentType);
                     if (array == 0) {

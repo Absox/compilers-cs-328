@@ -1,15 +1,11 @@
 //
 // Created by Ran on 2/27/2016.
-//
+// rliu14@jhu.edu
 
 #include "GraphicalSymbolTree.h"
-#include "SymbolTable.h"
-#include "Constant.h"
 #include "Variable.h"
 #include "Array.h"
 #include "Record.h"
-
-#include <vector>
 
 using std::vector;
 using std::string;

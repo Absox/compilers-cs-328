@@ -5,6 +5,14 @@ Type inference (auto keyword) is pretty nice in C++. I was hoping for
 something similar to the diamond operator in Java, but the auto keyword is
 even better than that. Supposedly a similar feature is coming to Java 9.
 
-Unfortunately, separating your source files into different directories
-when they're interdependent is a little bit harder than in Java. I'm sure
-there's some way to do it with CMake.
+I can't really help the creeping sensation that what I've been doing is bad
+object-oriented design, though, what with all the type checking. Perhaps using
+dependency injection, rather than making the symbol table, abstract syntax tree,
+etc. members of the Parser could have remedied this solution. I.e. we generate
+expressions, locations, etc using a Factory with dependency on the SymbolTable.
+Unfortunately, I didn't quite have the foresight for that.
+
+Dependency injection in C++ also tends to increase program complexity. Though
+I suppose it could be done somewhat easily with the aid of smart pointers.
+Actually, this program is already growing a bit too complex for my liking.
+I really hope that there won't be too many further modifications to the Parser.
