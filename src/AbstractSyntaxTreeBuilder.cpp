@@ -4,8 +4,10 @@
 
 #include "AbstractSyntaxTreeBuilder.h"
 #include "Variable.h"
-#include "Record.h"
-#include "Array.h"
+
+#include <iostream>
+
+using std::cout;
 
 using std::string;
 using std::vector;
@@ -207,10 +209,6 @@ void AbstractSyntaxTreeBuilder::processBinary(
 
 void AbstractSyntaxTreeBuilder::processVariable(
         const shared_ptr<VariableLocation> &variable) {
-    auto varEntry = dynamic_pointer_cast<Variable>(
-            symbolTable.getCurrentScope()->getEntry(variable->getIdentifier()));
-    auto type = varEntry->getType();
-
     writeWithIndent("Variable:");
     writeWithIndent("variable =>");
     indent();
@@ -218,7 +216,7 @@ void AbstractSyntaxTreeBuilder::processVariable(
     indent();
     writeWithIndent("type:");
     indent();
-    processType(type);
+    processType(getLocationType(variable));
     deindent();
     deindent();
     writeWithIndent("END VAR");
@@ -250,7 +248,14 @@ void AbstractSyntaxTreeBuilder::processField(
 
     writeWithIndent("variable =>");
     indent();
-    // TODO PROCESS RECORD MEMBERS
+    writeWithIndent("VAR BEGIN");
+    indent();
+    writeWithIndent("type:");
+    indent();
+    processType(getLocationType(field));
+    deindent();
+    deindent();
+    writeWithIndent("END VAR");
     deindent();
 }
 
@@ -259,14 +264,90 @@ void AbstractSyntaxTreeBuilder::processType(const std::shared_ptr<Type> &type) {
     auto array = dynamic_pointer_cast<Array>(type);
 
     if (record != 0) {
-
+        processRecord(record);
     } else if (array != 0) {
-
+        processArray(array);
     } else {
         writeWithIndent(type->getName());
     }
 }
 
+void AbstractSyntaxTreeBuilder::processRecord(
+        const std::shared_ptr<Record> &record) {
+    auto scope = record->getScope();
+    auto scopeIdentifiers = scope->getIdentifiersSorted();
+
+    writeWithIndent("RECORD BEGIN");
+    indent();
+    writeWithIndent("SCOPE BEGIN");
+    indent();
+
+    for (unsigned int c = 0; c < scopeIdentifiers.size(); c++) {
+        auto currentEntry = dynamic_pointer_cast<Variable>(
+                scope->getEntry(scopeIdentifiers[c]));
+        writeWithIndent(scopeIdentifiers[c] + " =>");
+        indent();
+        writeWithIndent("VAR BEGIN");
+        indent();
+        writeWithIndent("type:");
+        indent();
+        processType(currentEntry->getType());
+        deindent();
+        deindent();
+        writeWithIndent("END VAR");
+        deindent();
+
+    }
+
+
+    deindent();
+    writeWithIndent("END SCOPE");
+    deindent();
+    writeWithIndent("END RECORD");
+}
+
+void AbstractSyntaxTreeBuilder::processArray(
+        const std::shared_ptr<Array> &array) {
+    writeWithIndent("ARRAY BEGIN");
+    indent();
+    writeWithIndent("type:");
+    indent();
+    processType(array->getType());
+    deindent();
+    writeWithIndent("length:");
+    indent();
+    writeWithIndent(to_string(array->getLength()));
+    deindent();
+    deindent();
+    writeWithIndent("END ARRAY");
+
+}
+
+// Returns the type associated with a location.
+shared_ptr<Type> AbstractSyntaxTreeBuilder::getLocationType(
+        const shared_ptr<Location>& location) {
+    auto variable = dynamic_pointer_cast<VariableLocation>(location);
+    auto field = dynamic_pointer_cast<Field>(location);
+    auto index = dynamic_pointer_cast<Index>(location);
+    if (variable != 0) {
+        auto variableEntry = dynamic_pointer_cast<Variable>(
+                symbolTable.getCurrentScope()->getEntry(
+                variable->getIdentifier()));
+        return variableEntry->getType();
+    } else if (field != 0) {
+        auto recordEntry = dynamic_pointer_cast<Record>(
+                getLocationType(field->getLocation()));
+        auto fieldEntry = dynamic_pointer_cast<Variable>(
+                recordEntry->getScope()->getEntry(
+                        field->getVariable()->getIdentifier()));
+        return fieldEntry->getType();
+    } else if (index != 0) {
+        auto arrayEntry = dynamic_pointer_cast<Array>(
+                getLocationType(index->getLocation()));
+        return arrayEntry->getType();
+    }
+    return 0;
+}
 
 void AbstractSyntaxTreeBuilder::writeWithIndent(const string &value) {
     for (unsigned int c = 0; c < indentLevel; c++) {
@@ -282,4 +363,3 @@ void AbstractSyntaxTreeBuilder::indent() {
 void AbstractSyntaxTreeBuilder::deindent() {
     indentLevel--;
 }
-

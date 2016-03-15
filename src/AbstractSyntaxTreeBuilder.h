@@ -18,6 +18,8 @@
 #include "Index.h"
 #include "BinaryExpression.h"
 #include "Type.h"
+#include "Record.h"
+#include "Array.h"
 
 class AbstractSyntaxTreeBuilder {
 public:
@@ -48,6 +50,11 @@ private:
     void processIndex(const std::shared_ptr<Index>& index);
     void processField(const std::shared_ptr<Field>& field);
     void processType(const std::shared_ptr<Type>& type);
+    void processRecord(const std::shared_ptr<Record>& record);
+    void processArray(const std::shared_ptr<Array>& array);
+
+    std::shared_ptr<Type> getLocationType(
+            const std::shared_ptr<Location>& location);
 
     void writeWithIndent(const std::string& value);
     void indent();

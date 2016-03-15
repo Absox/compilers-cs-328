@@ -47,8 +47,7 @@ unsigned int Token::getEnd() const {
 }
 
 bool Token::isEof() const {
-    if (type == "eof") return true;
-    return false;
+    return type == "eof";
 }
 
 string Token::toString() const {

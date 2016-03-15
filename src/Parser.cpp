@@ -372,8 +372,6 @@ shared_ptr<Expression> Parser::factor() throw(ParseException) {
     } else if (match("identifier")) {
 
         auto designatorLocation = designator();
-        auto type = getLocationType(designatorLocation);
-
         result = designatorLocation;
 
         /*

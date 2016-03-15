@@ -8,7 +8,6 @@
 
 #include "Scanner.h"
 
-#include <cctype>
 #include <iostream>
 
 using std::string;
@@ -79,7 +78,7 @@ Token Scanner::next() throw(ScannerException) {
             currentPosition++;
             
             if (currentSourceCharacter() == '*') {
-                tokenValue = string();
+                tokenValue = string("");
                 commentDepth++;
                 currentPosition++;
             } else {
@@ -122,53 +121,43 @@ vector<Token> Scanner::all() throw(ScannerException) {
 }
 
 bool Scanner::isWhiteSpace(const char& c) {
-    if (c == '\n'
-        || c == '\r'
-        || c == '\t'
-        || c == '\f'
-        || c == ' ') return true;
-    return false;
+    return c == '\n'
+           || c == '\r'
+           || c == '\t'
+           || c == '\f'
+           || c == ' ';
 }
 
 bool Scanner::isKeyword(const string& s) {
-    if (s == "PROGRAM"
-        || s == "BEGIN"
-        || s == "END"
-        || s == "CONST"
-        || s == "TYPE"
-        || s == "VAR"
-        || s == "ARRAY"
-        || s == "OF"
-        || s == "RECORD"
-        || s == "DIV"
-        || s == "MOD"
-        || s == "IF"
-        || s == "THEN"
-        || s == "ELSE"
-        || s == "REPEAT"
-        || s == "UNTIL"
-        || s == "WHILE"
-        || s == "DO"
-        || s == "READ"
-        || s == "WRITE") {
-        return true;
-    }
-    return false;
+    return s == "PROGRAM"
+           || s == "BEGIN"
+           || s == "END"
+           || s == "CONST"
+           || s == "TYPE"
+           || s == "VAR"
+           || s == "ARRAY"
+           || s == "OF"
+           || s == "RECORD"
+           || s == "DIV"
+           || s == "MOD"
+           || s == "IF"
+           || s == "THEN"
+           || s == "ELSE"
+           || s == "REPEAT"
+           || s == "UNTIL"
+           || s == "WHILE"
+           || s == "DO"
+           || s == "READ"
+           || s == "WRITE";
 }
 
 bool Scanner::isStandaloneToken(const char& c) {
-    if (c == ';' || c == '.' || c == '=' || c == '+' || c == '-' || c == ')'
-            || c == '#' || c == '[' || c == ']' || c == ',' || c == '*') {
-        return true;
-    }
-    return false;
+    return c == ';' || c == '.' || c == '=' || c == '+' || c == '-' || c == ')'
+           || c == '#' || c == '[' || c == ']' || c == ',' || c == '*';
 }
 
 bool Scanner::isAssignmentOrInequality(const char& c) {
-    if (c == ':' || c == '>' || c == '<') {
-        return true;
-    }
-    return false;
+    return c == ':' || c == '>' || c == '<';
 }
 
 char Scanner::currentSourceCharacter() const {

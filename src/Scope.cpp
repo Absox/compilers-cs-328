@@ -27,15 +27,8 @@ bool Scope::scopeContainsEntry(const string &identifier) const {
 }
 
 bool Scope::containsEntry(const string &identifier) const {
-    if (scopeContainsEntry(identifier)) {
-        return true;
-    } else {
-        if (outer != 0) {
-            return outer->containsEntry(identifier);
-        } else {
-            return false;
-        }
-    }
+    return scopeContainsEntry(identifier) ||
+           outer != 0 && outer->containsEntry(identifier);
 }
 
 void Scope::addEntry(const string &identifier, const std::shared_ptr<Entry> &entry) {
@@ -118,6 +111,5 @@ bool Scope::wayToSort(string a, string b) {
     for (unsigned int c = 0; c < minLength; c++) {
         if (a[c] < b[c]) return true;
     }
-    if (a.size() < minLength) return true;
-    return false;
+    return a.size() < minLength;
 }
