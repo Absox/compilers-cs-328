@@ -43,3 +43,11 @@ std::shared_ptr<Condition> Condition::inverse() {
     return shared_ptr<Condition>(
             new Condition(inverseRelation, expression_left, expression_right));
 }
+
+std::shared_ptr<Expression> Condition::getExpressionLeft() {
+    return expression_left;
+}
+
+std::shared_ptr<Expression> Condition::getExpressionRight() {
+    return expression_right;
+}

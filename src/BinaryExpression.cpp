@@ -58,3 +58,11 @@ shared_ptr<NumberExpression> BinaryExpression::fold() {
 string BinaryExpression::getOperation() const {
     return operation;
 }
+
+std::shared_ptr<Expression> BinaryExpression::getExpressionLeft() const {
+    return expression_left;
+}
+
+std::shared_ptr<Expression> BinaryExpression::getExpressionRight() const {
+    return expression_right;
+}

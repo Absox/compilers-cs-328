@@ -17,6 +17,7 @@
 #include "Field.h"
 #include "Index.h"
 #include "BinaryExpression.h"
+#include "Type.h"
 
 class AbstractSyntaxTreeBuilder {
 public:
@@ -46,6 +47,7 @@ private:
     void processVariable(const std::shared_ptr<VariableLocation>& variable);
     void processIndex(const std::shared_ptr<Index>& index);
     void processField(const std::shared_ptr<Field>& field);
+    void processType(const std::shared_ptr<Type>& type);
 
     void writeWithIndent(const std::string& value);
     void indent();

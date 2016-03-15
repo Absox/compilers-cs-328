@@ -20,7 +20,8 @@ public:
 
     std::shared_ptr<NumberExpression> fold();
     std::string getOperation() const;
-
+    std::shared_ptr<Expression> getExpressionLeft() const;
+    std::shared_ptr<Expression> getExpressionRight() const;
 
 private:
     std::string operation;

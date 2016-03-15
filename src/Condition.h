@@ -16,9 +16,11 @@ public:
               const std::shared_ptr<Expression>& expression_left,
               const std::shared_ptr<Expression>& expression_right);
     virtual ~Condition();
-    virtual std::string getLabel();
+    virtual std::string getLabel() override;
 
     std::shared_ptr<Condition> inverse();
+    std::shared_ptr<Expression> getExpressionLeft();
+    std::shared_ptr<Expression> getExpressionRight();
 private:
     std::string relation;
     std::shared_ptr<Expression> expression_left;
