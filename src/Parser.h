@@ -20,7 +20,6 @@
 #include "Token.h"
 #include "SymbolTable.h"
 #include "Type.h"
-#include "AbstractSyntaxTree.h"
 #include "VariableLocation.h"
 #include "Condition.h"
 #include "Write.h"
@@ -44,13 +43,13 @@ public:
     unsigned int getIndentLevel() const;
 
     SymbolTable& getSymbolTable();
-    AbstractSyntaxTree& getAbstractSyntaxTree();
+    std::vector<std::shared_ptr<Instruction>>& getAbstractSyntaxTree();
 
 private:
     bool suppressContextErrors;
     bool suppressAbstractSyntaxErrors;
     SymbolTable symbolTable;
-    AbstractSyntaxTree ast;
+    std::vector<std::shared_ptr<Instruction>> ast;
 
     ParseState state;
     Token currentToken;

@@ -17,6 +17,9 @@ public:
            const std::vector<std::shared_ptr<Instruction>>& instructions);
     virtual ~Repeat();
     virtual std::string getLabel();
+
+    std::shared_ptr<Condition> getCondition();
+    std::vector<std::shared_ptr<Instruction>> getInstructions();
 private:
     std::shared_ptr<Condition> condition;
     std::vector<std::shared_ptr<Instruction>> instructions;

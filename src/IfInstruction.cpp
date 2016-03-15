@@ -23,3 +23,15 @@ IfInstruction::~IfInstruction() {
 std::string IfInstruction::getLabel() {
     return "If";
 }
+
+std::shared_ptr<Condition> IfInstruction::getCondition() {
+    return condition;
+}
+
+std::vector<std::shared_ptr<Instruction>> IfInstruction::getInstructionsTrue() {
+    return instructions_true;
+}
+
+std::vector<std::shared_ptr<Instruction>> IfInstruction::getInstructionsFalse() {
+    return instructions_false;
+}

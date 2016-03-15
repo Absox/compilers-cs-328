@@ -14,6 +14,8 @@ public:
     Read(const std::shared_ptr<Location>& location);
     virtual ~Read();
     virtual std::string getLabel();
+
+    std::shared_ptr<Location> getLocation();
 private:
     std::shared_ptr<Location> location;
 

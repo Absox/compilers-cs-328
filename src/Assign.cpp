@@ -4,8 +4,11 @@
 
 #include "Assign.h"
 
-Assign::Assign(const std::shared_ptr<Location> &location,
-               const std::shared_ptr<Expression> &expression) {
+using std::string;
+using std::shared_ptr;
+
+Assign::Assign(const shared_ptr<Location> &location,
+               const shared_ptr<Expression> &expression) {
     this->location = location;
     this->expression = expression;
 }
@@ -14,8 +17,15 @@ Assign::~Assign() {
 
 }
 
-std::string Assign::getLabel() {
+string Assign::getLabel() {
     return ":=";
 }
 
 
+shared_ptr<Location> Assign::getLocation() {
+    return location;
+}
+
+shared_ptr<Expression> Assign::getExpression() {
+    return expression;
+}

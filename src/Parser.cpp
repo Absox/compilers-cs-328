@@ -122,7 +122,7 @@ void Parser::program() throw(ParseException) {
     
     if (match("BEGIN")) {
         processToken("BEGIN");
-        ast.setInstructions(instructions());
+        ast = instructions();
     }
     
     processToken("END");
@@ -576,6 +576,10 @@ shared_ptr<Type> Parser::type() throw(ParseException) {
             if (length == 0) {
                 throw ParseException("Context error: array length non const!");
             }
+            if (length->getValue() <= 0) {
+                throw ParseException("Length of array must be positive!");
+            }
+
             result = shared_ptr<Type>(new Array(arrayType, length->getValue()));
         }
 
@@ -869,7 +873,7 @@ SymbolTable &Parser::getSymbolTable() {
     return symbolTable;
 }
 
-AbstractSyntaxTree &Parser::getAbstractSyntaxTree() {
+vector<shared_ptr<Instruction>> &Parser::getAbstractSyntaxTree() {
     return ast;
 }
 

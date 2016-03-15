@@ -13,6 +13,8 @@ public:
     Write(const std::shared_ptr<Expression>& expression);
     virtual ~Write();
     virtual std::string getLabel();
+
+    std::shared_ptr<Expression> getExpression();
 private:
     std::shared_ptr<Expression> expression;
 

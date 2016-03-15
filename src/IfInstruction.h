@@ -17,6 +17,10 @@ public:
           const std::vector<std::shared_ptr<Instruction>>& instructions_false);
     virtual ~IfInstruction();
     virtual std::string getLabel();
+
+    std::shared_ptr<Condition> getCondition();
+    std::vector<std::shared_ptr<Instruction>> getInstructionsTrue();
+    std::vector<std::shared_ptr<Instruction>> getInstructionsFalse();
 private:
     std::shared_ptr<Condition> condition;
     std::vector<std::shared_ptr<Instruction>> instructions_true;

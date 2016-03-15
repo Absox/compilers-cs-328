@@ -23,7 +23,6 @@ set(SOURCE_FILES
         ScopeVisitor.cpp
         GraphicalSymbolTree.cpp
         AbstractSyntaxTreeNode.cpp
-        AbstractSyntaxTree.cpp
         Instruction.cpp
         Expression.cpp
         Condition.cpp
@@ -37,7 +36,8 @@ set(SOURCE_FILES
         BinaryExpression.cpp
         Index.cpp
         VariableLocation.cpp
-        Field.cpp)
+        Field.cpp
+        AbstractSyntaxTreeBuilder.cpp)
 
 set(HEADER_FILES
         Array.h
@@ -61,7 +61,6 @@ set(HEADER_FILES
         ScopeVisitor.h
         GraphicalSymbolTree.h
         AbstractSyntaxTreeNode.h
-        AbstractSyntaxTree.h
         Instruction.h
         Expression.h
         Condition.h
@@ -75,6 +74,7 @@ set(HEADER_FILES
         BinaryExpression.h
         Index.h
         VariableLocation.h
-        Field.h)
+        Field.h
+        AbstractSyntaxTreeBuilder.h)
 
 add_library(compilers5_lib STATIC ${SOURCE_FILES} ${HEADER_FILES})

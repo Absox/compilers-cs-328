@@ -50,6 +50,16 @@ CMAKE_BINARY_DIR = /media/sf_workspace/compilers_hwk5
 #=============================================================================
 # Targets provided globally by CMake.
 
+# Special rule for the target install/strip
+install/strip: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
+	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip
+
+# Special rule for the target install/strip
+install/strip/fast: install/strip
+.PHONY : install/strip/fast
+
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
@@ -146,29 +156,29 @@ compilers5_lib/fast:
 	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/build
 .PHONY : compilers5_lib/fast
 
-AbstractSyntaxTree.o: AbstractSyntaxTree.cpp.o
-.PHONY : AbstractSyntaxTree.o
+AbstractSyntaxTreeBuilder.o: AbstractSyntaxTreeBuilder.cpp.o
+.PHONY : AbstractSyntaxTreeBuilder.o
 
 # target to build an object file
-AbstractSyntaxTree.cpp.o:
-	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/AbstractSyntaxTree.cpp.o
-.PHONY : AbstractSyntaxTree.cpp.o
+AbstractSyntaxTreeBuilder.cpp.o:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/AbstractSyntaxTreeBuilder.cpp.o
+.PHONY : AbstractSyntaxTreeBuilder.cpp.o
 
-AbstractSyntaxTree.i: AbstractSyntaxTree.cpp.i
-.PHONY : AbstractSyntaxTree.i
+AbstractSyntaxTreeBuilder.i: AbstractSyntaxTreeBuilder.cpp.i
+.PHONY : AbstractSyntaxTreeBuilder.i
 
 # target to preprocess a source file
-AbstractSyntaxTree.cpp.i:
-	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/AbstractSyntaxTree.cpp.i
-.PHONY : AbstractSyntaxTree.cpp.i
+AbstractSyntaxTreeBuilder.cpp.i:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/AbstractSyntaxTreeBuilder.cpp.i
+.PHONY : AbstractSyntaxTreeBuilder.cpp.i
 
-AbstractSyntaxTree.s: AbstractSyntaxTree.cpp.s
-.PHONY : AbstractSyntaxTree.s
+AbstractSyntaxTreeBuilder.s: AbstractSyntaxTreeBuilder.cpp.s
+.PHONY : AbstractSyntaxTreeBuilder.s
 
 # target to generate assembly for a file
-AbstractSyntaxTree.cpp.s:
-	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/AbstractSyntaxTree.cpp.s
-.PHONY : AbstractSyntaxTree.cpp.s
+AbstractSyntaxTreeBuilder.cpp.s:
+	cd /media/sf_workspace/compilers_hwk5 && $(MAKE) -f src/CMakeFiles/compilers5_lib.dir/build.make src/CMakeFiles/compilers5_lib.dir/AbstractSyntaxTreeBuilder.cpp.s
+.PHONY : AbstractSyntaxTreeBuilder.cpp.s
 
 AbstractSyntaxTreeNode.o: AbstractSyntaxTreeNode.cpp.o
 .PHONY : AbstractSyntaxTreeNode.o
@@ -1017,14 +1027,15 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... compilers5_lib"
+	@echo "... install/strip"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... install"
 	@echo "... list_install_components"
 	@echo "... install/local"
-	@echo "... AbstractSyntaxTree.o"
-	@echo "... AbstractSyntaxTree.i"
-	@echo "... AbstractSyntaxTree.s"
+	@echo "... AbstractSyntaxTreeBuilder.o"
+	@echo "... AbstractSyntaxTreeBuilder.i"
+	@echo "... AbstractSyntaxTreeBuilder.s"
 	@echo "... AbstractSyntaxTreeNode.o"
 	@echo "... AbstractSyntaxTreeNode.i"
 	@echo "... AbstractSyntaxTreeNode.s"

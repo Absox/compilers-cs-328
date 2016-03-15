@@ -4,6 +4,7 @@
 
 #include "Write.h"
 
+using std::string;
 using std::shared_ptr;
 
 Write::Write(const shared_ptr<Expression>& expression) {
@@ -14,6 +15,10 @@ Write::~Write() {
 
 }
 
-std::string Write::getLabel() {
+string Write::getLabel() {
     return "Write";
+}
+
+shared_ptr<Expression> Write::getExpression() {
+    return expression;
 }

@@ -13,13 +13,12 @@
       <sourceFolder url="file://$MODULE_DIR$/src/Constant.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/GraphObserver.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Expression.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/GraphicalSymbolTree.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Array.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Instruction.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Array.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/TextObserver.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Parser.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/SymbolTable.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/Token.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Type.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Observer.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Repeat.h" isTestSource="false" />
@@ -27,11 +26,12 @@
       <sourceFolder url="file://$MODULE_DIR$/src/Constant.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/ParseException.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Assign.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/Scanner.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Record.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Expression.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/AbstractSyntaxTree.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Token.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/NumberExpression.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/GraphicalSymbolTree.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/ScopeVisitor.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Scope.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/IfInstruction.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Write.cpp" isTestSource="false" />
@@ -47,13 +47,13 @@
       <sourceFolder url="file://$MODULE_DIR$/src/ScannerException.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/VariableLocation.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/NumberExpression.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/AbstractSyntaxTreeNode.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Entry.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Location.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/ParseException.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/ScannerException.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/ParseState.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Write.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/AbstractSyntaxTree.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Assign.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Parser.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/IfInstruction.cpp" isTestSource="false" />
@@ -68,9 +68,9 @@
       <sourceFolder url="file://$MODULE_DIR$/src/GraphNode.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/BinaryExpression.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/CMakeLists.txt" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/Array.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/AbstractSyntaxTreeNode.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/ScopeVisitor.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/AbstractSyntaxTreeBuilder.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Scanner.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/AbstractSyntaxTreeBuilder.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/AbstractSyntaxTreeNode.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Condition.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Read.cpp" isTestSource="false" />

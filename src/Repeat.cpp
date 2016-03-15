@@ -6,6 +6,7 @@
 
 using std::shared_ptr;
 using std::vector;
+using std::string;
 
 Repeat::Repeat(const shared_ptr<Condition>& condition,
                const vector<shared_ptr<Instruction>>& instructions) {
@@ -17,6 +18,14 @@ Repeat::~Repeat() {
 
 }
 
-std::string Repeat::getLabel() {
+string Repeat::getLabel() {
     return "Repeat";
+}
+
+shared_ptr<Condition> Repeat::getCondition() {
+    return condition;
+}
+
+vector<shared_ptr<Instruction>> Repeat::getInstructions() {
+    return instructions;
 }

@@ -15,6 +15,9 @@ public:
            const std::shared_ptr<Expression>& expression);
     virtual ~Assign();
     virtual std::string getLabel();
+
+    std::shared_ptr<Location> getLocation();
+    std::shared_ptr<Expression> getExpression();
 private:
     std::shared_ptr<Location> location;
     std::shared_ptr<Expression> expression;

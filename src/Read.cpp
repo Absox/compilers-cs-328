@@ -17,3 +17,7 @@ Read::~Read() {
 std::string Read::getLabel() {
     return "Read";
 }
+
+shared_ptr<Location> Read::getLocation() {
+    return location;
+}
