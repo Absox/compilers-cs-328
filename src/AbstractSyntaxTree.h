@@ -16,6 +16,9 @@ public:
     AbstractSyntaxTree();
     virtual ~AbstractSyntaxTree();
 
+    void setInstructions(
+            const std::vector<std::shared_ptr<Instruction>>& instructions);
+
 private:
     std::vector<std::shared_ptr<Instruction>> instructions;
 };

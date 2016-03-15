@@ -13,7 +13,8 @@
 
 class Repeat : public Instruction {
 public:
-    Repeat();
+    Repeat(const std::shared_ptr<Condition>& condition,
+           const std::vector<std::shared_ptr<Instruction>>& instructions);
     virtual ~Repeat();
     virtual std::string getLabel();
 private:

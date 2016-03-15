@@ -26,6 +26,8 @@
 #include "Write.h"
 #include "Read.h"
 #include "Assign.h"
+#include "IfInstruction.h"
+#include "Repeat.h"
 
 class Observer;
 
@@ -80,13 +82,14 @@ private:
             throw(ParseException);
     std::shared_ptr<Type> type() throw(ParseException);
     std::vector<Token> identifierList() throw(ParseException);
-    void instructions() throw(ParseException);
+    std::vector<std::shared_ptr<Instruction>> instructions()
+            throw(ParseException);
     std::shared_ptr<Instruction> instruction() throw(ParseException);
     std::shared_ptr<Assign> assign() throw(ParseException);
-    void parseIf() throw(ParseException);
+    std::shared_ptr<IfInstruction> parseIf() throw(ParseException);
     std::shared_ptr<Condition> condition() throw(ParseException);
-    void repeat() throw(ParseException);
-    void parseWhile() throw(ParseException);
+    std::shared_ptr<Repeat> repeat() throw(ParseException);
+    std::shared_ptr<IfInstruction> parseWhile() throw(ParseException);
     std::shared_ptr<Read> read() throw(ParseException);
     std::shared_ptr<Write> write() throw(ParseException);
 

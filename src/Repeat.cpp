@@ -4,8 +4,13 @@
 
 #include "Repeat.h"
 
-Repeat::Repeat() {
+using std::shared_ptr;
+using std::vector;
 
+Repeat::Repeat(const shared_ptr<Condition>& condition,
+               const vector<shared_ptr<Instruction>>& instructions) {
+    this->condition = condition;
+    this->instructions = instructions;
 }
 
 Repeat::~Repeat() {

@@ -12,3 +12,8 @@ AbstractSyntaxTree::AbstractSyntaxTree() {
 AbstractSyntaxTree::~AbstractSyntaxTree() {
 
 }
+
+void AbstractSyntaxTree::setInstructions(
+        const std::vector<std::shared_ptr<Instruction>> &instructions) {
+    this->instructions = instructions;
+}

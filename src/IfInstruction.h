@@ -12,14 +12,15 @@
 
 class IfInstruction : public Instruction {
 public:
-    IfInstruction();
+    IfInstruction(const std::shared_ptr<Condition>& condition,
+          const std::vector<std::shared_ptr<Instruction>>& instructions_true,
+          const std::vector<std::shared_ptr<Instruction>>& instructions_false);
     virtual ~IfInstruction();
     virtual std::string getLabel();
 private:
     std::shared_ptr<Condition> condition;
     std::vector<std::shared_ptr<Instruction>> instructions_true;
     std::vector<std::shared_ptr<Instruction>> instructions_false;
-
 };
 
 

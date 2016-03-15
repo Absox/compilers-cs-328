@@ -122,7 +122,7 @@ void Parser::program() throw(ParseException) {
     
     if (match("BEGIN")) {
         processToken("BEGIN");
-        instructions();
+        ast.setInstructions(instructions());
     }
     
     processToken("END");
@@ -644,18 +644,20 @@ vector<Token> Parser::identifierList() throw(ParseException) {
     return result;
 }
 
-void Parser::instructions() throw(ParseException) {
+vector<shared_ptr<Instruction>> Parser::instructions() throw(ParseException) {
+    vector<shared_ptr<Instruction>> result;
     setState("Instructions");
     indent();
     
-    instruction();
+    result.push_back(instruction());
     
     while (match(";")) {
         processToken(";");
-        instruction();
+        result.push_back(instruction());
     }
     
     deindent();
+    return result;
 }
 
 shared_ptr<Instruction> Parser::instruction() throw(ParseException) {
@@ -664,13 +666,13 @@ shared_ptr<Instruction> Parser::instruction() throw(ParseException) {
     indent();
     
     if (match("identifier")) {
-        assign();
+        result = assign();
     } else if (match("IF")) {
-        parseIf();
+        result = parseIf();
     } else if (match("REPEAT")) {
-        repeat();
+        result = repeat();
     } else if (match("WHILE")) {
-        parseWhile();
+        result = parseWhile();
     } else if (match("READ")) {
         result = read();
     } else if (match("WRITE")) {
@@ -711,23 +713,33 @@ shared_ptr<Assign> Parser::assign() throw(ParseException) {
     return result;
 }
 
-void Parser::parseIf() throw(ParseException) {
+shared_ptr<IfInstruction> Parser::parseIf() throw(ParseException) {
+    shared_ptr<IfInstruction> result;
+
     setState("If");
     indent();
     
     processToken("IF");
-    condition();
+    auto ifCondition = condition();
     processToken("THEN");
-    instructions();
+    auto trueInstructions = instructions();
+
+    vector<shared_ptr<Instruction>> falseInstructions;
     
     if (match("ELSE")) {
         processToken("ELSE");
-        instructions();
+        falseInstructions = instructions();
     }
+
+    result = shared_ptr<IfInstruction>(
+            new IfInstruction(
+                    ifCondition, trueInstructions, falseInstructions));
     
     processToken("END");
     
     deindent();
+
+    return result;
 }
 
 shared_ptr<Condition> Parser::condition() throw(ParseException) {
@@ -768,30 +780,47 @@ shared_ptr<Condition> Parser::condition() throw(ParseException) {
     return result;
 }
 
-void Parser::repeat() throw(ParseException) {
+shared_ptr<Repeat> Parser::repeat() throw(ParseException) {
+    shared_ptr<Repeat> result;
     setState("Repeat");
     indent();
     
     processToken("REPEAT");
-    instructions();
+    auto repeatInstructions = instructions();
     processToken("UNTIL");
     auto repeatCondition = condition();
     processToken("END");
 
+    result = shared_ptr<Repeat>(
+            new Repeat(repeatCondition, repeatInstructions));
+
     deindent();
+    return result;
 }
 
-void Parser::parseWhile() throw(ParseException) {
+shared_ptr<IfInstruction> Parser::parseWhile() throw(ParseException) {
+    shared_ptr<IfInstruction> result;
     setState("While");
     indent();
-    
+
+    // Must convert into an IF wrapped around a REPEAT
     processToken("WHILE");
-    condition();
+    auto whileCondition = condition();
+    auto inverseCondition = whileCondition->inverse();
     processToken("DO");
-    instructions();
+    auto whileInstructions = instructions();
     processToken("END");
+
+    auto repeatClause = shared_ptr<Repeat>(
+            new Repeat(inverseCondition, whileInstructions));
+    vector<shared_ptr<Instruction>> ifInstructions;
+    ifInstructions.push_back(repeatClause);
+    vector<shared_ptr<Instruction>> falseInstructions;
+    result = shared_ptr<IfInstruction>(
+            new IfInstruction(whileCondition, ifInstructions, falseInstructions));
     
     deindent();
+    return result;
 }
 
 shared_ptr<Read> Parser::read() throw(ParseException) {
@@ -860,15 +889,18 @@ bool Parser::isExpressionNumeric(const shared_ptr<Expression>& expression) {
     return getExpressionType(expression) == universalInt;
 }
 
-
+// Checks the type of an expression.
 std::shared_ptr<Type> Parser::getExpressionType(
         const std::shared_ptr<Expression> &expression) {
     static auto universalInt = dynamic_pointer_cast<Type>(
             symbolTable.getCurrentScope()->getOuter()->getEntry("INTEGER"));
     auto location = dynamic_pointer_cast<Location>(expression);
+
+    // If we're not a location, we're binary (which must be integer) or number.
     if (location != 0) {
         return getLocationType(location);
     }
+
     return universalInt;
 }
 

@@ -22,3 +22,24 @@ Condition::~Condition() {
 std::string Condition::getLabel() {
     return relation;
 }
+
+std::shared_ptr<Condition> Condition::inverse() {
+    string inverseRelation;
+
+    if (relation == "=") {
+        inverseRelation = "#";
+    } else if (relation == "#") {
+        inverseRelation = "=";
+    } else if (relation == "<") {
+        inverseRelation = ">=";
+    } else if (relation == "<=") {
+        inverseRelation = ">";
+    } else if (relation == ">") {
+        inverseRelation = "<=";
+    } else if (relation == ">=") {
+        inverseRelation = "<";
+    }
+
+    return shared_ptr<Condition>(
+            new Condition(inverseRelation, expression_left, expression_right));
+}
