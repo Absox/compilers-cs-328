@@ -10,9 +10,9 @@
 
 class Write : public Instruction {
 public:
-    Write();
+    Write(const std::shared_ptr<Expression>& expression);
     virtual ~Write();
-    virtual std::string getType();
+    virtual std::string getLabel();
 private:
     std::shared_ptr<Expression> expression;
 

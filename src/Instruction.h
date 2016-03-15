@@ -14,7 +14,7 @@ class Instruction : public AbstractSyntaxTreeNode {
 public:
     Instruction();
     virtual ~Instruction();
-    virtual std::string getType() = 0;
+    virtual std::string getLabel() = 0;
 private:
     std::shared_ptr<Expression> expression;
 };

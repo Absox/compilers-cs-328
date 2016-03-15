@@ -12,6 +12,6 @@ IfInstruction::~IfInstruction() {
 
 }
 
-std::string IfInstruction::getType() {
+std::string IfInstruction::getLabel() {
     return "If";
 }

@@ -12,10 +12,13 @@
 
 class Condition : public AbstractSyntaxTreeNode {
 public:
-    Condition();
+    Condition(const std::string& relation,
+              const std::shared_ptr<Expression>& expression_left,
+              const std::shared_ptr<Expression>& expression_right);
     virtual ~Condition();
-    virtual std::string getType();
+    virtual std::string getLabel();
 private:
+    std::string relation;
     std::shared_ptr<Expression> expression_left;
     std::shared_ptr<Expression> expression_right;
 };

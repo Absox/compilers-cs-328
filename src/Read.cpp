@@ -4,14 +4,16 @@
 
 #include "Read.h"
 
-Read::Read() {
+using std::shared_ptr;
 
+Read::Read(const shared_ptr<Location>& location) {
+    this->location = location;
 }
 
 Read::~Read() {
 
 }
 
-std::string Read::getType() {
+std::string Read::getLabel() {
     return "Read";
 }

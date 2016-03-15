@@ -30,12 +30,10 @@ using std::stoi;
 using std::vector;
 using std::dynamic_pointer_cast;
 
-Parser::Parser(Scanner* scanner, const bool& suppressContextErrors,
-               const bool& suppressAbstractSyntaxErrors)
+Parser::Parser(Scanner* scanner, const bool& suppressContextErrors)
         : state("init"), currentToken("", "", 0, 0) {
     this->scanner = scanner;
     this->suppressContextErrors = suppressContextErrors;
-    this->suppressAbstractSyntaxErrors = suppressAbstractSyntaxErrors;
     indentLevel = 0;
 }
 
@@ -714,30 +712,42 @@ void Parser::parseIf() throw(ParseException) {
     deindent();
 }
 
-void Parser::condition() throw(ParseException) {
+shared_ptr<Condition> Parser::condition() throw(ParseException) {
+    shared_ptr<Condition> result;
+
     setState("Condition");
     indent();
     
-    expression();
+    auto left = expression();
+    string relation;
     if (match("=")) {
-        processToken("=");
+        relation = processToken("=").getValue();
     } else if (match("#")) {
-        processToken("#");
+        relation = processToken("#").getValue();
     } else if (match("<")) {
-        processToken("<");
+        relation = processToken("<").getValue();
     } else if (match(">")) {
-        processToken(">");
+        relation = processToken(">").getValue();
     } else if (match("<=")) {
-        processToken("<=");
+        relation = processToken("<=").getValue();
     } else if (match(">=")) {
-        processToken(">=");
+        relation = processToken(">=").getValue();
     } else {
         throw ParseException("Operator expected in condition; actual: "
                 + currentToken.toString());
     }
-    expression();
+    auto right = expression();
+
+    if (!suppressContextErrors) {
+        if (!isExpressionNumeric(left) || !isExpressionNumeric(right)) {
+            throw ParseException(
+                    "Context error: expressions in condition must be numeric");
+        }
+        result = shared_ptr<Condition>(new Condition(relation, left, right));
+    }
     
     deindent();
+    return result;
 }
 
 void Parser::repeat() throw(ParseException) {
@@ -766,24 +776,46 @@ void Parser::parseWhile() throw(ParseException) {
     deindent();
 }
 
-void Parser::read() throw(ParseException) {
+shared_ptr<Read> Parser::read() throw(ParseException) {
+    shared_ptr<Read> result;
     setState("Read");
     indent();
     
     processToken("READ");
-    designator();
-    
+    auto location = designator();
+
+    if (!suppressContextErrors) {
+        if (!isExpressionNumeric(location)) {
+            throw ParseException(
+                    "Context error: reading into location that is non-numeric");
+        }
+
+        result = shared_ptr<Read>(new Read(location));
+    }
+
     deindent();
+    return result;
 }
 
-void Parser::write() throw(ParseException) {
+shared_ptr<Write> Parser::write() throw(ParseException) {
+    shared_ptr<Write> result;
     setState("Write");
     indent();
     
     processToken("WRITE");
-    expression();
+    auto writeExpression = expression();
+    if (!suppressContextErrors) {
+
+        if (!isExpressionNumeric(writeExpression)) {
+            throw ParseException(
+                    "Context error: expression being written is not numeric");
+        }
+
+        result = shared_ptr<Write>(new Write(writeExpression));
+    }
     
     deindent();
+    return result;
 }
 
 SymbolTable &Parser::getSymbolTable() {

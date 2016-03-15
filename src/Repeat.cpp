@@ -12,6 +12,6 @@ Repeat::~Repeat() {
 
 }
 
-std::string Repeat::getType() {
+std::string Repeat::getLabel() {
     return "Repeat";
 }

@@ -4,6 +4,6 @@
 
 #include "Assign.h"
 
-std::string Assign::getType() {
+std::string Assign::getLabel() {
     return ":=";
 }

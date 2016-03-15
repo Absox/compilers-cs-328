@@ -7,14 +7,15 @@
 
 
 #include "Instruction.h"
+#include "Location.h"
 
 class Read : public Instruction {
 public:
-    Read();
+    Read(const std::shared_ptr<Location>& location);
     virtual ~Read();
-    virtual std::string getType();
+    virtual std::string getLabel();
 private:
-    std::shared_ptr<Expression> expression;
+    std::shared_ptr<Location> location;
 
 };
 

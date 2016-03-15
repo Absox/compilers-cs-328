@@ -13,7 +13,7 @@ class Assign : public Instruction {
 public:
     Assign();
     virtual ~Assign();
-    virtual std::string getType();
+    virtual std::string getLabel();
 private:
     std::shared_ptr<Location> location;
     std::shared_ptr<Expression> expression;

@@ -22,13 +22,15 @@
 #include "Type.h"
 #include "AbstractSyntaxTree.h"
 #include "VariableLocation.h"
+#include "Condition.h"
+#include "Write.h"
+#include "Read.h"
 
 class Observer;
 
 class Parser {
 public:
-    Parser(Scanner* scanner, const bool& suppressContextErrors = true,
-           const bool& suppressAbstractSyntaxErrors = true);
+    Parser(Scanner* scanner, const bool& suppressContextErrors = true);
     virtual ~Parser();
     
     void parse() throw(ParseException);
@@ -81,11 +83,11 @@ private:
     void instruction() throw(ParseException);
     void assign() throw(ParseException);
     void parseIf() throw(ParseException);
-    void condition() throw(ParseException);
+    std::shared_ptr<Condition> condition() throw(ParseException);
     void repeat() throw(ParseException);
     void parseWhile() throw(ParseException);
-    void read() throw(ParseException);
-    void write() throw(ParseException);
+    std::shared_ptr<Read> read() throw(ParseException);
+    std::shared_ptr<Write> write() throw(ParseException);
 
     std::shared_ptr<Type> findType(const std::string& identifier);
     bool isExpressionNumeric(const std::shared_ptr<Expression>& expression);

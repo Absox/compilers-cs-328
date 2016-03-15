@@ -14,7 +14,7 @@ class IfInstruction : public Instruction {
 public:
     IfInstruction();
     virtual ~IfInstruction();
-    virtual std::string getType();
+    virtual std::string getLabel();
 private:
     std::shared_ptr<Condition> condition;
     std::vector<std::shared_ptr<Instruction>> instructions_true;

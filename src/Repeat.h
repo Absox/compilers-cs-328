@@ -15,7 +15,7 @@ class Repeat : public Instruction {
 public:
     Repeat();
     virtual ~Repeat();
-    virtual std::string getType();
+    virtual std::string getLabel();
 private:
     std::shared_ptr<Condition> condition;
     std::vector<std::shared_ptr<Instruction>> instructions;
