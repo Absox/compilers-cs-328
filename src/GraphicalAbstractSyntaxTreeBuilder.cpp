@@ -39,7 +39,7 @@ unsigned int GraphicalAbstractSyntaxTreeBuilder::processInstructions(
     if (ids.size() > 1) {
         stream << "{rank=same;" << endl;
         for (unsigned int c = 1; c < ids.size(); c++) {
-            stream << ids[c-1] << " -> " << ids[c] << endl;
+            stream << ids[c-1] << " -> " << ids[c] << " [label=next]" << endl;
         }
         stream << "}" << endl;
     }
@@ -89,11 +89,14 @@ unsigned int GraphicalAbstractSyntaxTreeBuilder::processAssign(
 
 unsigned int GraphicalAbstractSyntaxTreeBuilder::processIf(
         const std::shared_ptr<IfInstruction> &ifInstruction) {
+    unsigned int conditionNode = processCondition(ifInstruction->getCondition());
     unsigned int instructionsTrueNode = processInstructions(
             ifInstruction->getInstructionsTrue());
     unsigned int ifNode = getNextNodeId();
 
     stream << ifNode << " [label=\"If\", shape=box];" << endl;
+    stream << ifNode << " -> " << conditionNode <<
+            " [label=condition];" << endl;
     stream << ifNode << " -> " << instructionsTrueNode <<
             " [label=true];" << endl;
 

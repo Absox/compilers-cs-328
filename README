@@ -18,4 +18,6 @@ Actually, this program is already growing a bit too complex for my liking.
 I really hope that there won't be too many further modifications to the Parser.
 
 The code could probably also be a bit more DRY, especially when it comes to
-the output generators..
+the output generators. Interestingly enough, because of the symbol table
+information that's required for the text output, the graphical output was
+a bit more straightforward to write than the text output generator.
