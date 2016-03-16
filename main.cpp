@@ -12,10 +12,10 @@
 #include <fstream>
 #include <memory>
 #include <vector>
-#include <GraphicalSymbolTree.h>
-#include <AbstractSyntaxTreeBuilder.h>
-#include <GraphicalAbstractSyntaxTreeBuilder.h>
 
+#include "GraphicalSymbolTree.h"
+#include "AbstractSyntaxTreeBuilder.h"
+#include "GraphicalAbstractSyntaxTreeBuilder.h"
 #include "Scanner.h"
 #include "Parser.h"
 #include "TextObserver.h"
