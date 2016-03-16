@@ -705,6 +705,19 @@ shared_ptr<Assign> Parser::assign() throw(ParseException) {
 
     if (!suppressContextErrors) {
 
+        // Left side must be a variable - i.e. non-const
+        auto variableLocation = dynamic_pointer_cast<VariableLocation>(
+                assignmentLocation);
+        if (variableLocation != 0) {
+            auto variableEntry = dynamic_pointer_cast<Variable>(
+                    symbolTable.getCurrentScope()->getEntry(
+                            variableLocation->getIdentifier()));
+            if (variableEntry == 0) {
+                throw ParseException("Context error: must assign to variable!");
+            }
+        }
+
+        // Types must be compatible
         auto locationType = getLocationType(assignmentLocation);
         auto expressionType = getExpressionType(assignmentExpression);
 
@@ -841,6 +854,19 @@ shared_ptr<Read> Parser::read() throw(ParseException) {
     auto location = designator();
 
     if (!suppressContextErrors) {
+        // Have to check that we're reading into a variable, if our location
+        // is determined by a bare identifier.
+        auto variableLocation =
+                dynamic_pointer_cast<VariableLocation>(location);
+        if (variableLocation != 0) {
+            auto variableEntry = dynamic_pointer_cast<Variable>(
+                    symbolTable.getCurrentScope()->getEntry(
+                            variableLocation->getIdentifier()));
+            if (variableEntry == 0) {
+                throw ParseException("Context error: reading into non-variable");
+            }
+        }
+
         if (!isExpressionNumeric(location)) {
             throw ParseException(
                     "Context error: reading into location that is non-numeric");

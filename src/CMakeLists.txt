@@ -1,5 +1,5 @@
 project(compilers5_lib)
-add_definitions(-std=c++11 -g -Wall -Wextra -pedantic)
+add_definitions(-std=c++11 -Wall -Wextra -pedantic)
 
 set(SOURCE_FILES
         Array.cpp
