@@ -188,7 +188,6 @@ int main(int argc, char **argv) {
                     try {
                         parser->parse();
                         GraphicalAbstractSyntaxTreeBuilder astBuilder(
-                                parser->getSymbolTable(),
                                 parser->getAbstractSyntaxTree());
                         cout << astBuilder.getContent();
                     } catch (ParseException& e) {

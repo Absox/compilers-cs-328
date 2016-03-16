@@ -79,7 +79,6 @@ void AbstractSyntaxTreeBuilder::processAssign(
 
 void AbstractSyntaxTreeBuilder::processIfInstruction(
         const shared_ptr<IfInstruction> &ifInstruction) {
-    // TODO verify handling of instructions
     writeWithIndent("If:");
     writeWithIndent("condition =>");
     indent();
@@ -89,7 +88,6 @@ void AbstractSyntaxTreeBuilder::processIfInstruction(
     indent();
     processInstructions(ifInstruction->getInstructionsTrue());
     deindent();
-    // TODO verify handling of empty case
     auto instructionsFalse = ifInstruction->getInstructionsFalse();
     if (instructionsFalse.size() > 0) {
         writeWithIndent("false =>");
@@ -131,7 +129,6 @@ void AbstractSyntaxTreeBuilder::processWrite(
 
 void AbstractSyntaxTreeBuilder::processCondition(
         const shared_ptr<Condition> &condition) {
-    // TODO verify handling of conditions
     writeWithIndent("Condition (" + condition->getLabel() + "):");
     writeWithIndent("left =>");
     indent();

@@ -25,7 +25,6 @@
 class GraphicalAbstractSyntaxTreeBuilder {
 public:
     GraphicalAbstractSyntaxTreeBuilder(
-            const SymbolTable& symbolTable,
             const std::vector<std::shared_ptr<Instruction>> instructions);
     virtual ~GraphicalAbstractSyntaxTreeBuilder();
     std::string getContent();
