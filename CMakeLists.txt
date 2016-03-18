@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.2)
+set(CMAKE_CXX_COMPILER g++)
+
 project(compilers_hwk5)
 
-add_definitions(-std=c++11)
+add_definitions(-std=c++11 -Os)
 
 include_directories(src)
 

@@ -827,19 +827,21 @@ shared_ptr<IfInstruction> Parser::parseWhile() throw(ParseException) {
     // Must convert into an IF wrapped around a REPEAT
     processToken("WHILE");
     auto whileCondition = condition();
-    auto inverseCondition = whileCondition->inverse();
     processToken("DO");
     auto whileInstructions = instructions();
     processToken("END");
 
-    auto repeatClause = shared_ptr<Repeat>(
-            new Repeat(inverseCondition, whileInstructions));
-    vector<shared_ptr<Instruction>> ifInstructions;
-    ifInstructions.push_back(repeatClause);
-    vector<shared_ptr<Instruction>> falseInstructions;
-    result = shared_ptr<IfInstruction>(
-            new IfInstruction(whileCondition, ifInstructions,
-                              falseInstructions));
+    if (!suppressContextErrors) {
+        auto inverseCondition = whileCondition->inverse();
+        auto repeatClause = shared_ptr<Repeat>(
+                new Repeat(inverseCondition, whileInstructions));
+        vector<shared_ptr<Instruction>> ifInstructions;
+        ifInstructions.push_back(repeatClause);
+        vector<shared_ptr<Instruction>> falseInstructions;
+        result = shared_ptr<IfInstruction>(
+                new IfInstruction(whileCondition, ifInstructions,
+                                  falseInstructions));
+    }
 
     deindent();
     return result;
