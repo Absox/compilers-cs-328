@@ -190,7 +190,6 @@ void Parser::constDecl() throw(ParseException) {
                             + identifier.toString()
                             + " does not evaluate to a constant!");
                 }
-
             }
         }
 
@@ -251,12 +250,9 @@ void Parser::varDecl() throw(ParseException) {
                     symbolTable.getCurrentScope()->addEntry(
                             identifiers[c].getValue(), varEntry);
                 }
-
             }
         }
     }
-
-
     deindent();
 }
 
@@ -375,15 +371,16 @@ shared_ptr<Expression> Parser::factor() throw(ParseException) {
 
         auto designatorLocation = designator();
         result = designatorLocation;
+        auto type = getLocationType(designatorLocation);
 
         /*
          * For now, this seems to be an unreachable case.
+         */
         // Check that this denotes either a constant or variable.
         if (!suppressContextErrors && type == 0) {
             throw ParseException(
                     "Context error: designator must denote var or const!");
         }
-         */
 
         // Check if we can do constant folding with this designator.
         auto variable = dynamic_pointer_cast<VariableLocation>(result);
