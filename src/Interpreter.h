@@ -17,7 +17,8 @@ class Interpreter {
 
 public:
     Interpreter(const SymbolTable& symbolTable,
-                const std::vector<std::shared_ptr<Instruction>>& instructions);
+                const std::vector<std::shared_ptr<Instruction>>& instructions)
+        throw (RuntimeException);
     virtual ~Interpreter();
 private:
     std::shared_ptr<Environment> environment;

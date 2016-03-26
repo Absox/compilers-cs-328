@@ -3,6 +3,7 @@
 // rliu14@jhu.edu
 
 #include "Array.h"
+#include "ArrayBox.h"
 
 using std::to_string;
 using std::shared_ptr;
@@ -44,3 +45,9 @@ void Array::acceptVisitor(ScopeVisitor &visitor) {
     visitor.deindent();
     visitor.writeWithIndent("END ARRAY");
 }
+
+
+std::shared_ptr<Box> Array::initializeBox() {
+    return shared_ptr<Box>(new ArrayBox(length, type));
+}
+

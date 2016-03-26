@@ -4,6 +4,7 @@
 
 #include "IntegerBox.h"
 
+using std::shared_ptr;
 
 IntegerBox::IntegerBox() {
     value = 0;
@@ -19,5 +20,11 @@ int IntegerBox::getValue() const {
 
 void IntegerBox::setValue(int newValue) {
     value = newValue;
+}
+
+shared_ptr<Box> IntegerBox::copy() {
+    shared_ptr<IntegerBox> result(new IntegerBox);
+    result->setValue(value);
+    return result;
 }
 

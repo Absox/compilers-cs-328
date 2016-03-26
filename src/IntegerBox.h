@@ -15,6 +15,8 @@ public:
 
     int getValue() const;
     void setValue(int newValue);
+
+    virtual std::shared_ptr<Box> copy() override;
 private:
     int value;
 };

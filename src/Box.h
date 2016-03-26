@@ -6,10 +6,14 @@
 #define COMPILERS_HWK5_BOX_H
 
 
+#include <memory>
+
 class Box {
 public:
     Box();
     virtual ~Box();
+
+    virtual std::shared_ptr<Box> copy() = 0;
 
 };
 

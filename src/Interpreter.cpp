@@ -16,7 +16,8 @@ using std::endl;
 
 
 Interpreter::Interpreter(const SymbolTable &symbolTable,
-                         const vector<shared_ptr<Instruction>> &instructions) {
+                         const vector<shared_ptr<Instruction>> &instructions)
+    throw (RuntimeException) {
     buildEnvironment(symbolTable);
     run(instructions);
 }

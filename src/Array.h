@@ -18,6 +18,8 @@ public:
     int getLength() const;
 
     virtual void acceptVisitor(ScopeVisitor& visitor) override;
+    virtual std::shared_ptr<Box> initializeBox() override;
+
 private:
     std::shared_ptr<Type> type;
     int length;

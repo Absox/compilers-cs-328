@@ -3,6 +3,7 @@
 // rliu14@jhu.edu
 
 #include "Record.h"
+#include "RecordBox.h"
 
 using std::shared_ptr;
 
@@ -31,3 +32,8 @@ void Record::acceptVisitor(ScopeVisitor &visitor) {
     visitor.deindent();
     visitor.writeWithIndent("END RECORD");
 }
+
+std::shared_ptr<Box> Record::initializeBox() {
+    return shared_ptr<Box>(new RecordBox(scope->buildEnvironment()));
+}
+
