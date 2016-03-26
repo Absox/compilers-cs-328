@@ -207,8 +207,6 @@ int main(int argc, char **argv) {
                         cout << astBuilder.getContent();
                     } catch (ParseException &e) {
                         cerr << "error: " << e.getMessage() << endl;
-                    } catch (RuntimeException &e) {
-                        cerr << "error: " << e.getMessage() << endl;
                     }
                 }
                 break;
@@ -217,9 +215,12 @@ int main(int argc, char **argv) {
                 parser = unique_ptr<Parser>(new Parser(&scanner, false));
                 try {
                     parser->parse();
-                    Interpreter(parser->getSymbolTable(),
+                    Interpreter interpreter(parser->getSymbolTable(),
                                 parser->getAbstractSyntaxTree());
+
                 } catch (ParseException& e) {
+                    cerr << "error: " << e.getMessage() << endl;
+                } catch (RuntimeException &e) {
                     cerr << "error: " << e.getMessage() << endl;
                 }
                 break;

@@ -19,9 +19,12 @@ public:
     void assign(const std::shared_ptr<ArrayBox>& other);
     virtual std::shared_ptr<Box> copy() override;
 
+    unsigned int getSize() const;
+    std::shared_ptr<Box> getEntry(const int& index) const;
+
 private:
     std::shared_ptr<Box>* boxes;
-    int size;
+    unsigned int size;
 };
 
 

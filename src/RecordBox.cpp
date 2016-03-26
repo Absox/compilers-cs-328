@@ -36,3 +36,8 @@ shared_ptr<Box> RecordBox::copy() {
     return result;
 }
 
+
+std::shared_ptr<Box> RecordBox::getEntry(const std::string &identifier) const {
+    return entries.at(identifier);
+}
+

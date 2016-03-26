@@ -18,6 +18,8 @@ public:
                 scope);
     virtual ~Environment();
 
+    std::shared_ptr<Box> getBox(const std::string& identifier);
+
 private:
     std::unordered_map<std::string, std::shared_ptr<Box>> scope;
 };

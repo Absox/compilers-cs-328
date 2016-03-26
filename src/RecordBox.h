@@ -19,6 +19,7 @@ public:
 
     void assign(const std::shared_ptr<RecordBox>& other);
     virtual std::shared_ptr<Box> copy() override;
+    std::shared_ptr<Box> getEntry(const std::string& identifier) const;
 
 private:
     std::unordered_map<std::string, std::shared_ptr<Box>> entries;

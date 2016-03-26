@@ -41,3 +41,14 @@ std::shared_ptr<Box> ArrayBox::copy() {
     return result;
 }
 
+
+unsigned int ArrayBox::getSize() const {
+    return size;
+}
+
+std::shared_ptr<Box> ArrayBox::getEntry(const int &index) const {
+    return boxes[index];
+}
+
+
+
