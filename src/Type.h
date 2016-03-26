@@ -6,6 +6,7 @@
 #define COMPILERS_HWK4_TYPE_H
 
 #include "Entry.h"
+#include "Box.h"
 
 #include <string>
 
@@ -17,6 +18,8 @@ public:
     std::string getName() const;
     virtual std::string getEntryType() const override;
     virtual void acceptVisitor(ScopeVisitor& visitor) override;
+
+    virtual std::shared_ptr<Box> initializeBox();
 private:
     std::string name;
 };

@@ -12,6 +12,7 @@
 #include <fstream>
 #include <memory>
 #include <vector>
+#include <Interpreter.h>
 
 #include "GraphicalSymbolTree.h"
 #include "AbstractSyntaxTreeBuilder.h"
@@ -72,6 +73,7 @@ int main(int argc, char **argv) {
     const int PARSER = 4;
     const int SYMBOL_TABLE = 5;
     const int ABSTRACT_SYNTAX_TREE = 6;
+    const int INTERPRETER = 7;
 
     try {
 
@@ -91,6 +93,8 @@ int main(int argc, char **argv) {
                 option = SYMBOL_TABLE;
             } else if (argv[1][1] == 'a') {
                 option = ABSTRACT_SYNTAX_TREE;
+            } else if (argv[1][1] == 'i') {
+                option = INTERPRETER;
             } else {
                 throw INVALID_OPTIONS;
             }
@@ -100,7 +104,8 @@ int main(int argc, char **argv) {
 
         if (argc > 2) {
             if (argv[2][0] == '-') {
-                if (argv[2][1] == 'g' && option != SCANNER) {
+                if (argv[2][1] == 'g' && option != SCANNER
+                    && option != INTERPRETER) {
                     graphical = true;
                     if (argc > 3) {
                         filename = argv[3];
@@ -202,7 +207,20 @@ int main(int argc, char **argv) {
                         cout << astBuilder.getContent();
                     } catch (ParseException &e) {
                         cerr << "error: " << e.getMessage() << endl;
+                    } catch (RuntimeException &e) {
+                        cerr << "error: " << e.getMessage() << endl;
                     }
+                }
+                break;
+
+            case INTERPRETER:
+                parser = unique_ptr<Parser>(new Parser(&scanner, false));
+                try {
+                    parser->parse();
+                    Interpreter(parser->getSymbolTable(),
+                                parser->getAbstractSyntaxTree());
+                } catch (ParseException& e) {
+                    cerr << "error: " << e.getMessage() << endl;
                 }
                 break;
         }

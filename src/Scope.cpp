@@ -3,15 +3,18 @@
 // rliu14@jhu.edu
 
 #include "Scope.h"
-#include "Type.h"
+#include "Variable.h"
 
 #include <iostream>
 #include <algorithm>
 
 using std::cout;
+using std::endl;
 using std::shared_ptr;
 using std::string;
 using std::vector;
+using std::unordered_map;
+using std::dynamic_pointer_cast;
 
 Scope::Scope(const shared_ptr<Scope>& outer) {
     this->outer = outer;
@@ -113,3 +116,23 @@ bool Scope::wayToSort(string a, string b) {
     }
     return a.size() < minLength;
 }
+
+
+unordered_map<string, shared_ptr<Box>> Scope::buildEnvironment() {
+    unordered_map<string, shared_ptr<Box>> result;
+    vector<string> scopeIdentifiers = getIdentifiersSorted();
+
+    for (unsigned int c = 0; c < scopeIdentifiers.size(); c++) {
+
+        auto variable = dynamic_pointer_cast<Variable>(
+                getEntry(scopeIdentifiers[c]));
+        if (variable != 0) {
+            result[scopeIdentifiers[c]] = variable->getType()->initializeBox();
+        }
+
+    }
+
+
+    return result;
+}
+

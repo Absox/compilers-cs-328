@@ -39,7 +39,13 @@ set(SOURCE_FILES
         Field.cpp
         AbstractSyntaxTreeBuilder.cpp
         GraphicalAbstractSyntaxTreeBuilder.cpp
-        Interpreter.cpp)
+        Interpreter.cpp
+        Environment.cpp
+        Box.cpp
+        IntegerBox.cpp
+        ArrayBox.cpp
+        RecordBox.cpp
+        RuntimeException.cpp)
 
 set(HEADER_FILES
         Array.h
@@ -79,6 +85,12 @@ set(HEADER_FILES
         Field.h
         AbstractSyntaxTreeBuilder.h
         GraphicalAbstractSyntaxTreeBuilder.h
-        Interpreter.h)
+        Interpreter.h
+        Environment.h
+        Box.h
+        IntegerBox.h
+        ArrayBox.h
+        RecordBox.h
+        RuntimeException.h)
 
 add_library(compilers5_lib STATIC ${SOURCE_FILES} ${HEADER_FILES})

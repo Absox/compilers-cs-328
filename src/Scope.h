@@ -11,6 +11,8 @@
 #include <string>
 
 #include "Entry.h"
+#include "Box.h"
+#include "Type.h"
 
 class Scope {
 public:
@@ -30,6 +32,8 @@ public:
 
     void acceptVisitor(ScopeVisitor& visitor);
     std::vector<std::string> getIdentifiersSorted();
+
+    std::unordered_map<std::string, std::shared_ptr<Box>> buildEnvironment();
 
     static Scope* createUniverse();
     static bool wayToSort(std::string a, std::string b);
