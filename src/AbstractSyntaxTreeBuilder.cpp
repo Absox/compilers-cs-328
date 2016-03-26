@@ -244,6 +244,9 @@ void AbstractSyntaxTreeBuilder::processField(
 
     writeWithIndent("variable =>");
     indent();
+    writeWithIndent("Variable:");
+    writeWithIndent("variable =>");
+    indent();
     writeWithIndent("VAR BEGIN");
     indent();
     writeWithIndent("type:");
@@ -252,6 +255,7 @@ void AbstractSyntaxTreeBuilder::processField(
     deindent();
     deindent();
     writeWithIndent("END VAR");
+    deindent();
     deindent();
 }
 

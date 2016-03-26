@@ -38,7 +38,8 @@ set(SOURCE_FILES
         VariableLocation.cpp
         Field.cpp
         AbstractSyntaxTreeBuilder.cpp
-        GraphicalAbstractSyntaxTreeBuilder.cpp)
+        GraphicalAbstractSyntaxTreeBuilder.cpp
+        Interpreter.cpp)
 
 set(HEADER_FILES
         Array.h
@@ -77,6 +78,7 @@ set(HEADER_FILES
         VariableLocation.h
         Field.h
         AbstractSyntaxTreeBuilder.h
-        GraphicalAbstractSyntaxTreeBuilder.h)
+        GraphicalAbstractSyntaxTreeBuilder.h
+        Interpreter.h)
 
 add_library(compilers5_lib STATIC ${SOURCE_FILES} ${HEADER_FILES})
