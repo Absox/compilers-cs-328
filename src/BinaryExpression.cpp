@@ -25,7 +25,7 @@ string BinaryExpression::getLabel() {
     return operation;
 }
 
-shared_ptr<NumberExpression> BinaryExpression::fold() {
+shared_ptr<NumberExpression> BinaryExpression::fold() throw (ParseException) {
 
     shared_ptr<NumberExpression> left =
             dynamic_pointer_cast<NumberExpression>(expression_left);
@@ -43,9 +43,16 @@ shared_ptr<NumberExpression> BinaryExpression::fold() {
             return shared_ptr<NumberExpression>(
                     new NumberExpression(left->getValue() * right->getValue()));
         } else if (operation == "DIV") {
+            if (right->getValue() == 0) {
+                throw ParseException("Can't divide by zero!");
+            }
             return shared_ptr<NumberExpression>(
                     new NumberExpression(left->getValue() / right->getValue()));
         } else if (operation == "MOD") {
+            if (right->getValue() == 0) {
+                throw ParseException("Can't modulus by zero!");
+            }
+
             return shared_ptr<NumberExpression>(
                     new NumberExpression(left->getValue() % right->getValue()));
         }

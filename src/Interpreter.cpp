@@ -104,9 +104,10 @@ void Interpreter::runIfInstruction(
 
 void Interpreter::runRepeat(const shared_ptr<Repeat> &repeat)
         throw (RuntimeException) {
+    // Do until
     do {
         run(repeat->getInstructions());
-    } while(resolveCondition(repeat->getCondition()));
+    } while(!resolveCondition(repeat->getCondition()));
 }
 
 void Interpreter::runRead(const shared_ptr<Read> &read)
@@ -240,6 +241,4 @@ bool Interpreter::isNumeric(const shared_ptr<Expression> &expression)
         return true;
     }
 }
-
-
 

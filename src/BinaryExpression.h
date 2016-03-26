@@ -9,6 +9,7 @@
 
 #include "Expression.h"
 #include "NumberExpression.h"
+#include "ParseException.h"
 
 class BinaryExpression : public Expression {
 public:
@@ -18,7 +19,7 @@ public:
     virtual ~BinaryExpression();
     virtual std::string getLabel();
 
-    std::shared_ptr<NumberExpression> fold();
+    std::shared_ptr<NumberExpression> fold() throw (ParseException);
     std::string getOperation() const;
     std::shared_ptr<Expression> getExpressionLeft() const;
     std::shared_ptr<Expression> getExpressionRight() const;
