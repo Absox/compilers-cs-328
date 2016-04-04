@@ -1,23 +1,18 @@
-600.328 Compilers & Intepreters, Homework 5
+600.328 Compilers & Intepreters, Homework 6
 Ran Liu (rliu14@jhu.edu)
 
-Type inference (auto keyword) is pretty nice in C++. I was hoping for
-something similar to the diamond operator in Java, but the auto keyword is
-even better than that. Supposedly a similar feature is coming to Java 9.
+I opted out of explicitly defining a stack for the interpreter. While I
+understand the concept, having to put various boxes as well as integers and
+expression nodes onto the stack would require defining some encapsulating
+super type. It seemed like more of a bother than it was worth.
 
-I can't really help the creeping sensation that what I've been doing is bad
-object-oriented design, though, what with all the type checking. Perhaps using
-dependency injection, rather than making the symbol table, abstract syntax tree,
-etc. members of the Parser could have remedied this solution. I.e. we generate
-expressions, locations, etc using a Factory with dependency on the SymbolTable.
-Unfortunately, I didn't quite have the foresight for that.
+If building the code generator does require something more explicit, then
+I can always write the code for it then.
 
-Dependency injection in C++ also tends to increase program complexity. Though
-I suppose it could be done somewhat easily with the aid of smart pointers.
-Actually, this program is already growing a bit too complex for my liking.
-I really hope that there won't be too many further modifications to the Parser.
+There's a lot of typecasting of pointers in my implementation, but I'm not
+sure this could have been avoided, not without a fundamental redesign of
+the entire system. As-is, the implementation was fairly simple overall. The
+assignment was much less work than the AST, which took me on the order of 12
+or so development hours.
 
-The code could probably also be a bit more DRY, especially when it comes to
-the output generators. Interestingly enough, because of the symbol table
-information that's required for the text output, the graphical output was
-a bit more straightforward to write than the text output generator.
+I kind of wish I'd come up with a better directory structure.

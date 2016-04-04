@@ -22,10 +22,12 @@ AbstractSyntaxTreeBuilder::AbstractSyntaxTreeBuilder(
         : symbolTable(symbolTable) {
     indentLevel = 0;
 
-    writeWithIndent("instructions =>");
-    indent();
-    processInstructions(instructions);
-    deindent();
+    if (instructions.size() > 0) {
+        writeWithIndent("instructions =>");
+        indent();
+        processInstructions(instructions);
+        deindent();
+    }
 }
 
 AbstractSyntaxTreeBuilder::~AbstractSyntaxTreeBuilder() {
