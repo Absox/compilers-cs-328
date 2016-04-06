@@ -1,18 +1,4 @@
-600.328 Compilers & Intepreters, Homework 6
+600.328 Compilers & Intepreters, Homework 7
 Ran Liu (rliu14@jhu.edu)
 
-I opted out of explicitly defining a stack for the interpreter. While I
-understand the concept, having to put various boxes as well as integers and
-expression nodes onto the stack would require defining some encapsulating
-super type. It seemed like more of a bother than it was worth.
-
-If building the code generator does require something more explicit, then
-I can always write the code for it then.
-
-There's a lot of typecasting of pointers in my implementation, but I'm not
-sure this could have been avoided, not without a fundamental redesign of
-the entire system. As-is, the implementation was fairly simple overall. The
-assignment was much less work than the AST, which took me on the order of 12
-or so development hours.
-
-I kind of wish I'd come up with a better directory structure.
+Seems like an explicit stack still isn't necessary for the interpreter.

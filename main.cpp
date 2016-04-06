@@ -12,8 +12,9 @@
 #include <fstream>
 #include <memory>
 #include <vector>
-#include <Interpreter.h>
 
+#include "Interpreter.h"
+#include "CodeGenerator.h"
 #include "GraphicalSymbolTree.h"
 #include "AbstractSyntaxTreeBuilder.h"
 #include "GraphicalAbstractSyntaxTreeBuilder.h"
@@ -74,6 +75,7 @@ int main(int argc, char **argv) {
     const int SYMBOL_TABLE = 5;
     const int ABSTRACT_SYNTAX_TREE = 6;
     const int INTERPRETER = 7;
+    const int CODE_GENERATOR = 8;
 
     try {
 
@@ -82,40 +84,43 @@ int main(int argc, char **argv) {
         string content;
         bool graphical = false;
 
-        if (argc < 2) throw NO_OPTIONS;
-
-        if (argv[1][0] == '-') {
-            if (argv[1][1] == 's') {
-                option = SCANNER;
-            } else if (argv[1][1] == 'c') {
-                option = PARSER;
-            } else if (argv[1][1] == 't') {
-                option = SYMBOL_TABLE;
-            } else if (argv[1][1] == 'a') {
-                option = ABSTRACT_SYNTAX_TREE;
-            } else if (argv[1][1] == 'i') {
-                option = INTERPRETER;
-            } else {
-                throw INVALID_OPTIONS;
-            }
+        if (argc < 2) {
+            option = CODE_GENERATOR;
         } else {
-            throw NO_OPTIONS;
-        }
-
-        if (argc > 2) {
-            if (argv[2][0] == '-') {
-                if (argv[2][1] == 'g' && option != SCANNER
-                    && option != INTERPRETER) {
-                    graphical = true;
-                    if (argc > 3) {
-                        filename = argv[3];
-                    }
-
+            if (argv[1][0] == '-') {
+                if (argv[1][1] == 's') {
+                    option = SCANNER;
+                } else if (argv[1][1] == 'c') {
+                    option = PARSER;
+                } else if (argv[1][1] == 't') {
+                    option = SYMBOL_TABLE;
+                } else if (argv[1][1] == 'a') {
+                    option = ABSTRACT_SYNTAX_TREE;
+                } else if (argv[1][1] == 'i') {
+                    option = INTERPRETER;
                 } else {
                     throw INVALID_OPTIONS;
                 }
             } else {
-                filename = argv[2];
+                option = CODE_GENERATOR;
+                filename = argv[1];
+            }
+
+            if (argc > 2 && option != CODE_GENERATOR) {
+                if (argv[2][0] == '-') {
+                    if (argv[2][1] == 'g' && option != SCANNER
+                        && option != INTERPRETER) {
+                        graphical = true;
+                        if (argc > 3) {
+                            filename = argv[3];
+                        }
+
+                    } else {
+                        throw INVALID_OPTIONS;
+                    }
+                } else {
+                    filename = argv[2];
+                }
             }
         }
 
@@ -224,19 +229,35 @@ int main(int argc, char **argv) {
                     cerr << "error: " << e.getMessage() << endl;
                 }
                 break;
+            case CODE_GENERATOR:
+                parser = unique_ptr<Parser>(new Parser(&scanner, false));
+                try {
+                    parser->parse();
+                    CodeGenerator codeGenerator(
+                            parser->getSymbolTable(),
+                            parser->getAbstractSyntaxTree());
+
+                } catch (ParseException& e) {
+                    cerr << "error: " << e.getMessage() << endl;
+                }
+                break;
+            default:
+                break;
         }
         
         
     } catch (int& e) {
         switch(e) {
-            case NO_OPTIONS:
+            /*case NO_OPTIONS:
                 cerr << "error: no options specified" << endl;
-                break;
+                break;*/
             case INVALID_OPTIONS:
                 cerr << "error: invalid option" << endl;
                 break;
             case NONEXISTENT_FILE:
                 cerr << "error: file does not exist" << endl;
+            default:
+                cerr << "error: generic error" << endl;
         }
     }
 

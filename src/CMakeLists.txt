@@ -45,7 +45,8 @@ set(SOURCE_FILES
         IntegerBox.cpp
         ArrayBox.cpp
         RecordBox.cpp
-        RuntimeException.cpp)
+        RuntimeException.cpp
+        CodeGenerator.cpp)
 
 set(HEADER_FILES
         Array.h
@@ -91,6 +92,7 @@ set(HEADER_FILES
         IntegerBox.h
         ArrayBox.h
         RecordBox.h
-        RuntimeException.h)
+        RuntimeException.h
+        CodeGenerator.h)
 
 add_library(compilers5_lib STATIC ${SOURCE_FILES} ${HEADER_FILES})

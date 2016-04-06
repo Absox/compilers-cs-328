@@ -17,10 +17,11 @@ public:
 
     virtual std::string getEntryType() const override;
     virtual void acceptVisitor(ScopeVisitor& visitor) override;
-    std::shared_ptr<Type> getType();
+    std::shared_ptr<Type> getType() const;
 
 private:
     std::shared_ptr<Type> type;
+    int offset;
 };
 
 

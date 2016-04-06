@@ -9,6 +9,7 @@ using std::shared_ptr;
 
 Variable::Variable(const shared_ptr<Type>& type) {
     this->type = type;
+    this->offset = -1;
 }
 
 Variable::~Variable() {
@@ -30,6 +31,6 @@ void Variable::acceptVisitor(ScopeVisitor &visitor) {
     visitor.writeWithIndent("END VAR");
 }
 
-std::shared_ptr<Type> Variable::getType() {
+std::shared_ptr<Type> Variable::getType() const {
     return type;
 }

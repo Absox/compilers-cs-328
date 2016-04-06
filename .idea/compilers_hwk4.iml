@@ -54,8 +54,9 @@
       <sourceFolder url="file://$MODULE_DIR$/src/Variable.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/GraphicalSymbolTree.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/AbstractSyntaxTreeNode.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/Location.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/IntegerBox.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Constant.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Location.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Record.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Condition.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/ScopeVisitor.h" isTestSource="false" />
@@ -84,10 +85,11 @@
       <sourceFolder url="file://$MODULE_DIR$/src/TextObserver.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/RecordBox.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Environment.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/CodeGenerator.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/IfInstruction.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Type.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Parser.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/IntegerBox.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/CodeGenerator.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Box.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Array.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/ScopeVisitor.cpp" isTestSource="false" />
