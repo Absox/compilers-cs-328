@@ -49,6 +49,7 @@ private:
     void processRead(const std::shared_ptr<Read>& read);
     void processWrite(const std::shared_ptr<Write>& write);
 
+    void resolveCondition(const std::shared_ptr<Condition>& condition);
     void resolveLocationOffset(const std::shared_ptr<Location>& location);
     std::shared_ptr<Type> getLocationType(
             const std::shared_ptr<Location>& location);

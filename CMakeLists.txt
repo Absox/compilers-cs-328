@@ -10,5 +10,6 @@ set(SOURCE_FILES main.cpp)
 add_executable(sc ${SOURCE_FILES})
 
 add_subdirectory(src)
+add_subdirectory(test)
 
 target_link_libraries(sc compilers5_lib)

@@ -66,7 +66,7 @@ int CodeGenerator::calculateScopeOffsets(const shared_ptr<Scope> &scope) {
 }
 
 
-int CodeGenerator::getTypeSize(const std::shared_ptr<Type> &type) {
+int CodeGenerator::getTypeSize(const shared_ptr<Type> &type) {
 
     // If found in the hashmap, store its size.
     if (typeSizes.find(type) != typeSizes.end()) {
@@ -133,14 +133,14 @@ void CodeGenerator::finalizeProgram() {
 
 
 void CodeGenerator::processInstructions(
-        const std::vector<std::shared_ptr<Instruction>> &instructions) {
+        const vector<shared_ptr<Instruction>> &instructions) {
     for (int c = 0; c < instructions.size(); c++) {
         processInstruction(instructions[c]);
     }
 }
 
 void CodeGenerator::processInstruction(
-        const std::shared_ptr<Instruction> &instruction) {
+        const shared_ptr<Instruction> &instruction) {
     auto assign = dynamic_pointer_cast<Assign>(instruction);
     auto ifInstruction = dynamic_pointer_cast<IfInstruction>(instruction);
     auto repeat = dynamic_pointer_cast<Repeat>(instruction);
@@ -164,15 +164,20 @@ void CodeGenerator::processInstruction(
 void CodeGenerator::processAssign(const shared_ptr<Assign> &assign) {
 
     // We need to know if we're assigning integers, arrays, or records.
+    auto type = getLocationType(assign->getLocation());
+    auto record = dynamic_pointer_cast<Record>(type);
+    auto array = dynamic_pointer_cast<Array>(type);
 
 }
 
 void CodeGenerator::processIfInstruction(
         const shared_ptr<IfInstruction> &assign) {
 
+
 }
 
 void CodeGenerator::processRepeat(const shared_ptr<Repeat> &repeat) {
+
 
 }
 
@@ -205,8 +210,42 @@ void CodeGenerator::processWrite(const shared_ptr<Write> &write) {
 }
 
 
+void CodeGenerator::resolveCondition(
+        const shared_ptr<Condition> &condition) {
+    resolveExpressionValue(condition->getExpressionLeft());
+    resolveExpressionValue(condition->getExpressionRight());
+    // Pop right, pop left
+    writeWithIndent("pop {r1}");
+    writeWithIndent("pop {r0}");
+
+    writeWithIndent("cmp r0, r1");
+
+    if (condition->getLabel() == "=") {
+        writeWithIndent("ldrne r3, =0");
+        writeWithIndent("ldreq r3, =1");
+    } else if (condition->getLabel() == "#") {
+        writeWithIndent("ldrne r3, =1");
+        writeWithIndent("ldreq r3, =0");
+    } else if (condition->getLabel() == "<") {
+        writeWithIndent("ldrlt r3, =1");
+        writeWithIndent("ldrge r3, =0");
+    } else if (condition->getLabel() == "<=") {
+        writeWithIndent("ldrle r3, =1");
+        writeWithIndent("ldrgt r3, =0");
+    } else if (condition->getLabel() == ">") {
+        writeWithIndent("ldrgt r3, =1");
+        writeWithIndent("ldrle r3, =0");
+    } else if (condition->getLabel() == ">=") {
+        writeWithIndent("ldrge r3, =1");
+        writeWithIndent("ldrlt r3, =0");
+    }
+
+    writeWithIndent("push {r3}");
+}
+
+
 void CodeGenerator::resolveLocationOffset(
-        const std::shared_ptr<Location> &location) {
+        const shared_ptr<Location> &location) {
     // Ultimately pushes an offset onto the stack.
     auto variable = dynamic_pointer_cast<VariableLocation>(location);
     auto index = dynamic_pointer_cast<Index>(location);
@@ -257,8 +296,8 @@ void CodeGenerator::resolveLocationOffset(
 }
 
 // Copied verbatim from Parser.cpp
-std::shared_ptr<Type> CodeGenerator::getLocationType(
-        const std::shared_ptr<Location> &location) {
+shared_ptr<Type> CodeGenerator::getLocationType(
+        const shared_ptr<Location> &location) {
     auto variable = dynamic_pointer_cast<VariableLocation>(location);
     auto index = dynamic_pointer_cast<Index>(location);
     auto field = dynamic_pointer_cast<Field>(location);
@@ -297,7 +336,7 @@ std::shared_ptr<Type> CodeGenerator::getLocationType(
 }
 
 void CodeGenerator::resolveExpressionValue(
-        const std::shared_ptr<Expression> &expression) {
+        const shared_ptr<Expression> &expression) {
     // Ultimately pushes a numerical value onto the stack.
 
     auto number = dynamic_pointer_cast<NumberExpression>(expression);
@@ -364,7 +403,7 @@ void CodeGenerator::deindent() {
     indentLevel--;
 }
 
-void CodeGenerator::writeWithIndent(const std::string &value) {
+void CodeGenerator::writeWithIndent(const string &value) {
     for (int c = 0; c < indentLevel; c++) {
         stream << "    ";
     }
