@@ -236,6 +236,7 @@ int main(int argc, char **argv) {
                     CodeGenerator codeGenerator(
                             parser->getSymbolTable(),
                             parser->getAbstractSyntaxTree());
+                    cout << codeGenerator.getContent();
 
                 } catch (ParseException& e) {
                     cerr << "error: " << e.getMessage() << endl;

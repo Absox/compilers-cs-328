@@ -31,6 +31,16 @@ void Variable::acceptVisitor(ScopeVisitor &visitor) {
     visitor.writeWithIndent("END VAR");
 }
 
-std::shared_ptr<Type> Variable::getType() const {
+shared_ptr<Type> Variable::getType() const {
     return type;
 }
+
+
+int Variable::getOffset() const {
+    return offset;
+}
+
+void Variable::setOffset(int offset) {
+    this->offset = offset;
+}
+

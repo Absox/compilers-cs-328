@@ -19,6 +19,8 @@ public:
     virtual void acceptVisitor(ScopeVisitor& visitor) override;
     std::shared_ptr<Type> getType() const;
 
+    int getOffset() const;
+    void setOffset(int offset);
 private:
     std::shared_ptr<Type> type;
     int offset;
