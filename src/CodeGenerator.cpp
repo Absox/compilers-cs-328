@@ -100,7 +100,7 @@ void CodeGenerator::initializeProgram() {
     indent();
     writeWithIndent(".asciz \"%d\\n\"");
     deindent();
-    writeWithIndent("input_format");
+    writeWithIndent("input_format:");
     indent();
     writeWithIndent(".asciz \"%d\"");
 
@@ -124,6 +124,9 @@ void CodeGenerator::initializeProgram() {
 
 
 void CodeGenerator::finalizeProgram() {
+    deindent();
+    writeWithIndent("terminate:");
+    indent();
     writeWithIndent("pop {fp, lr}");
     writeWithIndent("bx lr");
 }
@@ -143,6 +146,18 @@ void CodeGenerator::processInstruction(
     auto repeat = dynamic_pointer_cast<Repeat>(instruction);
     auto read = dynamic_pointer_cast<Read>(instruction);
     auto write = dynamic_pointer_cast<Write>(instruction);
+
+    if (assign != 0) {
+        processAssign(assign);
+    } else if (ifInstruction != 0) {
+        processIfInstruction(ifInstruction);
+    } else if (repeat != 0) {
+        processRepeat(repeat);
+    } else if (read != 0) {
+        processRead(read);
+    } else if (write != 0) {
+        processWrite(write);
+    }
 }
 
 
@@ -163,15 +178,28 @@ void CodeGenerator::processRepeat(const shared_ptr<Repeat> &repeat) {
 
 void CodeGenerator::processRead(const shared_ptr<Read> &read) {
 
-    // Pop address we're reading to from stack.
+    // Pop offset of location we're reading to from stack.
+    resolveLocationOffset(read->getLocation());
+    writeWithIndent("pop {r3}");
 
+    // Address goes into r1
+    // Calculate address
+    writeWithIndent("add r1, r3, r11");
+
+    // Format goes into r0
+    writeWithIndent("ldr r0, =input_format");
+    // bl scanf
+    writeWithIndent("bl __isoc99_scanf");
 }
 
 void CodeGenerator::processWrite(const shared_ptr<Write> &write) {
 
+    resolveExpressionValue(write->getExpression());
     // Pop value we're writing from stack.
-    // format goes into r0
     // value goes into r1
+    writeWithIndent("pop {r1}");
+    // format goes into r0
+    writeWithIndent("ldr r0, =output_format");
     // bl printf
     writeWithIndent("bl printf");
 }
@@ -180,8 +208,55 @@ void CodeGenerator::processWrite(const shared_ptr<Write> &write) {
 void CodeGenerator::resolveLocationOffset(
         const std::shared_ptr<Location> &location) {
     // Ultimately pushes an offset onto the stack.
+    auto variable = dynamic_pointer_cast<VariableLocation>(location);
+    auto index = dynamic_pointer_cast<Index>(location);
+    auto field = dynamic_pointer_cast<Field>(location);
+
+    if (variable != 0) {
+        // If we have a variable, we can find its offset from the symbol table.
+        auto variableEntry = dynamic_pointer_cast<Variable>(
+                symbolTable.getCurrentScope()->getEntry(
+                        variable->getIdentifier()));
+        writeWithIndent("ldr r3, =" + to_string(variableEntry->getOffset()));
+    } else if (index != 0) {
+        // If we have an index:
+        // We need to to know offset of parent array and width of elements.
+        resolveLocationOffset(index->getLocation());
+        resolveExpressionValue(index->getExpression());
+        // Pop index
+        writeWithIndent("pop {r0}");
+        // Pop offset of parent array.
+        writeWithIndent("pop {r1}");
+
+        // Calculate what we have to add to this offset.
+        auto array = dynamic_pointer_cast<Array>(
+                getLocationType(index->getLocation()));
+        int elementSize = typeSizes[array->getType()];
+
+        writeWithIndent("ldr r2, =" + to_string(elementSize));
+        writeWithIndent("mul r3, r0, r2");
+        writeWithIndent("add r3, r1, r3");
+        // TODO ADD CODE TO CHECK ARRAY OUT OF BOUNDS
+    } else if (field != 0) {
+        // If we have a field:
+        // We need to know offset of parent record and variable offset.
+        resolveLocationOffset(field->getLocation());
+        // Pop offset of parent record.
+        writeWithIndent("pop {r0}");
+
+        auto record = dynamic_pointer_cast<Record>(
+                getLocationType(field->getLocation()));
+        auto fieldVariable = dynamic_pointer_cast<Variable>(
+                record->getScope()->getEntry(
+                        field->getVariable()->getIdentifier()));
+        writeWithIndent("ldr r1, =" + to_string(fieldVariable->getOffset()));
+        writeWithIndent("add r3, r0, r1");
+    }
+    writeWithIndent("push {r3}");
+
 }
 
+// Copied verbatim from Parser.cpp
 std::shared_ptr<Type> CodeGenerator::getLocationType(
         const std::shared_ptr<Location> &location) {
     auto variable = dynamic_pointer_cast<VariableLocation>(location);
@@ -271,7 +346,7 @@ void CodeGenerator::resolveExpressionValue(
             writeWithIndent("bl __aeabi_idiv");
             writeWithIndent("mov r3, r0");
         } else if (binary->getOperation() == "MOD") {
-            writeWithIndent("bl __aaebi_idivmod");
+            writeWithIndent("bl __aeabi_idivmod");
             writeWithIndent("mov r3, r1");
             // TODO Generate error for modulus by zero.
         }
@@ -297,7 +372,7 @@ void CodeGenerator::writeWithIndent(const std::string &value) {
 }
 
 
-int CodeGenerator::getNextLabel() {
+int CodeGenerator::getNextLabelIndex() {
     return labelCounter++;
 }
 

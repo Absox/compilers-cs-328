@@ -58,7 +58,7 @@ private:
     void deindent();
     void writeWithIndent(const std::string& value);
 
-    int getNextLabel();
+    int getNextLabelIndex();
 };
 
 
