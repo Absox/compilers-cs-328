@@ -12,6 +12,11 @@
 #include "Instruction.h"
 #include "Location.h"
 #include "Variable.h"
+#include "IfInstruction.h"
+#include "Assign.h"
+#include "Write.h"
+#include "Read.h"
+#include "Repeat.h"
 
 class CodeGenerator {
 public:
@@ -37,6 +42,17 @@ private:
     void processInstructions(
             const std::vector<std::shared_ptr<Instruction>>& instructions);
     void processInstruction(const std::shared_ptr<Instruction>& instruction);
+
+    void processAssign(const std::shared_ptr<Assign>& assign);
+    void processIfInstruction(const std::shared_ptr<IfInstruction>& assign);
+    void processRepeat(const std::shared_ptr<Repeat>& repeat);
+    void processRead(const std::shared_ptr<Read>& read);
+    void processWrite(const std::shared_ptr<Write>& write);
+
+    void resolveLocationOffset(const std::shared_ptr<Location>& location);
+    std::shared_ptr<Type> getLocationType(
+            const std::shared_ptr<Location>& location);
+    void resolveExpressionValue(const std::shared_ptr<Expression>& expression);
 
     void indent();
     void deindent();
