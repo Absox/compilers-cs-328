@@ -1,4 +1,6 @@
 600.328 Compilers & Intepreters, Homework 7
 Ran Liu (rliu14@jhu.edu)
 
-Seems like an explicit stack still isn't necessary for the interpreter.
+Seems like an explicit stack still isn't necessary for the code generator,
+at least on the back-end side of things. Obviously we need to use the stack
+when it comes to the code we generate.

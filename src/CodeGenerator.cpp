@@ -5,18 +5,27 @@
 #include "CodeGenerator.h"
 #include "Array.h"
 #include "Record.h"
-#include "Variable.h"
+#include "Assign.h"
+
 
 using std::string;
 using std::dynamic_pointer_cast;
 using std::vector;
 using std::shared_ptr;
+using std::endl;
+using std::to_string;
 
 CodeGenerator::CodeGenerator(
         SymbolTable &symbolTable,
         const vector<shared_ptr<Instruction>> &instructions)
         : symbolTable(symbolTable) {
+    indentLevel = 0;
+    labelCounter = 0;
+
     calculateOffsets();
+    initializeProgram();
+    processInstructions(instructions);
+    finalizeProgram();
 }
 
 string CodeGenerator::getContent() {
@@ -29,7 +38,7 @@ void CodeGenerator::calculateOffsets() {
             symbolTable.getCurrentScope()->getOuter()->getEntry("INTEGER"));
     typeSizes[universalInt] = 4;
 
-    calculateScopeOffsets(symbolTable.getCurrentScope());
+    totalBytes = calculateScopeOffsets(symbolTable.getCurrentScope());
 
 }
 
@@ -73,5 +82,72 @@ int CodeGenerator::getTypeSize(const std::shared_ptr<Type> &type) {
         return result;
     }
 
+}
+
+
+void CodeGenerator::initializeProgram() {
+    indent();
+        writeWithIndent(".arch armv6");
+        writeWithIndent(".data");
+    deindent();
+
+    writeWithIndent("format:");
+
+    indent();
+        writeWithIndent(".asciz \"%d\\n\"");
+    deindent();
+
+    writeWithIndent("variables:");
+
+    indent();
+        writeWithIndent(".space " + to_string(totalBytes));
+        writeWithIndent(".text");
+        writeWithIndent(".global main");
+    deindent();
+
+    writeWithIndent("main:");
+
+    indent();
+    writeWithIndent("push {fp, lr}");
+    writeWithIndent("ldr r11, =variables");
+}
+
+
+void CodeGenerator::finalizeProgram() {
+    writeWithIndent("pop {fp, lr}");
+    writeWithIndent("bx lr");
+}
+
+
+void CodeGenerator::processInstructions(
+        const std::vector<std::shared_ptr<Instruction>> &instructions) {
+    for (int c = 0; c < instructions.size(); c++) {
+        processInstruction(instructions[c]);
+    }
+}
+
+void CodeGenerator::processInstruction(
+        const std::shared_ptr<Instruction> &instruction) {
+    auto assign = dynamic_pointer_cast<Assign>(instruction);
+}
+
+void CodeGenerator::indent() {
+    indentLevel++;
+}
+
+void CodeGenerator::deindent() {
+    indentLevel--;
+}
+
+void CodeGenerator::writeWithIndent(const std::string &value) {
+    for (int c = 0; c < indentLevel; c++) {
+        stream << "    ";
+    }
+    stream << value << endl;
+}
+
+
+int CodeGenerator::getNextLabel() {
+    return labelCounter++;
 }
 
