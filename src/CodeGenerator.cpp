@@ -233,19 +233,17 @@ void CodeGenerator::processIfInstruction(
 
     processInstructions(ifInstruction->getInstructionsTrue());
 
-    if (ifInstruction->getInstructionsFalse().size() > 0) {
-        writeWithIndent("b " + instructions_end);
+    writeWithIndent("b " + instructions_end);
 
-        deindent();
-        writeWithIndent(instructions_false + ":");
-        indent();
+    deindent();
+    writeWithIndent(instructions_false + ":");
+    indent();
 
-        processInstructions(ifInstruction->getInstructionsFalse());
+    processInstructions(ifInstruction->getInstructionsFalse());
 
-        deindent();
-        writeWithIndent(instructions_end + ":");
-        indent();
-    }
+    deindent();
+    writeWithIndent(instructions_end + ":");
+    indent();
 
 }
 
