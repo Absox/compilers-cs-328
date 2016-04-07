@@ -6,6 +6,10 @@
 #include "Array.h"
 #include "Record.h"
 #include "Assign.h"
+#include "IfInstruction.h"
+#include "Repeat.h"
+#include "Read.h"
+#include "Write.h"
 
 
 using std::string;
@@ -87,22 +91,27 @@ int CodeGenerator::getTypeSize(const std::shared_ptr<Type> &type) {
 
 void CodeGenerator::initializeProgram() {
     indent();
-        writeWithIndent(".arch armv6");
-        writeWithIndent(".data");
+    writeWithIndent(".arch armv6");
+    writeWithIndent(".data");
     deindent();
 
-    writeWithIndent("format:");
-
+    writeWithIndent("output_format:");
     indent();
-        writeWithIndent(".asciz \"%d\\n\"");
+    writeWithIndent(".asciz \"%d\\n\"");
     deindent();
-
-    writeWithIndent("variables:");
-
+    writeWithIndent("input_format");
     indent();
+    writeWithIndent(".asciz \"%d\"");
+
+    if (totalBytes > 0) {
+        deindent();
+        writeWithIndent("variables:");
+        indent();
         writeWithIndent(".space " + to_string(totalBytes));
-        writeWithIndent(".text");
-        writeWithIndent(".global main");
+    }
+
+    writeWithIndent(".text");
+    writeWithIndent(".global main");
     deindent();
 
     writeWithIndent("main:");
@@ -129,6 +138,10 @@ void CodeGenerator::processInstructions(
 void CodeGenerator::processInstruction(
         const std::shared_ptr<Instruction> &instruction) {
     auto assign = dynamic_pointer_cast<Assign>(instruction);
+    auto ifInstruction = dynamic_pointer_cast<IfInstruction>(instruction);
+    auto repeat = dynamic_pointer_cast<Repeat>(instruction);
+    auto read = dynamic_pointer_cast<Read>(instruction);
+    auto write = dynamic_pointer_cast<Write>(instruction);
 }
 
 void CodeGenerator::indent() {
