@@ -1,4 +1,5 @@
+cmake_minimum_required(VERSION 2.8)
 project(test)
 set(TEST_SOURCES Hello.cpp)
 add_executable(runUnitTests ${TEST_SOURCES})
-target_link_libraries(runUnitTests gtest gtest_main)
+target_link_libraries(runUnitTests gtest_main gtest)

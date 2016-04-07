@@ -44,7 +44,7 @@ private:
     void processInstruction(const std::shared_ptr<Instruction>& instruction);
 
     void processAssign(const std::shared_ptr<Assign>& assign);
-    void processIfInstruction(const std::shared_ptr<IfInstruction>& assign);
+    void processIfInstruction(const std::shared_ptr<IfInstruction>& ifInstruction);
     void processRepeat(const std::shared_ptr<Repeat>& repeat);
     void processRead(const std::shared_ptr<Read>& read);
     void processWrite(const std::shared_ptr<Write>& write);

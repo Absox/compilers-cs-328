@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
-set(CMAKE_CXX_COMPILER g++)
+set(CMAKE_CXX_COMPILER clang++)
 
 project(compilers_hwk5)
 
-add_definitions(-std=c++11)
+add_definitions(-std=c++11 -Os)
 
 include_directories(src)
 set(SOURCE_FILES main.cpp)

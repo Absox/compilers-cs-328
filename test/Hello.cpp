@@ -8,5 +8,6 @@ using std::cout;
 using std::endl;
 
 TEST(helloworld_test, helloworld) {
+    int x = 0;
     cout << endl << "Hello, world!" << endl;
 }

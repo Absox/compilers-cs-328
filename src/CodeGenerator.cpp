@@ -120,6 +120,8 @@ void CodeGenerator::initializeProgram() {
     indent();
     writeWithIndent("push {fp, lr}");
     if (totalBytes > 0) writeWithIndent("ldr r11, =variables");
+
+    writeWithIndent("");
 }
 
 
@@ -148,36 +150,119 @@ void CodeGenerator::processInstruction(
     auto write = dynamic_pointer_cast<Write>(instruction);
 
     if (assign != 0) {
+        writeWithIndent("@Assign");
         processAssign(assign);
     } else if (ifInstruction != 0) {
+        writeWithIndent("@If");
         processIfInstruction(ifInstruction);
     } else if (repeat != 0) {
+        writeWithIndent("@Repeat");
         processRepeat(repeat);
     } else if (read != 0) {
+        writeWithIndent("@Read");
         processRead(read);
     } else if (write != 0) {
+        writeWithIndent("@Write");
         processWrite(write);
     }
+    // Pad with extra line.
+    writeWithIndent("");
 }
 
 
 void CodeGenerator::processAssign(const shared_ptr<Assign> &assign) {
+
+    // We need to resolve our target offset.
+    resolveLocationOffset(assign->getLocation());
 
     // We need to know if we're assigning integers, arrays, or records.
     auto type = getLocationType(assign->getLocation());
     auto record = dynamic_pointer_cast<Record>(type);
     auto array = dynamic_pointer_cast<Array>(type);
 
+    if (record != 0 || array != 0) {
+        int numBytesToMove = typeSizes[type];
+        auto origin_location = dynamic_pointer_cast<Location>(
+                assign->getExpression());
+
+        resolveLocationOffset(origin_location);
+
+        // Pop the origin offset.
+        writeWithIndent("pop {r0}");
+        // Calculate origin address.
+        writeWithIndent("add r0, r0, r11");
+        // Pop the destination offset.
+        writeWithIndent("pop {r1}");
+        writeWithIndent("add r1, r1, r11");
+
+        for (int currentOffset = 0;
+             currentOffset < numBytesToMove;
+             currentOffset = currentOffset + 4) {
+
+            writeWithIndent("ldr r2, =" + to_string(currentOffset));
+            writeWithIndent("add r0, r0, r2");
+            writeWithIndent("add r1, r1, r2");
+
+            writeWithIndent("ldr r3, [r0]");
+            writeWithIndent("str r3, [r1]");
+        }
+
+        // We're aligned to 4 bytes so we can copy everything in 32-bit chunks.
+
+    } else {
+        // It's an integer.
+        resolveExpressionValue(assign->getExpression());
+        writeWithIndent("pop {r0}");
+        writeWithIndent("pop {r1}");
+        writeWithIndent("add r2, r1, r11");
+        writeWithIndent("str r0, [r2]");
+    }
+
 }
 
 void CodeGenerator::processIfInstruction(
-        const shared_ptr<IfInstruction> &assign) {
+        const shared_ptr<IfInstruction> &ifInstruction) {
+    int labelSuffix = getNextLabelIndex();
+    string instructions_false = "if_false_begin_" + to_string(labelSuffix);
+    string instructions_end = "if_end_" + to_string(labelSuffix);
 
+    resolveCondition(ifInstruction->getCondition());
+    writeWithIndent("pop {r0}");
+    writeWithIndent("cmp r0, #1");
+    writeWithIndent("bne " + instructions_false);
+
+    processInstructions(ifInstruction->getInstructionsTrue());
+
+    if (instructions_false.size() > 0) {
+        writeWithIndent("b " + instructions_end);
+
+        deindent();
+        writeWithIndent(instructions_false + ":");
+        indent();
+
+        processInstructions(ifInstruction->getInstructionsFalse());
+
+        deindent();
+        writeWithIndent(instructions_end + ":");
+        indent();
+    }
 
 }
 
 void CodeGenerator::processRepeat(const shared_ptr<Repeat> &repeat) {
 
+    int labelSuffix = getNextLabelIndex();
+    string loop_begin_label = "repeat_begin_" + to_string(labelSuffix);
+
+    deindent();
+    writeWithIndent(loop_begin_label + ":");
+    indent();
+    processInstructions(repeat->getInstructions());
+    resolveCondition(repeat->getCondition());
+
+    writeWithIndent("pop {r0}");
+    writeWithIndent("cmp r0, #1");
+    writeWithIndent("bne " + loop_begin_label);
 
 }
 
