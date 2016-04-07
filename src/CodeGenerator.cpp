@@ -233,7 +233,7 @@ void CodeGenerator::processIfInstruction(
 
     processInstructions(ifInstruction->getInstructionsTrue());
 
-    if (instructions_false.size() > 0) {
+    if (ifInstruction->getInstructionsFalse().size() > 0) {
         writeWithIndent("b " + instructions_end);
 
         deindent();
@@ -494,7 +494,6 @@ void CodeGenerator::writeWithIndent(const string &value) {
     }
     stream << value << endl;
 }
-
 
 int CodeGenerator::getNextLabelIndex() {
     return labelCounter++;
