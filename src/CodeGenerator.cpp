@@ -96,6 +96,10 @@ void CodeGenerator::initializeProgram() {
     writeWithIndent(".data");
     deindent();
 
+    writeWithIndent("string_output:");
+    indent();
+    writeWithIndent(".asciz \"%s\\n\"");
+    deindent();
     writeWithIndent("output_format:");
     indent();
     writeWithIndent(".asciz \"%d\\n\"");
@@ -103,6 +107,18 @@ void CodeGenerator::initializeProgram() {
     writeWithIndent("input_format:");
     indent();
     writeWithIndent(".asciz \"%d\"");
+    deindent();
+    writeWithIndent("divide_by_zero_error:");
+    indent();
+    writeWithIndent(".asciz \"error: Divided by zero!\"");
+    deindent();
+    writeWithIndent("mod_by_zero_error:");
+    indent();
+    writeWithIndent(".asciz \"error: Modulus by zero!\"");
+    deindent();
+    writeWithIndent("array_bounds_error:");
+    indent();
+    writeWithIndent(".asciz \"error: Array index out of bounds!\"");
 
     if (totalBytes > 0) {
         deindent();
@@ -119,7 +135,8 @@ void CodeGenerator::initializeProgram() {
 
     indent();
     writeWithIndent("push {fp, lr}");
-    if (totalBytes > 0) writeWithIndent("ldr r11, =variables");
+    writeWithIndent("mov fp, sp");
+    if (totalBytes > 0) writeWithIndent("ldr r10, =variables");
 
     writeWithIndent("");
 }
@@ -127,10 +144,50 @@ void CodeGenerator::initializeProgram() {
 
 void CodeGenerator::finalizeProgram() {
     deindent();
+    writeWithIndent("div_zero:");
+    indent();
+    writeWithIndent("ldr r0, standard_error");
+    writeWithIndent("ldr r0, [r0]");
+
+    writeWithIndent("ldr r1, =string_output");
+    writeWithIndent("ldr r2, =divide_by_zero_error");
+    writeWithIndent("bl fprintf");
+    writeWithIndent("b terminate");
+
+    deindent();
+    writeWithIndent("mod_zero:");
+    indent();
+    writeWithIndent("ldr r0, standard_error");
+    writeWithIndent("ldr r0, [r0]");
+    writeWithIndent("ldr r1, =string_output");
+    writeWithIndent("ldr r2, =mod_by_zero_error");
+    writeWithIndent("bl fprintf");
+    writeWithIndent("b terminate");
+
+    deindent();
+    writeWithIndent("array_out_of_bounds:");
+    indent();
+    writeWithIndent("ldr r0, standard_error");
+    writeWithIndent("ldr r0, [r0]");
+
+    writeWithIndent("ldr r1, =string_output");
+    writeWithIndent("ldr r2, =array_bounds_error");
+    writeWithIndent("bl fprintf");
+    writeWithIndent("b terminate");
+
+    deindent();
     writeWithIndent("terminate:");
     indent();
+    // Note that we have to reset the stack to the beginning of the frame.
+    writeWithIndent("mov sp, fp");
     writeWithIndent("pop {fp, lr}");
     writeWithIndent("bx lr");
+
+    deindent();
+    writeWithIndent("standard_error:");
+    indent();
+    writeWithIndent(".word stderr");
+    deindent();
 }
 
 
@@ -190,10 +247,10 @@ void CodeGenerator::processAssign(const shared_ptr<Assign> &assign) {
         // Pop the origin offset.
         writeWithIndent("pop {r0}");
         // Calculate origin address.
-        writeWithIndent("add r0, r0, r11");
+        writeWithIndent("add r0, r0, r10");
         // Pop the destination offset.
         writeWithIndent("pop {r1}");
-        writeWithIndent("add r1, r1, r11");
+        writeWithIndent("add r1, r1, r10");
 
         for (int currentOffset = 0;
              currentOffset < numBytesToMove;
@@ -214,7 +271,7 @@ void CodeGenerator::processAssign(const shared_ptr<Assign> &assign) {
         resolveExpressionValue(assign->getExpression());
         writeWithIndent("pop {r0}");
         writeWithIndent("pop {r1}");
-        writeWithIndent("add r2, r1, r11");
+        writeWithIndent("add r2, r1, r10");
         writeWithIndent("str r0, [r2]");
     }
 
@@ -272,7 +329,7 @@ void CodeGenerator::processRead(const shared_ptr<Read> &read) {
 
     // Address goes into r1
     // Calculate address
-    writeWithIndent("add r1, r3, r11");
+    writeWithIndent("add r1, r3, r10");
 
     // Format goes into r0
     writeWithIndent("ldr r0, =input_format");
@@ -355,10 +412,16 @@ void CodeGenerator::resolveLocationOffset(
                 getLocationType(index->getLocation()));
         int elementSize = typeSizes[array->getType()];
 
+        // Check if negative
+        writeWithIndent("cmp r0, #0");
+        writeWithIndent("blt array_out_of_bounds");
+        writeWithIndent("ldr r2, =" + to_string(array->getLength()));
+        writeWithIndent("cmp r0, r2");
+        writeWithIndent("bge array_out_of_bounds");
+
         writeWithIndent("ldr r2, =" + to_string(elementSize));
         writeWithIndent("mul r3, r0, r2");
         writeWithIndent("add r3, r1, r3");
-        // TODO ADD CODE TO CHECK ARRAY OUT OF BOUNDS
     } else if (field != 0) {
         // If we have a field:
         // We need to know offset of parent record and variable offset.
@@ -438,7 +501,7 @@ void CodeGenerator::resolveExpressionValue(
         // Pop the offset into r3.
         writeWithIndent("pop {r3}");
         // Calculate the address.
-        writeWithIndent("add r0, r11, r3");
+        writeWithIndent("add r0, r10, r3");
         // Load the value from the address.
         writeWithIndent("ldr r1, [r0]");
         // Push onto the stack.
@@ -464,13 +527,17 @@ void CodeGenerator::resolveExpressionValue(
         } else if (binary->getOperation() == "*") {
             writeWithIndent("mul r3, r0, r1");
         } else if (binary->getOperation() == "DIV") {
-            // TODO Generate error for divide by zero.
+            writeWithIndent("cmp r1, #0");
+            writeWithIndent("beq div_zero");
+
             writeWithIndent("bl __aeabi_idiv");
             writeWithIndent("mov r3, r0");
         } else if (binary->getOperation() == "MOD") {
+            writeWithIndent("cmp r1, #0");
+            writeWithIndent("beq mod_zero");
+
             writeWithIndent("bl __aeabi_idivmod");
             writeWithIndent("mov r3, r1");
-            // TODO Generate error for modulus by zero.
         }
         writeWithIndent("push {r3}");
 
