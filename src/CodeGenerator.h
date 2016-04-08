@@ -34,8 +34,8 @@ private:
     std::unordered_map<std::shared_ptr<Type>, int> typeSizes;
 
     void calculateOffsets();
-    int calculateScopeOffsets(const std::shared_ptr<Scope> &scope);
-    int getTypeSize(const std::shared_ptr<Type>& type);
+    long long int calculateScopeOffsets(const std::shared_ptr<Scope> &scope);
+    long long int getTypeSize(const std::shared_ptr<Type> &type);
 
     void initializeProgram();
     void finalizeProgram();

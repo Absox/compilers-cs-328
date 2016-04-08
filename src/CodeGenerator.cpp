@@ -44,11 +44,15 @@ void CodeGenerator::calculateOffsets() {
     typeSizes[universalInt] = 4;
 
     totalBytes = calculateScopeOffsets(symbolTable.getCurrentScope());
+    if (totalBytes > 4294967296) {
+
+    }
 
 }
 
-int CodeGenerator::calculateScopeOffsets(const shared_ptr<Scope> &scope) {
-    int nextOffset = 0;
+long long int CodeGenerator::calculateScopeOffsets(
+        const shared_ptr<Scope> &scope) {
+    long long nextOffset = 0;
 
     vector<string> identifiers = scope->getIdentifiersSorted();
     for (unsigned c = 0; c < identifiers.size(); c++) {
@@ -66,7 +70,7 @@ int CodeGenerator::calculateScopeOffsets(const shared_ptr<Scope> &scope) {
 }
 
 
-int CodeGenerator::getTypeSize(const shared_ptr<Type> &type) {
+long long int CodeGenerator::getTypeSize(const shared_ptr<Type> &type) {
 
     // If found in the hashmap, store its size.
     if (typeSizes.find(type) != typeSizes.end()) {
@@ -143,6 +147,8 @@ void CodeGenerator::initializeProgram() {
 
 
 void CodeGenerator::finalizeProgram() {
+
+    writeWithIndent("b terminate");
     deindent();
     writeWithIndent("div_zero:");
     indent();
