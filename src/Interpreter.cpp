@@ -122,7 +122,7 @@ void Interpreter::runRead(const shared_ptr<Read> &read)
 
 void Interpreter::runWrite(const shared_ptr<Write> &write)
         throw (RuntimeException) {
-    int value = resolveNumericExpression(write->getExpression());
+    long long value = resolveNumericExpression(write->getExpression());
     cout << value << endl;
 }
 
@@ -173,7 +173,7 @@ std::shared_ptr<Box> Interpreter::resolveIndex(
             resolveLocation(index->getLocation()));
     auto indexValue = resolveNumericExpression(index->getExpression());
 
-    if (indexValue < 0 || abs(indexValue) >= location->getSize()) {
+    if (indexValue < 0 || indexValue >= location->getSize()) {
         throw RuntimeException("Array index out of bounds!");
     }
 
@@ -189,7 +189,7 @@ std::shared_ptr<Box> Interpreter::resolveField(
 }
 
 
-int Interpreter::resolveNumericExpression(
+long long int Interpreter::resolveNumericExpression(
         const shared_ptr<Expression> &expression)
         throw (RuntimeException) {
     auto location = dynamic_pointer_cast<Location>(expression);

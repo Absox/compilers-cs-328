@@ -26,7 +26,7 @@ using std::stack;
 using std::shared_ptr;
 using std::string;
 using std::to_string;
-using std::stoi;
+using std::stoll;
 using std::vector;
 using std::dynamic_pointer_cast;
 
@@ -365,7 +365,7 @@ shared_ptr<Expression> Parser::factor() throw(ParseException) {
     indent();
 
     if (match("integer")) {
-        int value = stoi(processToken("integer").getValue());
+        long long value = stoll(processToken("integer").getValue());
         result = shared_ptr<NumberExpression>(new NumberExpression(value));
     } else if (match("identifier")) {
 

@@ -10,13 +10,13 @@
 
 class NumberExpression : public Expression {
 public:
-    NumberExpression(const int& value);
+    NumberExpression(const long long &value);
     virtual ~NumberExpression();
     virtual std::string getLabel();
 
-    int getValue() const;
+    long long getValue() const;
 private:
-    int value;
+    long long value;
 };
 
 

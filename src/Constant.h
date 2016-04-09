@@ -14,17 +14,17 @@
 
 class Constant : public Entry {
 public:
-    Constant(const int& value, const std::shared_ptr<Type>& type);
+    Constant(const long long int &value, const std::shared_ptr<Type> &type);
     virtual ~Constant();
 
-    void setValue(const int& value);
+    void setValue(const long long &value);
     virtual std::string getEntryType() const override;
     virtual void acceptVisitor(ScopeVisitor& visitor) override;
-    int getValue();
+    long long getValue();
     std::shared_ptr<Type> getType() const;
 
 private:
-    int value;
+    long long value;
     std::shared_ptr<Type> type;
 };
 

@@ -23,6 +23,7 @@ using std::to_string;
 CodeGenerator::CodeGenerator(
         SymbolTable &symbolTable,
         const vector<shared_ptr<Instruction>> &instructions)
+        throw (CodeGenerationException)
         : symbolTable(symbolTable) {
     indentLevel = 0;
     labelCounter = 0;
@@ -37,7 +38,7 @@ string CodeGenerator::getContent() {
     return stream.str();
 }
 
-void CodeGenerator::calculateOffsets() {
+void CodeGenerator::calculateOffsets() throw (CodeGenerationException) {
     // First, register the universal integer as 4 bytes.
     auto universalInt = dynamic_pointer_cast<Type>(
             symbolTable.getCurrentScope()->getOuter()->getEntry("INTEGER"));
@@ -45,14 +46,15 @@ void CodeGenerator::calculateOffsets() {
 
     totalBytes = calculateScopeOffsets(symbolTable.getCurrentScope());
     if (totalBytes > 4294967296) {
-
+        throw CodeGenerationException(
+                "More memory requested than can be addressed!");
     }
 
 }
 
-long long int CodeGenerator::calculateScopeOffsets(
+unsigned long long CodeGenerator::calculateScopeOffsets(
         const shared_ptr<Scope> &scope) {
-    long long nextOffset = 0;
+    unsigned long long nextOffset = 0;
 
     vector<string> identifiers = scope->getIdentifiersSorted();
     for (unsigned c = 0; c < identifiers.size(); c++) {
@@ -61,7 +63,7 @@ long long int CodeGenerator::calculateScopeOffsets(
         if (variable != 0) {
 
             variable->setOffset(nextOffset);
-            int size = getTypeSize(variable->getType());
+            unsigned long long size = getTypeSize(variable->getType());
             nextOffset += size;
         }
     }
@@ -70,7 +72,7 @@ long long int CodeGenerator::calculateScopeOffsets(
 }
 
 
-long long int CodeGenerator::getTypeSize(const shared_ptr<Type> &type) {
+unsigned long long CodeGenerator::getTypeSize(const shared_ptr<Type> &type) {
 
     // If found in the hashmap, store its size.
     if (typeSizes.find(type) != typeSizes.end()) {
@@ -82,11 +84,12 @@ long long int CodeGenerator::getTypeSize(const shared_ptr<Type> &type) {
     auto record = dynamic_pointer_cast<Record>(type);
 
     if (array != 0) {
-        int result = array->getLength() * getTypeSize(array->getType());
+        unsigned long long result =
+                array->getLength() * getTypeSize(array->getType());
         typeSizes[array] = result;
         return result;
     } else {
-        int result = calculateScopeOffsets(record->getScope());
+        unsigned long long result = calculateScopeOffsets(record->getScope());
         typeSizes[record] = result;
         return result;
     }
@@ -199,7 +202,7 @@ void CodeGenerator::finalizeProgram() {
 
 void CodeGenerator::processInstructions(
         const vector<shared_ptr<Instruction>> &instructions) {
-    for (int c = 0; c < instructions.size(); c++) {
+    for (unsigned long c = 0; c < instructions.size(); c++) {
         processInstruction(instructions[c]);
     }
 }
@@ -244,7 +247,7 @@ void CodeGenerator::processAssign(const shared_ptr<Assign> &assign) {
     auto array = dynamic_pointer_cast<Array>(type);
 
     if (record != 0 || array != 0) {
-        int numBytesToMove = typeSizes[type];
+        unsigned long long numBytesToMove = typeSizes[type];
         auto origin_location = dynamic_pointer_cast<Location>(
                 assign->getExpression());
 
@@ -258,7 +261,7 @@ void CodeGenerator::processAssign(const shared_ptr<Assign> &assign) {
         writeWithIndent("pop {r1}");
         writeWithIndent("add r1, r1, r10");
 
-        for (int currentOffset = 0;
+        for (unsigned long long currentOffset = 0;
              currentOffset < numBytesToMove;
              currentOffset = currentOffset + 4) {
 
@@ -416,7 +419,7 @@ void CodeGenerator::resolveLocationOffset(
         // Calculate what we have to add to this offset.
         auto array = dynamic_pointer_cast<Array>(
                 getLocationType(index->getLocation()));
-        int elementSize = typeSizes[array->getType()];
+        unsigned long long elementSize = typeSizes[array->getType()];
 
         // Check if negative
         writeWithIndent("cmp r0, #0");
@@ -488,7 +491,8 @@ shared_ptr<Type> CodeGenerator::getLocationType(
 }
 
 void CodeGenerator::resolveExpressionValue(
-        const shared_ptr<Expression> &expression) {
+        const shared_ptr<Expression> &expression)
+        throw (CodeGenerationException) {
     // Ultimately pushes a numerical value onto the stack.
 
     auto number = dynamic_pointer_cast<NumberExpression>(expression);
@@ -497,7 +501,14 @@ void CodeGenerator::resolveExpressionValue(
 
     if (number != 0) {
         // Load the value into r3
-        writeWithIndent("ldr r3, =" + to_string(number->getValue()));
+        auto value = number->getValue();
+
+        if (value > 2147483647) {
+            throw CodeGenerationException(
+                    "Value of constant can't be held in 32 bits!");
+        }
+
+        writeWithIndent("ldr r3, =" + to_string(value));
         writeWithIndent("push {r3}");
 
     } else if (location != 0) {

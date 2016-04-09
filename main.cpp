@@ -220,7 +220,7 @@ int main(int argc, char **argv) {
                 parser = unique_ptr<Parser>(new Parser(&scanner, false));
                 try {
                     parser->parse();
-                    Interpreter interpreter(parser->getSymbolTable(),
+                    Interpreter(parser->getSymbolTable(),
                                 parser->getAbstractSyntaxTree());
 
                 } catch (ParseException& e) {
@@ -240,9 +240,9 @@ int main(int argc, char **argv) {
 
                 } catch (ParseException& e) {
                     cerr << "error: " << e.getMessage() << endl;
+                } catch (CodeGenerationException& e) {
+                    cerr << "error: " << e.getMessage() << endl;
                 }
-                break;
-            default:
                 break;
         }
         

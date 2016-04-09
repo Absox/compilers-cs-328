@@ -17,25 +17,28 @@
 #include "Write.h"
 #include "Read.h"
 #include "Repeat.h"
+#include "CodeGenerationException.h"
 
 class CodeGenerator {
 public:
     CodeGenerator(
             SymbolTable& symbolTable,
-            const std::vector<std::shared_ptr<Instruction>>& instructions);
+            const std::vector<std::shared_ptr<Instruction>>& instructions)
+            throw (CodeGenerationException);
     std::string getContent();
 private:
     SymbolTable& symbolTable;
-    int totalBytes;
+    long long totalBytes;
     int indentLevel;
     int labelCounter;
 
     std::stringstream stream;
-    std::unordered_map<std::shared_ptr<Type>, int> typeSizes;
+    std::unordered_map<std::shared_ptr<Type>, unsigned long long> typeSizes;
 
-    void calculateOffsets();
-    long long int calculateScopeOffsets(const std::shared_ptr<Scope> &scope);
-    long long int getTypeSize(const std::shared_ptr<Type> &type);
+    void calculateOffsets() throw (CodeGenerationException);
+    unsigned long long calculateScopeOffsets(
+            const std::shared_ptr<Scope> &scope);
+    unsigned long long getTypeSize(const std::shared_ptr<Type> &type);
 
     void initializeProgram();
     void finalizeProgram();
@@ -53,7 +56,8 @@ private:
     void resolveLocationOffset(const std::shared_ptr<Location>& location);
     std::shared_ptr<Type> getLocationType(
             const std::shared_ptr<Location>& location);
-    void resolveExpressionValue(const std::shared_ptr<Expression>& expression);
+    void resolveExpressionValue(const std::shared_ptr<Expression>& expression)
+        throw (CodeGenerationException);
 
     void indent();
     void deindent();

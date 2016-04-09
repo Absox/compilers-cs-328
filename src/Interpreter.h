@@ -53,8 +53,8 @@ private:
             throw (RuntimeException);
     std::shared_ptr<Box> resolveField(const std::shared_ptr<Field>& field)
             throw (RuntimeException);
-    int resolveNumericExpression(
-            const std::shared_ptr<Expression>& expression)
+    long long int resolveNumericExpression(
+            const std::shared_ptr<Expression> &expression)
             throw (RuntimeException);
     bool isNumeric(const std::shared_ptr<Expression>& expression)
             throw (RuntimeException);

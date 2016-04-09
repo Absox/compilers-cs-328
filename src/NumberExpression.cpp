@@ -4,7 +4,7 @@
 
 #include "NumberExpression.h"
 
-NumberExpression::NumberExpression(const int &value) {
+NumberExpression::NumberExpression(const long long int &value) {
     this->value = value;
 }
 
@@ -15,6 +15,6 @@ std::string NumberExpression::getLabel() {
     return "Number";
 }
 
-int NumberExpression::getValue() const {
+long long int NumberExpression::getValue() const {
     return value;
 }
