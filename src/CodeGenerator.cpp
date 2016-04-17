@@ -390,18 +390,26 @@ void CodeGenerator::processRepeat(const shared_ptr<Repeat> &repeat) {
 
 void CodeGenerator::processRead(const shared_ptr<Read> &read) {
 
-    // Pop offset of location we're reading to from stack.
-    resolveLocationOffset(read->getLocation());
-    writeWithIndent("pop {r3}");
-
-    // Address goes into r1
-    // Calculate address
-    writeWithIndent("add r1, r3, r11");
-
-    // Format goes into r0
+    auto location = resolveLocationOffset(read->getLocation());
     writeWithIndent("ldr r0, =input_format");
-    // bl scanf
+
+    // Put address into r1.
+    if (location.is_register) {
+        writeWithIndent("add r1, r" + to_string(location.value) + ", r11");
+        pop();
+    } else {
+        if (canImmediateValue(location.value)) {
+            writeWithIndent("add r1, r11, #" + to_string(location.value));
+        } else {
+            writeWithIndent("ldr r1, =" + to_string(location.value));
+            writeWithIndent("add r1, r1, r11");
+        }
+    }
+
+    // Don't want to trash these registers.
+    writeWithIndent("push {r2-r3}");
     writeWithIndent("bl __isoc99_scanf");
+    writeWithIndent("pop {r2-r3}");
 }
 
 void CodeGenerator::processWrite(const shared_ptr<Write>& write) {
@@ -421,25 +429,12 @@ void CodeGenerator::processWrite(const shared_ptr<Write>& write) {
         }
     }
 
-    // We need to not trash our registers when we bl.
+    // We need to not trash our stack registers when we bl into the function.
     writeWithIndent("push {r2-r3}");
     writeWithIndent("bl printf");
     writeWithIndent("pop {r2-r3}");
 
 }
-
-/*void CodeGenerator::processWrite(const shared_ptr<Write> &write) {
-
-    resolveExpressionValue(write->getExpression());
-    // Pop value we're writing from stack.
-    // value goes into r1
-    writeWithIndent("pop {r1}");
-    // format goes into r0
-    writeWithIndent("ldr r0, =output_format");
-    // bl printf
-    writeWithIndent("bl printf");
-}*/
-
 
 void CodeGenerator::resolveCondition(
         const shared_ptr<Condition> &condition) {
