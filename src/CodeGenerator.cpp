@@ -245,6 +245,7 @@ void CodeGenerator::processAssign(const shared_ptr<Assign>& assign) {
     if (record != 0 || array != 0) {
         auto origin_location = resolveLocationOffset(
                 dynamic_pointer_cast<Location>(assign->getExpression()));
+        // Need to copy the memory word by word
 
     } else {
         // Simple integer assignment.
@@ -289,7 +290,6 @@ void CodeGenerator::processAssign(const shared_ptr<Assign>& assign) {
                     writeWithIndent("str r0, [r11, r1]");
                 }
             }
-
         }
     }
 }
@@ -481,6 +481,7 @@ CodeGenerationMessage CodeGenerator::resolveLocationOffset(
     auto field = dynamic_pointer_cast<Field>(location);
 
     if (variable != 0) {
+        // If variable, we can just look up in the symbol table.
         auto variableEntry = dynamic_pointer_cast<Variable>(
                 symbolTable.getCurrentScope()->getEntry
                         (variable->getIdentifier()));
@@ -489,15 +490,114 @@ CodeGenerationMessage CodeGenerator::resolveLocationOffset(
         auto locationOffset = resolveLocationOffset(index->getLocation());
         auto expressionValue = resolveExpressionValue(index->getExpression());
 
-        if (!locationOffset.is_register && !expressionValue.is_register) {
+        auto array = dynamic_pointer_cast<Array>(
+                getLocationType(index->getLocation()));
+        auto elementSize = typeSizes[array->getType()];
+
+        if (expressionValue.is_register) {
+            // If it's a register, let's check the index.
+            if (canImmediateValue(array->getLength())) {
+                writeWithIndent("cmp r" + to_string(expressionValue.value)
+                                + ", #" + to_string(array->getLength()));
+            } else {
+                writeWithIndent("ldr r0, =" + to_string(array->getLength()));
+                writeWithIndent("cmp r" + to_string(expressionValue.value)
+                                + ", r0");
+            }
+            writeWithIndent("bhs array_out_of_bounds");
+        } else {
+            // If index is constant
+            if (expressionValue.value < 0
+                || expressionValue.value > array->getLength()) {
+                throw CodeGenerationException("Array index out of bounds!");
+            }
+        }
+
+        if (locationOffset.is_register) {
+            if (expressionValue.is_register) {
+
+                if (canImmediateValue(elementSize)) {
+                    writeWithIndent("mov r0, #" + to_string(elementSize));
+                } else {
+                    writeWithIndent("ldr r0, =" + to_string(elementSize));
+                }
+                writeWithIndent("mul r" + to_string(expressionValue.value)
+                                + ", r" + to_string(expressionValue.value)
+                                + ", r0");
+                writeWithIndent("add r" + to_string(locationOffset.value)
+                                + ", r" + to_string(locationOffset.value)
+                                + ", r" + to_string(expressionValue.value));
+                pop();
+            } else {
+                auto newOffset = expressionValue.value * elementSize;
+                if (canImmediateValue(newOffset)) {
+                    writeWithIndent("add r" + to_string(locationOffset.value)
+                                    + ", r" + to_string(locationOffset.value)
+                                    + ", #" + to_string(newOffset));
+                } else {
+                    writeWithIndent("ldr r0, =" + to_string(newOffset));
+                    writeWithIndent("add r" + to_string(locationOffset.value)
+                                    + ", r" + to_string(locationOffset.value) +
+                                            ", r0");
+                }
+            }
+            return CodeGenerationMessage(true, true, locationOffset.value);
 
         } else {
-
+            // The offset is a constant if the index is a constant.
+            if (expressionValue.is_register) {
+                // Need to calculate new offset
+                if (canImmediateValue(elementSize)) {
+                    writeWithIndent("mov r0, #" + to_string(elementSize));
+                } else {
+                    writeWithIndent("ldr r0, =" + to_string(elementSize));
+                }
+                writeWithIndent("mul r" + to_string(expressionValue.value)
+                                + ", r" + to_string(expressionValue.value)
+                                + ", r0");
+                if (canImmediateValue(locationOffset.value)) {
+                    writeWithIndent("add r" + to_string(expressionValue.value)
+                                    + ", r" + to_string(expressionValue.value)
+                                    + ", #" + to_string(locationOffset.value));
+                } else {
+                    writeWithIndent("ldr r0, ="
+                                    + to_string(locationOffset.value));
+                    writeWithIndent("add r" + to_string(expressionValue.value)
+                                    + ", r" + to_string(expressionValue.value)
+                                    + ", r0");
+                }
+                return CodeGenerationMessage(true, true, expressionValue.value);
+            } else {
+                auto newOffset = locationOffset.value
+                                 + expressionValue.value * elementSize;
+                return CodeGenerationMessage(true, false, newOffset);
+            }
         }
 
     } else if (field != 0) {
+        auto locationOffset = resolveLocationOffset(field->getLocation());
+        auto record = dynamic_pointer_cast<Record>(
+                getLocationType(field->getLocation()));
+        auto fieldOffset = dynamic_pointer_cast<Variable>(
+                record->getScope()->getEntry(
+                        field->getVariable()->getIdentifier()))->getOffset();
 
-
+        if (locationOffset.is_register) {
+            if (canImmediateValue(fieldOffset)) {
+                writeWithIndent("add r" + to_string(locationOffset.value)
+                                + ", r" + to_string(locationOffset.value)
+                                + ", #" + to_string(fieldOffset));
+            } else {
+                writeWithIndent("ldr r0, =" + to_string(fieldOffset));
+                writeWithIndent("add r" + to_string(locationOffset.value)
+                                + ", r" + to_string(locationOffset.value)
+                                + ", r0");
+            }
+            return CodeGenerationMessage(true, true, locationOffset.value);
+        } else {
+            auto newOffset = locationOffset.value + fieldOffset;
+            return CodeGenerationMessage(true, false, newOffset);
+        }
     }
 }
 
@@ -641,7 +741,7 @@ CodeGenerationMessage CodeGenerator::resolveExpressionValue(
         auto left = resolveExpressionValue(binary->getExpressionLeft());
 
         if (left.is_register) {
-            writeWithIndent("mov r0, r" + left.value);
+            writeWithIndent("mov r0, r" + to_string(left.value));
             pop();
         } else {
             if (canImmediateValue(left.value)) {

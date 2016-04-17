@@ -8,11 +8,12 @@
 
 class CodeGenerationMessage {
 public:
-    CodeGenerationMessage(const bool& is_offset, const bool& is_register, const int& value);
+    CodeGenerationMessage(const bool &is_offset, const bool &is_register,
+                          const long long &value);
 private:
     bool is_offset;
     bool is_register;
-    int value;
+    long long value;
 
     friend class CodeGenerator;
 };
