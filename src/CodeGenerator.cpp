@@ -49,7 +49,6 @@ void CodeGenerator::calculateOffsets() throw (CodeGenerationException) {
         throw CodeGenerationException(
                 "More memory requested than can be addressed!");
     }
-
 }
 
 unsigned long long CodeGenerator::calculateScopeOffsets(

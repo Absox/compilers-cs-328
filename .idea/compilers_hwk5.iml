@@ -15,6 +15,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/IfInstruction.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Scanner.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Scope.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/GraphicalAbstractSyntaxTreeBuilder.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Condition.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/ParseState.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/AbstractSyntaxTreeBuilder.cpp" isTestSource="false" />
@@ -49,7 +50,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/ParseException.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Read.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/CodeGenerationMessage.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/GraphicalAbstractSyntaxTreeBuilder.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Read.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/CodeGenerationException.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/VariableLocation.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/RuntimeException.cpp" isTestSource="false" />
@@ -83,7 +84,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/ArrayBox.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Assign.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Record.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/Read.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Token.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Interpreter.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Entry.h" isTestSource="false" />
@@ -103,6 +103,9 @@
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test/Hello.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/test/RegisterStack.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/test/RegisterStack.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/test/RegisterStackTest.cpp" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
