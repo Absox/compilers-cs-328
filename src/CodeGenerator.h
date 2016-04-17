@@ -18,6 +18,7 @@
 #include "Read.h"
 #include "Repeat.h"
 #include "CodeGenerationException.h"
+#include "CodeGenerationMessage.h"
 
 class CodeGenerator {
 public:
@@ -60,10 +61,12 @@ private:
     void processWrite(const std::shared_ptr<Write>& write);
 
     void resolveCondition(const std::shared_ptr<Condition>& condition);
-    void resolveLocationOffset(const std::shared_ptr<Location>& location);
+    CodeGenerationMessage resolveLocationOffset(
+            const std::shared_ptr<Location>& location);
     std::shared_ptr<Type> getLocationType(
             const std::shared_ptr<Location>& location);
-    void resolveExpressionValue(const std::shared_ptr<Expression>& expression)
+    CodeGenerationMessage resolveExpressionValue(
+            const std::shared_ptr<Expression>& expression)
         throw (CodeGenerationException);
 
     void indent();
@@ -71,6 +74,8 @@ private:
     void writeWithIndent(const std::string &value);
 
     int getNextLabelIndex();
+
+    bool canImmediateValue(const int& value);
 };
 
 

@@ -142,8 +142,7 @@ void CodeGenerator::initializeProgram() {
 
     indent();
     writeWithIndent("push {fp, lr}");
-    writeWithIndent("mov fp, sp");
-    if (totalBytes > 0) writeWithIndent("ldr r10, =variables");
+    if (totalBytes > 0) writeWithIndent("ldr r11, =variables");
 
     writeWithIndent("");
 }
@@ -188,9 +187,8 @@ void CodeGenerator::finalizeProgram() {
     writeWithIndent("terminate:");
     indent();
     // Note that we have to reset the stack to the beginning of the frame.
-    writeWithIndent("mov sp, fp");
-    writeWithIndent("pop {fp, lr}");
-    writeWithIndent("bx lr");
+    writeWithIndent("mov r0, #0");
+    writeWithIndent("bl exit");
 
     deindent();
     writeWithIndent("standard_error:");
@@ -235,8 +233,68 @@ void CodeGenerator::processInstruction(
     writeWithIndent("");
 }
 
+void CodeGenerator::processAssign(const shared_ptr<Assign>& assign) {
+    auto locationOffset = resolveLocationOffset(assign->getLocation());
+    auto type = getLocationType(assign->getLocation());
 
-void CodeGenerator::processAssign(const shared_ptr<Assign> &assign) {
+
+    auto record = dynamic_pointer_cast<Record>(type);
+    auto array = dynamic_pointer_cast<Array>(type);
+    auto size = typeSizes[type];
+
+    if (record != 0 || array != 0) {
+        auto origin_location = resolveLocationOffset(
+                dynamic_pointer_cast<Location>(assign->getExpression()));
+
+    } else {
+        // Simple integer assignment.
+        auto expressionValue = resolveExpressionValue(assign->getExpression());
+        if (!expressionValue.is_register) {
+            if (canImmediateValue(expressionValue.value)) {
+                writeWithIndent("mov r0, #" + to_string(expressionValue.value));
+            } else {
+                writeWithIndent("ldr r0, =" + to_string(expressionValue.value));
+            }
+        }
+
+        if (locationOffset.is_register) {
+            if (expressionValue.is_register) {
+                writeWithIndent("str r" + to_string(expressionValue.value)
+                                + ", [r11, r" + to_string(locationOffset.value)
+                                + "]");
+                pop();
+            } else {
+                writeWithIndent("str r0, [r11, r"
+                                + to_string(locationOffset.value) + "]");
+            }
+            pop();
+        } else {
+            if (canImmediateValue(locationOffset.value)) {
+                if (expressionValue.is_register) {
+                    writeWithIndent("str r" + to_string(expressionValue.value)
+                                    + ", [r11, #"
+                                    + to_string(locationOffset.value) + "]");
+                    pop();
+                } else {
+                    writeWithIndent("str r0, [r11, #"
+                                    + to_string(locationOffset.value) + "]");
+                }
+            } else {
+                writeWithIndent("ldr r1, =" + to_string(locationOffset.value));
+                if (expressionValue.is_register) {
+                    writeWithIndent("str r" + to_string(expressionValue.value)
+                                    + ", [r11, r1]");
+                    pop();
+                } else {
+                    writeWithIndent("str r0, [r11, r1]");
+                }
+            }
+
+        }
+    }
+}
+
+/*void CodeGenerator::processAssign(const shared_ptr<Assign> &assign) {
 
     // We need to resolve our target offset.
     resolveLocationOffset(assign->getLocation());
@@ -256,10 +314,10 @@ void CodeGenerator::processAssign(const shared_ptr<Assign> &assign) {
         // Pop the origin offset.
         writeWithIndent("pop {r0}");
         // Calculate origin address.
-        writeWithIndent("add r0, r0, r10");
+        writeWithIndent("add r0, r0, r11");
         // Pop the destination offset.
         writeWithIndent("pop {r1}");
-        writeWithIndent("add r1, r1, r10");
+        writeWithIndent("add r1, r1, r11");
 
         for (unsigned long long currentOffset = 0;
              currentOffset < numBytesToMove;
@@ -280,11 +338,11 @@ void CodeGenerator::processAssign(const shared_ptr<Assign> &assign) {
         resolveExpressionValue(assign->getExpression());
         writeWithIndent("pop {r0}");
         writeWithIndent("pop {r1}");
-        writeWithIndent("add r2, r1, r10");
+        writeWithIndent("add r2, r1, r11");
         writeWithIndent("str r0, [r2]");
     }
 
-}
+}*/
 
 void CodeGenerator::processIfInstruction(
         const shared_ptr<IfInstruction> &ifInstruction) {
@@ -338,7 +396,7 @@ void CodeGenerator::processRead(const shared_ptr<Read> &read) {
 
     // Address goes into r1
     // Calculate address
-    writeWithIndent("add r1, r3, r10");
+    writeWithIndent("add r1, r3, r11");
 
     // Format goes into r0
     writeWithIndent("ldr r0, =input_format");
@@ -346,7 +404,31 @@ void CodeGenerator::processRead(const shared_ptr<Read> &read) {
     writeWithIndent("bl __isoc99_scanf");
 }
 
-void CodeGenerator::processWrite(const shared_ptr<Write> &write) {
+void CodeGenerator::processWrite(const shared_ptr<Write>& write) {
+
+    auto expression = resolveExpressionValue(write->getExpression());
+    writeWithIndent("ldr r0, =output_format");
+
+
+    if (expression.is_register) {
+        writeWithIndent("mov r1, r" + to_string(expression.value));
+        pop();
+    } else {
+        if (canImmediateValue(expression.value)) {
+            writeWithIndent("mov r1, #" + to_string(expression.value));
+        } else {
+            writeWithIndent("ldr r1, =" + to_string(expression.value));
+        }
+    }
+
+    // We need to not trash our registers when we bl.
+    writeWithIndent("push {r2-r3}");
+    writeWithIndent("bl printf");
+    writeWithIndent("pop {r2-r3}");
+
+}
+
+/*void CodeGenerator::processWrite(const shared_ptr<Write> &write) {
 
     resolveExpressionValue(write->getExpression());
     // Pop value we're writing from stack.
@@ -356,7 +438,7 @@ void CodeGenerator::processWrite(const shared_ptr<Write> &write) {
     writeWithIndent("ldr r0, =output_format");
     // bl printf
     writeWithIndent("bl printf");
-}
+}*/
 
 
 void CodeGenerator::resolveCondition(
@@ -392,8 +474,34 @@ void CodeGenerator::resolveCondition(
     writeWithIndent("push {r3}");
 }
 
+CodeGenerationMessage CodeGenerator::resolveLocationOffset(
+        const shared_ptr<Location> &location) {
+    auto variable = dynamic_pointer_cast<VariableLocation>(location);
+    auto index = dynamic_pointer_cast<Index>(location);
+    auto field = dynamic_pointer_cast<Field>(location);
 
-void CodeGenerator::resolveLocationOffset(
+    if (variable != 0) {
+        auto variableEntry = dynamic_pointer_cast<Variable>(
+                symbolTable.getCurrentScope()->getEntry
+                        (variable->getIdentifier()));
+        return CodeGenerationMessage(true, false, variableEntry->getOffset());
+    } else if (index != 0) {
+        auto locationOffset = resolveLocationOffset(index->getLocation());
+        auto expressionValue = resolveExpressionValue(index->getExpression());
+
+        if (!locationOffset.is_register && !expressionValue.is_register) {
+
+        } else {
+
+        }
+
+    } else if (field != 0) {
+
+
+    }
+}
+
+/*void CodeGenerator::resolveLocationOffset(
         const shared_ptr<Location> &location) {
     // Ultimately pushes an offset onto the stack.
     auto variable = dynamic_pointer_cast<VariableLocation>(location);
@@ -448,7 +556,7 @@ void CodeGenerator::resolveLocationOffset(
     }
     writeWithIndent("push {r3}");
 
-}
+}*/
 
 // Copied verbatim from Parser.cpp
 shared_ptr<Type> CodeGenerator::getLocationType(
@@ -490,77 +598,105 @@ shared_ptr<Type> CodeGenerator::getLocationType(
     return 0;
 }
 
-void CodeGenerator::resolveExpressionValue(
+CodeGenerationMessage CodeGenerator::resolveExpressionValue(
         const shared_ptr<Expression> &expression)
         throw (CodeGenerationException) {
-    // Ultimately pushes a numerical value onto the stack.
 
     auto number = dynamic_pointer_cast<NumberExpression>(expression);
     auto location = dynamic_pointer_cast<Location>(expression);
     auto binary = dynamic_pointer_cast<BinaryExpression>(expression);
 
     if (number != 0) {
-        // Load the value into r3
         auto value = number->getValue();
-
-        if (value > 2147483647) {
+        if (value > 2147483647 || value < -2147483648) {
             throw CodeGenerationException(
                     "Value of constant can't be held in 32 bits!");
         }
-
-        writeWithIndent("ldr r3, =" + to_string(value));
-        writeWithIndent("push {r3}");
+        return CodeGenerationMessage(false, false, value);
 
     } else if (location != 0) {
+        auto message = resolveLocationOffset(location);
+        if (message.is_register) {
+            writeWithIndent("ldr r" + to_string(message.value)
+                            + ", [r" + to_string(message.value) + ", r11]");
+            return CodeGenerationMessage(false, true, message.value);
+        } else {
+            // We need to ask for a new register to store the value.
+            auto register_number = push();
 
-        // We need to resolve the offset of the location first.
-        resolveLocationOffset(location);
-        // Pop the offset into r3.
-        writeWithIndent("pop {r3}");
-        // Calculate the address.
-        writeWithIndent("add r0, r10, r3");
-        // Load the value from the address.
-        writeWithIndent("ldr r1, [r0]");
-        // Push onto the stack.
-        writeWithIndent("push {r1}");
-
+            if (canImmediateValue(message.value)) {
+                writeWithIndent("ldr r" + to_string(register_number)
+                                + ", [r11, #" + to_string(message.value) + "]");
+            } else {
+                writeWithIndent("ldr r" + to_string(register_number)
+                                + ", =" + to_string(message.value));
+                writeWithIndent("ldr r" + to_string(register_number)
+                                + ", [r11, r"
+                                + to_string(register_number) + "]");
+            }
+            return CodeGenerationMessage(false, true, register_number);
+        }
     } else if (binary != 0) {
+        auto right = resolveExpressionValue(binary->getExpressionRight());
+        auto left = resolveExpressionValue(binary->getExpressionLeft());
 
-        // We need to pop two numbers, then do the operation, then push result.
-        // Push right
-        resolveExpressionValue(binary->getExpressionRight());
-        // Push left
-        resolveExpressionValue(binary->getExpressionLeft());
+        if (left.is_register) {
+            writeWithIndent("mov r0, r" + left.value);
+            pop();
+        } else {
+            if (canImmediateValue(left.value)) {
+                writeWithIndent("mov r0, #" + to_string(left.value));
+            } else {
+                writeWithIndent("ldr r0, =" + to_string(left.value));
+            }
+        }
 
-        // Pop left
-        writeWithIndent("pop {r0}");
-        // Pop right
-        writeWithIndent("pop {r1}");
+        if (right.is_register) {
+            writeWithIndent("mov r1, r" + to_string(right.value));
+            pop();
+        } else {
+            if (canImmediateValue(right.value)) {
+                writeWithIndent("mov r1, #" + to_string(right.value));
+            } else {
+                writeWithIndent("ldr r1, =" + to_string(right.value));
+            }
+        }
+
+        auto register_number = push();
 
         if (binary->getOperation() == "+") {
-            writeWithIndent("add r3, r0, r1");
+            writeWithIndent("add r" + to_string(register_number) + ", r0, r1");
         } else if (binary->getOperation() == "-") {
-            writeWithIndent("sub r3, r0, r1");
+            writeWithIndent("sub r" + to_string(register_number) + ", r0, r1");
         } else if (binary->getOperation() == "*") {
-            writeWithIndent("mul r3, r0, r1");
+            writeWithIndent("mul r" + to_string(register_number) + ", r0, r1");
         } else if (binary->getOperation() == "DIV") {
-            writeWithIndent("cmp r1, #0");
-            writeWithIndent("beq div_zero");
-
+            if (!right.is_register && right.value == 0) {
+                throw CodeGenerationException("Dividing by zero!");
+            }
+            if (!right.is_register) {
+                writeWithIndent("cmp r1, #0");
+                writeWithIndent("beq div_zero");
+            }
             writeWithIndent("bl __aeabi_idiv");
-            writeWithIndent("mov r3, r0");
+            writeWithIndent("mov r" + to_string(register_number) + ", r0");
+
         } else if (binary->getOperation() == "MOD") {
-            writeWithIndent("cmp r1, #0");
-            writeWithIndent("beq mod_zero");
+            if (!right.is_register && right.value == 0) {
+                throw CodeGenerationException("Modulus by zero!");
+            }
+            if (!right.is_register) {
+                writeWithIndent("cmp r1, #0");
+                writeWithIndent("beq mod_zero");
+            }
 
             writeWithIndent("bl __aeabi_idivmod");
-            writeWithIndent("mov r3, r1");
+            writeWithIndent("mov r" + to_string(register_number) + ", r1");
         }
-        writeWithIndent("push {r3}");
 
+        return CodeGenerationMessage(false, true, register_number);
     }
 }
-
 
 void CodeGenerator::indent() {
     indentLevel++;
@@ -616,3 +752,9 @@ unsigned int CodeGenerator::pop() {
     auto result = --stackSize % numRegisters + startRegister;
     return result;
 }
+
+
+bool CodeGenerator::canImmediateValue(const int &value) {
+    return value < 256 && value >= -256;
+}
+

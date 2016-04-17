@@ -14,7 +14,7 @@ private:
     bool is_register;
     int value;
 
-    friend class CodeGenerator2;
+    friend class CodeGenerator;
 };
 
 
