@@ -346,56 +346,6 @@ void CodeGenerator::processAssign(const shared_ptr<Assign>& assign) {
     }
 }
 
-/*void CodeGenerator::processAssign(const shared_ptr<Assign> &assign) {
-
-    // We need to resolve our target offset.
-    resolveLocationOffset(assign->getLocation());
-
-    // We need to know if we're assigning integers, arrays, or records.
-    auto type = getLocationType(assign->getLocation());
-    auto record = dynamic_pointer_cast<Record>(type);
-    auto array = dynamic_pointer_cast<Array>(type);
-
-    if (record != 0 || array != 0) {
-        unsigned long long numBytesToMove = typeSizes[type];
-        auto origin_location = dynamic_pointer_cast<Location>(
-                assign->getExpression());
-
-        resolveLocationOffset(origin_location);
-
-        // Pop the origin offset.
-        writeWithIndent("pop {r0}");
-        // Calculate origin address.
-        writeWithIndent("add r0, r0, r11");
-        // Pop the destination offset.
-        writeWithIndent("pop {r1}");
-        writeWithIndent("add r1, r1, r11");
-
-        for (unsigned long long currentOffset = 0;
-             currentOffset < numBytesToMove;
-             currentOffset = currentOffset + 4) {
-
-            writeWithIndent("ldr r2, =" + to_string(currentOffset));
-            writeWithIndent("add r0, r0, r2");
-            writeWithIndent("add r1, r1, r2");
-
-            writeWithIndent("ldr r3, [r0]");
-            writeWithIndent("str r3, [r1]");
-        }
-
-        // We're aligned to 4 bytes so we can copy everything in 32-bit chunks.
-
-    } else {
-        // It's an integer.
-        resolveExpressionValue(assign->getExpression());
-        writeWithIndent("pop {r0}");
-        writeWithIndent("pop {r1}");
-        writeWithIndent("add r2, r1, r11");
-        writeWithIndent("str r0, [r2]");
-    }
-
-}*/
-
 void CodeGenerator::processIfInstruction(
         const shared_ptr<IfInstruction> &ifInstruction) {
     auto condition = resolveCondition(ifInstruction->getCondition());
@@ -436,12 +386,18 @@ void CodeGenerator::processRepeat(const shared_ptr<Repeat> &repeat) {
     writeWithIndent(loop_begin_label + ":");
     indent();
     processInstructions(repeat->getInstructions());
-    resolveCondition(repeat->getCondition());
 
-    writeWithIndent("pop {r0}");
-    writeWithIndent("cmp r0, #1");
-    writeWithIndent("bne " + loop_begin_label);
+    auto condition = resolveCondition(repeat->getCondition());
 
+    if (condition.is_register) {
+        writeWithIndent("cmp r" + to_string(condition.value) + ", #1");
+        writeWithIndent("bne " + loop_begin_label);
+        pop();
+    } else {
+        if (!condition.value) {
+            writeWithIndent("b " + loop_begin_label);
+        }
+    }
 }
 
 void CodeGenerator::processRead(const shared_ptr<Read> &read) {
@@ -647,17 +603,26 @@ CodeGenerationMessage CodeGenerator::resolveLocationOffset(
         if (locationOffset.is_register) {
             if (expressionValue.is_register) {
 
-                if (canImmediateValue(elementSize)) {
-                    writeWithIndent("mov r0, #" + to_string(elementSize));
+                if (powerOfTwo(elementSize)) {
+                    auto exponent = logTwo(elementSize);
+                    writeWithIndent("add r" + to_string(locationOffset.value)
+                                    + ", r" + to_string(locationOffset.value)
+                                    + ", r" + to_string(expressionValue.value)
+                                    + ", LSL #" + to_string(exponent));
                 } else {
-                    writeWithIndent("ldr r0, =" + to_string(elementSize));
+                    if (canImmediateValue(elementSize)) {
+                        writeWithIndent("mov r0, #" + to_string(elementSize));
+                    } else {
+                        writeWithIndent("ldr r0, =" + to_string(elementSize));
+                    }
+                    writeWithIndent("mul r" + to_string(expressionValue.value)
+                                    + ", r" + to_string(expressionValue.value)
+                                    + ", r0");
+                    writeWithIndent("add r" + to_string(locationOffset.value)
+                                    + ", r" + to_string(locationOffset.value)
+                                    + ", r" + to_string(expressionValue.value));
                 }
-                writeWithIndent("mul r" + to_string(expressionValue.value)
-                                + ", r" + to_string(expressionValue.value)
-                                + ", r0");
-                writeWithIndent("add r" + to_string(locationOffset.value)
-                                + ", r" + to_string(locationOffset.value)
-                                + ", r" + to_string(expressionValue.value));
+
                 pop();
             } else {
                 auto newOffset = expressionValue.value * elementSize;
@@ -731,63 +696,6 @@ CodeGenerationMessage CodeGenerator::resolveLocationOffset(
         }
     }
 }
-
-/*void CodeGenerator::resolveLocationOffset(
-        const shared_ptr<Location> &location) {
-    // Ultimately pushes an offset onto the stack.
-    auto variable = dynamic_pointer_cast<VariableLocation>(location);
-    auto index = dynamic_pointer_cast<Index>(location);
-    auto field = dynamic_pointer_cast<Field>(location);
-
-    if (variable != 0) {
-        // If we have a variable, we can find its offset from the symbol table.
-        auto variableEntry = dynamic_pointer_cast<Variable>(
-                symbolTable.getCurrentScope()->getEntry(
-                        variable->getIdentifier()));
-        writeWithIndent("ldr r3, =" + to_string(variableEntry->getOffset()));
-    } else if (index != 0) {
-        // If we have an index:
-        // We need to to know offset of parent array and width of elements.
-        resolveLocationOffset(index->getLocation());
-        resolveExpressionValue(index->getExpression());
-        // Pop index
-        writeWithIndent("pop {r0}");
-        // Pop offset of parent array.
-        writeWithIndent("pop {r1}");
-
-        // Calculate what we have to add to this offset.
-        auto array = dynamic_pointer_cast<Array>(
-                getLocationType(index->getLocation()));
-        unsigned long long elementSize = typeSizes[array->getType()];
-
-        // Check if negative
-        writeWithIndent("cmp r0, #0");
-        writeWithIndent("blt array_out_of_bounds");
-        writeWithIndent("ldr r2, =" + to_string(array->getLength()));
-        writeWithIndent("cmp r0, r2");
-        writeWithIndent("bge array_out_of_bounds");
-
-        writeWithIndent("ldr r2, =" + to_string(elementSize));
-        writeWithIndent("mul r3, r0, r2");
-        writeWithIndent("add r3, r1, r3");
-    } else if (field != 0) {
-        // If we have a field:
-        // We need to know offset of parent record and variable offset.
-        resolveLocationOffset(field->getLocation());
-        // Pop offset of parent record.
-        writeWithIndent("pop {r0}");
-
-        auto record = dynamic_pointer_cast<Record>(
-                getLocationType(field->getLocation()));
-        auto fieldVariable = dynamic_pointer_cast<Variable>(
-                record->getScope()->getEntry(
-                        field->getVariable()->getIdentifier()));
-        writeWithIndent("ldr r1, =" + to_string(fieldVariable->getOffset()));
-        writeWithIndent("add r3, r0, r1");
-    }
-    writeWithIndent("push {r3}");
-
-}*/
 
 // Copied verbatim from Parser.cpp
 shared_ptr<Type> CodeGenerator::getLocationType(
@@ -988,4 +896,19 @@ unsigned int CodeGenerator::pop() {
 bool CodeGenerator::canImmediateValue(const long long int &value) {
     return value < 256 && value >= -256;
 }
+
+
+bool CodeGenerator::powerOfTwo(const long long &value) {
+    return ((value & (value - 1)) == 0);
+}
+
+
+unsigned int CodeGenerator::logTwo(const long long &value) {
+    unsigned int result = 0;
+    while (((1 << result) & value) == 0) {
+        result++;
+    }
+    return result;
+}
+
 

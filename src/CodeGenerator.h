@@ -77,6 +77,8 @@ private:
     int getNextLabelIndex();
 
     bool canImmediateValue(const long long int &value);
+    bool powerOfTwo(const long long& value);
+    unsigned int logTwo(const long long& value);
 };
 
 
