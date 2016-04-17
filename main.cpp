@@ -43,7 +43,7 @@ string &readFileContents(const char* filename, string& target) {
     ifstream file(filename);
 
     file.seekg(0, file.end);
-    long length = file.tellg();
+    auto length = file.tellg();
     file.seekg(0, file.beg);
 
     target = string(length, ' ');

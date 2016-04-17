@@ -27,6 +27,7 @@ CodeGenerator::CodeGenerator(
         : symbolTable(symbolTable) {
     indentLevel = 0;
     labelCounter = 0;
+    stackSize = 0;
 
     calculateOffsets();
     initializeProgram();
@@ -580,3 +581,38 @@ int CodeGenerator::getNextLabelIndex() {
     return labelCounter++;
 }
 
+/**
+ * If we want to push something into the register stack,
+ * this tells us which register to put our value into.
+ */
+unsigned int CodeGenerator::push() {
+    auto result = stackSize++ % numRegisters + startRegister;
+    if (stackSize % numRegisters == numRegisters / 2
+        && (stackSize / numRegisters > 0)) {
+        stream << "push {r" << numRegisters / 2 + startRegister
+        << "-r" << numRegisters + startRegister - 1 << "}" << endl;
+    } else if (stackSize % numRegisters == 0 && stackSize > 0) {
+        stream << "push {r" << startRegister << "-r"
+        << numRegisters / 2 + startRegister - 1 << "}" << endl;
+    }
+    return result;
+}
+
+/**
+ * If we want to pop something from the register stack, this tells us
+ * which register our value is in.
+ */
+unsigned int CodeGenerator::pop() {
+    if (stackSize % numRegisters == numRegisters / 2
+        && stackSize / numRegisters > 0) {
+        stream << "pop {r" << numRegisters / 2 + startRegister
+        << "-r" << numRegisters + startRegister - 1 << "}" << endl;
+
+    } else if (stackSize % numRegisters == 0 && stackSize > 0) {
+        stream << "pop {r" << startRegister << "-r"
+        << numRegisters / 2 + startRegister - 1 << "}" << endl;
+    }
+
+    auto result = --stackSize % numRegisters + startRegister;
+    return result;
+}

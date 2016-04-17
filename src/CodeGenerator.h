@@ -27,6 +27,13 @@ public:
             throw (CodeGenerationException);
     std::string getContent();
 private:
+    unsigned int stackSize;
+    const unsigned int numRegisters = 9;
+    const unsigned int startRegister = 2;
+
+    unsigned int pop();
+    unsigned int push();
+
     SymbolTable& symbolTable;
     unsigned long long totalBytes;
     int indentLevel;
@@ -61,7 +68,7 @@ private:
 
     void indent();
     void deindent();
-    void writeWithIndent(const std::string& value);
+    void writeWithIndent(const std::string &value);
 
     int getNextLabelIndex();
 };

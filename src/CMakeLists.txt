@@ -48,7 +48,6 @@ set(SOURCE_FILES
         RuntimeException.cpp
         CodeGenerator.cpp
         CodeGenerationException.cpp
-        CodeGenerator2.cpp
         CodeGenerationMessage.cpp)
 
 set(HEADER_FILES
@@ -98,7 +97,6 @@ set(HEADER_FILES
         RuntimeException.h
         CodeGenerator.h
         CodeGenerationException.h
-        CodeGenerator2.h
         CodeGenerationMessage.h)
 
 add_library(compilers5_lib STATIC ${SOURCE_FILES} ${HEADER_FILES})
