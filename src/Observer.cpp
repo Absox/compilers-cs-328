@@ -13,6 +13,7 @@ Observer::Observer() {
 }
 
 Observer::~Observer() {
+
 }
 
 void Observer::setSubject(Parser *parser) {

@@ -28,7 +28,7 @@ public:
     std::string getContent();
 private:
     SymbolTable& symbolTable;
-    long long totalBytes;
+    unsigned long long totalBytes;
     int indentLevel;
     int labelCounter;
 

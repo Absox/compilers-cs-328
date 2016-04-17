@@ -47,7 +47,9 @@ set(SOURCE_FILES
         RecordBox.cpp
         RuntimeException.cpp
         CodeGenerator.cpp
-        CodeGenerationException.cpp)
+        CodeGenerationException.cpp
+        CodeGenerator2.cpp
+        CodeGenerationMessage.cpp)
 
 set(HEADER_FILES
         Array.h
@@ -95,6 +97,8 @@ set(HEADER_FILES
         RecordBox.h
         RuntimeException.h
         CodeGenerator.h
-        CodeGenerationException.h)
+        CodeGenerationException.h
+        CodeGenerator2.h
+        CodeGenerationMessage.h)
 
 add_library(compilers5_lib STATIC ${SOURCE_FILES} ${HEADER_FILES})
