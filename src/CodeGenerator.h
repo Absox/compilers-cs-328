@@ -60,7 +60,8 @@ private:
     void processRead(const std::shared_ptr<Read>& read);
     void processWrite(const std::shared_ptr<Write>& write);
 
-    void resolveCondition(const std::shared_ptr<Condition>& condition);
+    CodeGenerationMessage resolveCondition(
+            const std::shared_ptr<Condition>& condition);
     CodeGenerationMessage resolveLocationOffset(
             const std::shared_ptr<Location>& location);
     std::shared_ptr<Type> getLocationType(
@@ -75,7 +76,7 @@ private:
 
     int getNextLabelIndex();
 
-    bool canImmediateValue(const int& value);
+    bool canImmediateValue(const long long int &value);
 };
 
 

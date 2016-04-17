@@ -237,7 +237,6 @@ void CodeGenerator::processAssign(const shared_ptr<Assign>& assign) {
     auto locationOffset = resolveLocationOffset(assign->getLocation());
     auto type = getLocationType(assign->getLocation());
 
-
     auto record = dynamic_pointer_cast<Record>(type);
     auto array = dynamic_pointer_cast<Array>(type);
     auto size = typeSizes[type];
@@ -245,7 +244,60 @@ void CodeGenerator::processAssign(const shared_ptr<Assign>& assign) {
     if (record != 0 || array != 0) {
         auto origin_location = resolveLocationOffset(
                 dynamic_pointer_cast<Location>(assign->getExpression()));
+
         // Need to copy the memory word by word
+        // Move origin address into r0
+        if (origin_location.is_register) {
+            writeWithIndent("add r0, r11, r"
+                            + to_string(origin_location.value));
+            pop();
+        } else {
+            if (canImmediateValue(origin_location.value)) {
+                writeWithIndent("add r0, r11, #"
+                                + to_string(origin_location.value));
+            } else {
+                writeWithIndent("ldr r0, =" + to_string(origin_location.value));
+                writeWithIndent("add r0, r0, r11");
+            }
+        }
+
+        unsigned int destination_register = 0;
+        if (locationOffset.is_register) {
+            destination_register = locationOffset.value;
+            writeWithIndent("add r" + to_string(destination_register)
+                            + ", r" + to_string(destination_register)
+                            + ", r11");
+        } else {
+            destination_register = push();
+            if (canImmediateValue(locationOffset.value)) {
+                writeWithIndent("add r" + to_string(destination_register)
+                                + ", r11, #"
+                                + to_string(locationOffset.value));
+            } else {
+                writeWithIndent("ldr r" + to_string(destination_register)
+                                + ", =" + to_string(locationOffset.value));
+                writeWithIndent("add r" + to_string(destination_register)
+                                + ", r" + to_string(destination_register)
+                                + ", r11");
+            }
+        }
+
+        for (unsigned long long c = 0; c < size; c = c + 4) {
+            if (canImmediateValue(size)) {
+                writeWithIndent("ldr r1, [r0, #" + to_string(c) + "]");
+                writeWithIndent("str r1, [r" + to_string(destination_register)
+                                + ", #" + to_string(c) + "]");
+            } else {
+                writeWithIndent("ldr r1, [r0]");
+                writeWithIndent("str r1, [r" + to_string(destination_register)
+                                + "]");
+                writeWithIndent("add r0, r0, #4");
+                writeWithIndent("add r" + to_string(destination_register)
+                                + ", r" + to_string(destination_register)
+                                + ", #4");
+            }
+        }
+        pop();
 
     } else {
         // Simple integer assignment.
@@ -346,29 +398,33 @@ void CodeGenerator::processAssign(const shared_ptr<Assign>& assign) {
 
 void CodeGenerator::processIfInstruction(
         const shared_ptr<IfInstruction> &ifInstruction) {
-    int labelSuffix = getNextLabelIndex();
-    string instructions_false = "if_false_begin_" + to_string(labelSuffix);
-    string instructions_end = "if_end_" + to_string(labelSuffix);
+    auto condition = resolveCondition(ifInstruction->getCondition());
+    if (condition.is_register) {
+        int labelSuffix = getNextLabelIndex();
+        string instructions_false = "if_false_begin_" + to_string(labelSuffix);
+        string instructions_end = "if_end_" + to_string(labelSuffix);
 
-    resolveCondition(ifInstruction->getCondition());
-    writeWithIndent("pop {r0}");
-    writeWithIndent("cmp r0, #1");
-    writeWithIndent("bne " + instructions_false);
+        writeWithIndent("cmp r" + to_string(condition.value) + ", #1");
+        writeWithIndent("bne " + instructions_false);
+        pop();
 
-    processInstructions(ifInstruction->getInstructionsTrue());
-
-    writeWithIndent("b " + instructions_end);
-
-    deindent();
-    writeWithIndent(instructions_false + ":");
-    indent();
-
-    processInstructions(ifInstruction->getInstructionsFalse());
-
-    deindent();
-    writeWithIndent(instructions_end + ":");
-    indent();
-
+        processInstructions(ifInstruction->getInstructionsTrue());
+        writeWithIndent("b " + instructions_end);
+        deindent();
+        writeWithIndent(instructions_false + ":");
+        indent();
+        processInstructions(ifInstruction->getInstructionsFalse());
+        deindent();
+        writeWithIndent(instructions_end + ":");
+        indent();
+    } else {
+        // If our condition is constant, we need only generate one or the other.
+        if (condition.value) {
+            processInstructions(ifInstruction->getInstructionsTrue());
+        } else {
+            processInstructions(ifInstruction->getInstructionsFalse());
+        }
+    }
 }
 
 void CodeGenerator::processRepeat(const shared_ptr<Repeat> &repeat) {
@@ -436,37 +492,117 @@ void CodeGenerator::processWrite(const shared_ptr<Write>& write) {
 
 }
 
-void CodeGenerator::resolveCondition(
-        const shared_ptr<Condition> &condition) {
-    resolveExpressionValue(condition->getExpressionLeft());
-    resolveExpressionValue(condition->getExpressionRight());
-    // Pop right, pop left
-    writeWithIndent("pop {r1}");
-    writeWithIndent("pop {r0}");
+CodeGenerationMessage CodeGenerator::resolveCondition(
+        const shared_ptr<Condition>& condition) {
+    auto right = resolveExpressionValue(condition->getExpressionRight());
+    auto left = resolveExpressionValue(condition->getExpressionLeft());
 
-    writeWithIndent("cmp r0, r1");
+    if (left.is_register) {
+        if (right.is_register) {
+            writeWithIndent("cmp r" + to_string(left.value)
+                            + ", r" + to_string(right.value));
+            pop();
+        } else {
+            if (canImmediateValue(right.value)) {
+                writeWithIndent("cmp r" + to_string(left.value)
+                                + ", #" + to_string(right.value));
+            } else {
+                writeWithIndent("ldr r0, =" + to_string(right.value));
+                writeWithIndent("cmp r" + to_string(left.value) + ", r"
+                                + to_string(right.value));
+            }
+        }
+        if (condition->getLabel() == "=") {
+            writeWithIndent("moveq r" + to_string(left.value) + ", #1");
+            writeWithIndent("movne r" + to_string(left.value) + ", #0");
+        } else if (condition->getLabel() == "#") {
+            writeWithIndent("movne r" + to_string(left.value) + ", #1");
+            writeWithIndent("moveq r" + to_string(left.value) + ", #0");
+        } else if (condition->getLabel() == "<") {
+            writeWithIndent("movlt r" + to_string(left.value) + ", #1");
+            writeWithIndent("movge r" + to_string(left.value) + ", #0");
+        } else if (condition->getLabel() == "<=") {
+            writeWithIndent("movle r" + to_string(left.value) + ", #1");
+            writeWithIndent("movgt r" + to_string(left.value) + ", #0");
+        } else if (condition->getLabel() == ">") {
+            writeWithIndent("movgt r" + to_string(left.value) + ", #1");
+            writeWithIndent("movle r" + to_string(left.value) + ", #0");
+        } else if (condition->getLabel() == ">=") {
+            writeWithIndent("movge r" + to_string(left.value) + ", #1");
+            writeWithIndent("movlt r" + to_string(left.value) + ", #0");
+        }
+        return CodeGenerationMessage(false, true, left.value);
+    } else {
+        if (right.is_register) {
+            if (canImmediateValue(left.value)) {
+                writeWithIndent("cmp r" + to_string(right.value)
+                                + ", #" + to_string(left.value));
+            } else {
+                writeWithIndent("ldr r0, =" + to_string(left.value));
+                writeWithIndent("cmp r" + to_string(right.value) + ", r0");
+            }
 
-    if (condition->getLabel() == "=") {
-        writeWithIndent("ldrne r3, =0");
-        writeWithIndent("ldreq r3, =1");
-    } else if (condition->getLabel() == "#") {
-        writeWithIndent("ldrne r3, =1");
-        writeWithIndent("ldreq r3, =0");
-    } else if (condition->getLabel() == "<") {
-        writeWithIndent("ldrlt r3, =1");
-        writeWithIndent("ldrge r3, =0");
-    } else if (condition->getLabel() == "<=") {
-        writeWithIndent("ldrle r3, =1");
-        writeWithIndent("ldrgt r3, =0");
-    } else if (condition->getLabel() == ">") {
-        writeWithIndent("ldrgt r3, =1");
-        writeWithIndent("ldrle r3, =0");
-    } else if (condition->getLabel() == ">=") {
-        writeWithIndent("ldrge r3, =1");
-        writeWithIndent("ldrlt r3, =0");
+            if (condition->getLabel() == "=") {
+                writeWithIndent("moveq r" + to_string(right.value) + ", #1");
+                writeWithIndent("movne r" + to_string(right.value) + ", #0");
+            } else if (condition->getLabel() == "#") {
+                writeWithIndent("movne r" + to_string(right.value) + ", #1");
+                writeWithIndent("moveq r" + to_string(right.value) + ", #0");
+            } else if (condition->getLabel() == "<") {
+                writeWithIndent("movgt r" + to_string(right.value) + ", #1");
+                writeWithIndent("movle r" + to_string(right.value) + ", #0");
+            } else if (condition->getLabel() == "<=") {
+                writeWithIndent("movge r" + to_string(right.value) + ", #1");
+                writeWithIndent("movlt r" + to_string(right.value) + ", #0");
+            } else if (condition->getLabel() == ">") {
+                writeWithIndent("movlt r" + to_string(right.value) + ", #1");
+                writeWithIndent("movge r" + to_string(right.value) + ", #0");
+            } else if (condition->getLabel() == ">=") {
+                writeWithIndent("movle r" + to_string(right.value) + ", #1");
+                writeWithIndent("movgt r" + to_string(right.value) + ", #0");
+            }
+            return CodeGenerationMessage(false, true, right.value);
+        } else {
+            // If both sides are constant, we can return a constant.
+            if (condition->getLabel() == "=") {
+                if (left.value == right.value) {
+                    return CodeGenerationMessage(false, false, 1);
+                } else {
+                    return CodeGenerationMessage(false, false, 0);
+                }
+            } else if (condition->getLabel() == "#") {
+                if (left.value != right.value) {
+                    return CodeGenerationMessage(false, false, 1);
+                } else {
+                    return CodeGenerationMessage(false, false, 0);
+                }
+            } else if (condition->getLabel() == "<") {
+                if (left.value < right.value) {
+                    return CodeGenerationMessage(false, false, 1);
+                } else {
+                    return CodeGenerationMessage(false, false, 0);
+                }
+            } else if (condition->getLabel() == "<=") {
+                if (left.value <= right.value) {
+                    return CodeGenerationMessage(false, false, 1);
+                } else {
+                    return CodeGenerationMessage(false, false, 0);
+                }
+            } else if (condition->getLabel() == ">") {
+                if (left.value > right.value) {
+                    return CodeGenerationMessage(false, false, 1);
+                } else {
+                    return CodeGenerationMessage(false, false, 0);
+                }
+            } else if (condition->getLabel() == ">=") {
+                if (left.value >= right.value) {
+                    return CodeGenerationMessage(false, false, 1);
+                } else {
+                    return CodeGenerationMessage(false, false, 0);
+                }
+            }
+        }
     }
-
-    writeWithIndent("push {r3}");
 }
 
 CodeGenerationMessage CodeGenerator::resolveLocationOffset(
@@ -849,7 +985,7 @@ unsigned int CodeGenerator::pop() {
 }
 
 
-bool CodeGenerator::canImmediateValue(const int &value) {
+bool CodeGenerator::canImmediateValue(const long long int &value) {
     return value < 256 && value >= -256;
 }
 
