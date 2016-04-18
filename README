@@ -2,4 +2,30 @@
 Ran Liu (rliu14@jhu.edu)
 
 I use friend class here, instead of using accessor/mutator for
-CodeGenerationMessage.
+CodeGenerationMessage. A lot of things I wish I could refactor, but
+unfortunately I don't really have the time.
+
+There really are hideously many edge cases once you start trying to optimize
+your code generation. The code generator is now the single largest piece of
+code in my program; Parser used to be.
+
+Improvements implemented:
+-Stack register with half-push/pop when full. Because registers r0-r3 get
+ trashed fairly often by function calls, I use r4-r10 for the stack.
+-Context passing for offsets/values- in the form of CodeGenerationMessage.
+-Use of immediate values whenever possible. I just use everything that fits in 
+ 8 bits. Maybe a more complicated algorithm of determining whether something 
+ can use immediate values is possible, but I decided it wasn't worth the
+ effort to implement.
+-Barrel shift instead of mul when size of array element is a power of 2.
+-Unsigned comparison for detecting array out of bounds. When array index
+ is constant, this is done at code generation time.
+-If there's an if statement with a constant condition, I only generate the
+ code for the relevant branch.
+
+However, I don't manage to do delayed code generation for Expressions that are
+Locations. This introduces an extra move instruction, but saves a lot of
+control code.
+
+I use linux exit() syscall to end the program now, instead of worrying about
+popping the sp and lr back on.

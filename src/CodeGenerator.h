@@ -29,8 +29,8 @@ public:
     std::string getContent();
 private:
     unsigned int stackSize;
-    const unsigned int numRegisters = 9;
-    const unsigned int startRegister = 2;
+    const unsigned int numRegisters = 7;
+    const unsigned int startRegister = 4;
 
     unsigned int pop();
     unsigned int push();

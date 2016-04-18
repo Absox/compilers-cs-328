@@ -419,9 +419,7 @@ void CodeGenerator::processRead(const shared_ptr<Read> &read) {
     }
 
     // Don't want to trash these registers.
-    writeWithIndent("push {r2-r3}");
     writeWithIndent("bl __isoc99_scanf");
-    writeWithIndent("pop {r2-r3}");
 }
 
 void CodeGenerator::processWrite(const shared_ptr<Write>& write) {
@@ -442,9 +440,7 @@ void CodeGenerator::processWrite(const shared_ptr<Write>& write) {
     }
 
     // We need to not trash our stack registers when we bl into the function.
-    writeWithIndent("push {r2-r3}");
     writeWithIndent("bl printf");
-    writeWithIndent("pop {r2-r3}");
 
 }
 
@@ -776,64 +772,287 @@ CodeGenerationMessage CodeGenerator::resolveExpressionValue(
             return CodeGenerationMessage(false, true, register_number);
         }
     } else if (binary != 0) {
-        auto right = resolveExpressionValue(binary->getExpressionRight());
         auto left = resolveExpressionValue(binary->getExpressionLeft());
-
-        if (left.is_register) {
-            writeWithIndent("mov r0, r" + to_string(left.value));
-            pop();
-        } else {
-            if (canImmediateValue(left.value)) {
-                writeWithIndent("mov r0, #" + to_string(left.value));
-            } else {
-                writeWithIndent("ldr r0, =" + to_string(left.value));
-            }
-        }
-
-        if (right.is_register) {
-            writeWithIndent("mov r1, r" + to_string(right.value));
-            pop();
-        } else {
-            if (canImmediateValue(right.value)) {
-                writeWithIndent("mov r1, #" + to_string(right.value));
-            } else {
-                writeWithIndent("ldr r1, =" + to_string(right.value));
-            }
-        }
-
-        auto register_number = push();
+        auto right = resolveExpressionValue(binary->getExpressionRight());
 
         if (binary->getOperation() == "+") {
-            writeWithIndent("add r" + to_string(register_number) + ", r0, r1");
+
+            if (left.is_register) {
+                if (right.is_register) {
+                    writeWithIndent("add r" + to_string(left.value)
+                                    + ", r" + to_string(left.value)
+                                    + ", r" + to_string(right.value));
+                    pop();
+                    return CodeGenerationMessage(false, true, left.value);
+                } else {
+                    // No point in generating code for an addition by 0.
+                    if (right.value != 0) {
+                        if (canImmediateValue(right.value)) {
+                            writeWithIndent("add r" + to_string(left.value)
+                                            + ", r" + to_string(left.value)
+                                            + ", #" + to_string(right.value));
+                        } else {
+                            writeWithIndent("ldr r0, ="
+                                            + to_string(right.value));
+                            writeWithIndent("add r" + to_string(left.value)
+                                            + ", r" + to_string(left.value)
+                                            + ", r0");
+                        }
+                    }
+                    return CodeGenerationMessage(false, true, left.value);
+                }
+            } else {
+                if (right.is_register) {
+                    if (left.value != 0) {
+                        if (canImmediateValue(left.value)) {
+                            writeWithIndent("add r" + to_string(right.value)
+                                            + ", r" + to_string(right.value)
+                                            + ", #" + to_string(left.value));
+                        } else {
+                            writeWithIndent("ldr r0, ="
+                                            + to_string(left.value));
+                            writeWithIndent("add r" + to_string(right.value)
+                                            + ", r" + to_string(right.value)
+                                            + ", r0");
+                        }
+                    }
+                    return CodeGenerationMessage(false, true, right.value);
+                } else {
+                    return CodeGenerationMessage(
+                            false, false, left.value + right.value);
+                }
+            }
+
         } else if (binary->getOperation() == "-") {
-            writeWithIndent("sub r" + to_string(register_number) + ", r0, r1");
+            if (left.is_register) {
+                if (right.is_register) {
+                    writeWithIndent("sub r" + to_string(left.value)
+                                    + ", r" + to_string(left.value)
+                                    + ", r" + to_string(right.value));
+                    pop();
+                    return CodeGenerationMessage(false, true, left.value);
+                } else {
+                    if (right.value != 0) {
+                        if (canImmediateValue(right.value)) {
+                            writeWithIndent("sub r" + to_string(left.value)
+                                            + ", r" + to_string(left.value)
+                                            + ", #" + to_string(right.value));
+                        } else {
+                            writeWithIndent("ldr r0, ="
+                                            + to_string(right.value));
+                            writeWithIndent("sub r" + to_string(left.value)
+                                            + ", r" + to_string(left.value)
+                                            + ", r0");
+                        }
+                    }
+                    return CodeGenerationMessage(false, true, left.value);
+                }
+            } else {
+                if (right.is_register) {
+                    if (canImmediateValue(left.value)) {
+                        writeWithIndent("mov r0, #" + to_string(left.value));
+                    } else {
+                        writeWithIndent("ldr r0, =" + to_string(left.value));
+                    }
+                    writeWithIndent("sub r" + to_string(right.value)
+                                    + ", r0, " + to_string(right.value));
+                    return CodeGenerationMessage(false, true, right.value);
+                } else {
+                    return CodeGenerationMessage(
+                            false, false, left.value - right.value);
+                }
+
+            }
+
         } else if (binary->getOperation() == "*") {
-            writeWithIndent("mul r" + to_string(register_number) + ", r0, r1");
+            if (left.is_register) {
+                if (right.is_register) {
+                    writeWithIndent("mul r" + to_string(left.value)
+                                    + ", r" + to_string(left.value)
+                                    + ", r" + to_string(right.value));
+                    pop();
+                    return CodeGenerationMessage(false, true, left.value);
+                } else {
+                    if (right.value == 0) {
+                        pop();
+                        return CodeGenerationMessage(false, false, 0);
+                    } else if (powerOfTwo(right.value)) {
+                        writeWithIndent("mov r" + to_string(left.value)
+                                        + ", r" + to_string(left.value)
+                                        + ", LSL #"
+                                        + to_string(logTwo(right.value)));
+                    } else {
+                        if (canImmediateValue(right.value)) {
+                            writeWithIndent("mul r" + to_string(left.value)
+                                            + ", r" + to_string(left.value)
+                                            + ", #" + to_string(right.value));
+                        } else {
+                            writeWithIndent("ldr r0, ="
+                                            + to_string(right.value));
+                            writeWithIndent("mul r" + to_string(left.value)
+                                            + ", r" + to_string(left.value)
+                                            + ", r0");
+                        }
+                    }
+                    return CodeGenerationMessage(false, true, left.value);
+                }
+            } else {
+                if (left.value == 0) {
+                    return CodeGenerationMessage(false, false, 0);
+                } else {
+                    if (right.is_register) {
+                        if (canImmediateValue(left.value)) {
+                            writeWithIndent("mul r" + to_string(right.value)
+                                            + ", r" + to_string(right.value)
+                                            + ", #" + to_string(left.value));
+                        } else {
+                            writeWithIndent("ldr r0, =" + to_string(left.value));
+                            writeWithIndent("mul r" + to_string(right.value)
+                                            + ", r" + to_string(right.value)
+                                            + ", r0");
+                        }
+                        return CodeGenerationMessage(false, true, right.value);
+                    } else {
+                        return CodeGenerationMessage(
+                                false, false, left.value * right.value);
+                    }
+                }
+            }
         } else if (binary->getOperation() == "DIV") {
-            if (!right.is_register && right.value == 0) {
-                throw CodeGenerationException("Dividing by zero!");
-            }
-            if (!right.is_register) {
-                writeWithIndent("cmp r1, #0");
-                writeWithIndent("beq div_zero");
-            }
-            writeWithIndent("bl __aeabi_idiv");
-            writeWithIndent("mov r" + to_string(register_number) + ", r0");
+            if (left.is_register) {
+                writeWithIndent("mov r0, r" + to_string(left.value));
+                if (right.is_register) {
+                    writeWithIndent("cmp r" + to_string(right.value) + ", #0");
+                    writeWithIndent("beq div_zero");
+                    writeWithIndent("mov r1, r" + to_string(right.value));
+                    writeWithIndent("bl __aeabi_idiv");
+                    writeWithIndent("mov r" + to_string(left.value) + ", r0");
+                    pop();
+                } else {
+                    if (right.value == 0) {
+                        throw CodeGenerationException("Dividing by zero");
+                    } else if (powerOfTwo(right.value)) {
+                        writeWithIndent("mov r" + to_string(left.value)
+                                        + ", r" + to_string(left.value)
+                                        + ", LSR #"
+                                        + to_string(logTwo(right.value)));
+                    } else {
+                        if (canImmediateValue(right.value)) {
+                            writeWithIndent("mov r1, #"
+                                            + to_string(right.value));
+                        } else {
+                            writeWithIndent("ldr r1, ="
+                                            + to_string(right.value));
+                        }
+                        writeWithIndent("bl __aeabi_idiv");
+                        writeWithIndent("mov r" + to_string(left.value)
+                                        + ", r0");
+                    }
+                }
+                return CodeGenerationMessage(false, true, left.value);
 
+            } else {
+                if (right.is_register) {
+                    writeWithIndent("cmp r"
+                                    + to_string(right.value) + ", #0");
+                    writeWithIndent("beq div_zero");
+                    if (left.value == 0) {
+                        pop();
+                        return CodeGenerationMessage(false, false, 0);
+                    } else {
+                        if (canImmediateValue(left.value)) {
+                            writeWithIndent("mov r0, #"
+                                            + to_string(left.value));
+                        } else {
+                            writeWithIndent("ldr r0, ="
+                                            + to_string(left.value));
+                        }
+                        writeWithIndent("mov r1, " + to_string(right.value));
+                        writeWithIndent("bl __aeabi_idiv");
+                        writeWithIndent("mov r" + to_string(right.value)
+                                        + ", r0");
+                        return CodeGenerationMessage(false, true, right.value);
+                    }
+                } else {
+                    if (right.value == 0) {
+                        throw CodeGenerationException("Divide by zero");
+                    }
+                    return CodeGenerationMessage(
+                            false, false, left.value / right.value);
+                }
+            }
         } else if (binary->getOperation() == "MOD") {
-            if (!right.is_register && right.value == 0) {
-                throw CodeGenerationException("Modulus by zero!");
-            }
-            if (!right.is_register) {
-                writeWithIndent("cmp r1, #0");
-                writeWithIndent("beq mod_zero");
-            }
 
-            writeWithIndent("bl __aeabi_idivmod");
-            writeWithIndent("mov r" + to_string(register_number) + ", r1");
+            if (left.is_register) {
+                if (right.is_register) {
+                    writeWithIndent("mov r0, r" + to_string(left.value));
+                    writeWithIndent("cmp r" + to_string(right.value) + ", #0");
+                    writeWithIndent("beq mod_zero");
+                    writeWithIndent("mov r1, r" + to_string(right.value));
+                    writeWithIndent("bl __aeabi_idivmod");
+                    writeWithIndent("mov r1, r" + to_string(left.value));
+                    pop();
+                } else {
+                    if (right.value == 0) {
+                        throw CodeGenerationException("Modulus by zero!");
+                    } else if (powerOfTwo(right.value)) {
+                        if (canImmediateValue(right.value - 1)) {
+                            writeWithIndent("and r" + to_string(left.value)
+                                            + ", r" + to_string(left.value)
+                                            + ", #"
+                                            + to_string(right.value - 1));
+                        } else {
+                            writeWithIndent("ldr r0, ="
+                                            + to_string(right.value - 1));
+                            writeWithIndent("and r" + to_string(left.value)
+                                            + ", r" + to_string(right.value)
+                                            + ", r0");
+                        }
+                    } else {
+                        writeWithIndent("mov r0, r" + to_string(left.value));
+                        if (canImmediateValue(right.value)) {
+                            writeWithIndent("mov r1, #"
+                                            + to_string(right.value)):
+                        } else {
+                            writeWithIndent("mov r1, ="
+                                            + to_string(right.value));
+                        }
+                        writeWithIndent("bl __aeabi_idivmod");
+                        writeWithIndent("mov r1, r" + to_string(left.value));
+                    }
+                }
+                return CodeGenerationMessage(false, true, left.value);
+            } else {
+                if (right.is_register) {
+                    writeWithIndent("cmp r"
+                                    + to_string(right.value) + ", #0");
+                    writeWithIndent("beq mod_zero");
+                    if (left.value == 0) {
+                        pop();
+                        return CodeGenerationMessage(false, false, 0);
+                    } else {
+                        if (canImmediateValue(left.value)) {
+                            writeWithIndent("mov r0, #"
+                                            + to_string(left.value));
+                        } else {
+                            writeWithIndent("ldr r0, ="
+                                            + to_string(left.value));
+                        }
+                        writeWithIndent("mov r1, r" + to_string(right.value));
+                        writeWithIndent("bl __aeabi_idivmod");
+                        writeWithIndent("mov r1, r" + to_string(right.value));
+                    }
+                    return CodeGenerationMessage(false, true, right.value);
+                } else {
+                    if (right.value == 0) {
+                        throw CodeGenerationException("Modulus by zero!");
+                    } else {
+                        return CodeGenerationMessage(
+                                false, false, left.value % right.value);
+                    }
+                }
+            }
         }
-
-        return CodeGenerationMessage(false, true, register_number);
     }
 }
 
