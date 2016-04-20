@@ -876,6 +876,7 @@ CodeGenerationMessage CodeGenerator::resolveExpressionValue(
                     if (right.value == 0) {
                         pop();
                         return CodeGenerationMessage(false, false, 0);
+                    } else if (right.value == 1) {
                     } else if (powerOfTwo(right.value)) {
                         writeWithIndent("mov r" + to_string(left.value)
                                         + ", r" + to_string(left.value)
@@ -883,45 +884,52 @@ CodeGenerationMessage CodeGenerator::resolveExpressionValue(
                                         + to_string(logTwo(right.value)));
                     } else {
                         if (canImmediateValue(right.value)) {
-                            writeWithIndent("mul r" + to_string(left.value)
-                                            + ", r" + to_string(left.value)
-                                            + ", #" + to_string(right.value));
+                            writeWithIndent("mov r0, #" + to_string(right.value));
                         } else {
                             writeWithIndent("ldr r0, ="
                                             + to_string(right.value));
-                            writeWithIndent("mul r" + to_string(left.value)
-                                            + ", r" + to_string(left.value)
-                                            + ", r0");
                         }
+                        writeWithIndent("mul r" + to_string(left.value)
+                                        + ", r" + to_string(left.value)
+                                        + ", r0");
                     }
                     return CodeGenerationMessage(false, true, left.value);
                 }
             } else {
-                if (left.value == 0) {
-                    return CodeGenerationMessage(false, false, 0);
-                } else {
-                    if (right.is_register) {
-                        if (canImmediateValue(left.value)) {
-                            writeWithIndent("mul r" + to_string(right.value)
+                if (right.is_register) {
+                    if (left.value == 0) {
+                        pop();
+                        return CodeGenerationMessage(false, false, 0);
+                    } else {
+                        if (left.value == 1) {
+                        } else if (powerOfTwo(left.value)) {
+                            writeWithIndent("mov r" + to_string(right.value)
                                             + ", r" + to_string(right.value)
-                                            + ", #" + to_string(left.value));
+                                            + ", LSL #"
+                                            + to_string(logTwo(left.value)));
                         } else {
-                            writeWithIndent("ldr r0, =" + to_string(left.value));
+                            if (canImmediateValue(left.value)) {
+                                writeWithIndent("mov r0, #"
+                                                + to_string(left.value));
+                            } else {
+                                writeWithIndent("ldr r0, ="
+                                                + to_string(left.value));
+                            }
                             writeWithIndent("mul r" + to_string(right.value)
                                             + ", r" + to_string(right.value)
                                             + ", r0");
                         }
                         return CodeGenerationMessage(false, true, right.value);
-                    } else {
-                        return CodeGenerationMessage(
-                                false, false, left.value * right.value);
                     }
+                } else {
+                    return CodeGenerationMessage(
+                            false, false, left.value * right.value);
                 }
             }
         } else if (binary->getOperation() == "DIV") {
             if (left.is_register) {
-                writeWithIndent("mov r0, r" + to_string(left.value));
                 if (right.is_register) {
+                    writeWithIndent("mov r0, r" + to_string(left.value));
                     writeWithIndent("cmp r" + to_string(right.value) + ", #0");
                     writeWithIndent("beq div_zero");
                     writeWithIndent("mov r1, r" + to_string(right.value));
@@ -931,12 +939,15 @@ CodeGenerationMessage CodeGenerator::resolveExpressionValue(
                 } else {
                     if (right.value == 0) {
                         throw CodeGenerationException("Dividing by zero");
+                    } else if (right.value == 1) {
                     } else if (powerOfTwo(right.value)) {
+                        // Note that we have to use arithmetic shift.
                         writeWithIndent("mov r" + to_string(left.value)
                                         + ", r" + to_string(left.value)
-                                        + ", LSR #"
+                                        + ", ASR #"
                                         + to_string(logTwo(right.value)));
                     } else {
+                        writeWithIndent("mov r0, r" + to_string(left.value));
                         if (canImmediateValue(right.value)) {
                             writeWithIndent("mov r1, #"
                                             + to_string(right.value));
@@ -967,7 +978,7 @@ CodeGenerationMessage CodeGenerator::resolveExpressionValue(
                             writeWithIndent("ldr r0, ="
                                             + to_string(left.value));
                         }
-                        writeWithIndent("mov r1, " + to_string(right.value));
+                        writeWithIndent("mov r1, r" + to_string(right.value));
                         writeWithIndent("bl __aeabi_idiv");
                         writeWithIndent("mov r" + to_string(right.value)
                                         + ", r0");
@@ -1012,9 +1023,9 @@ CodeGenerationMessage CodeGenerator::resolveExpressionValue(
                         writeWithIndent("mov r0, r" + to_string(left.value));
                         if (canImmediateValue(right.value)) {
                             writeWithIndent("mov r1, #"
-                                            + to_string(right.value)):
+                                            + to_string(right.value));
                         } else {
-                            writeWithIndent("mov r1, ="
+                            writeWithIndent("ldr r1, ="
                                             + to_string(right.value));
                         }
                         writeWithIndent("bl __aeabi_idivmod");
@@ -1065,10 +1076,20 @@ void CodeGenerator::deindent() {
 }
 
 void CodeGenerator::writeWithIndent(const string &value) {
+    static unsigned int poolSize = 0;
+    static unsigned int poolId = 0;
     for (int c = 0; c < indentLevel; c++) {
         stream << "    ";
     }
     stream << value << endl;
+
+    poolSize += 4;
+    if (poolSize == 4096) {
+        poolSize= 0;
+        stream << "b pool_" << poolId << endl;
+        stream << ".ltorg" << endl;
+        stream << "pool_" << poolId++ << ":" << endl;
+    }
 }
 
 int CodeGenerator::getNextLabelIndex() {
@@ -1118,9 +1139,11 @@ bool CodeGenerator::canImmediateValue(const long long int &value) {
 
 
 bool CodeGenerator::powerOfTwo(const long long &value) {
-    return ((value & (value - 1)) == 0);
+    if (value != 0) {
+        return ((value & (value - 1)) == 0);
+    }
+    return false;
 }
-
 
 unsigned int CodeGenerator::logTwo(const long long &value) {
     unsigned int result = 0;
@@ -1129,5 +1152,3 @@ unsigned int CodeGenerator::logTwo(const long long &value) {
     }
     return result;
 }
-
-
