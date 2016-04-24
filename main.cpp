@@ -13,6 +13,7 @@
 #include <memory>
 #include <vector>
 
+#include "BasicCodeGenerator.h"
 #include "Interpreter.h"
 #include "CodeGenerator.h"
 #include "GraphicalSymbolTree.h"
@@ -76,6 +77,7 @@ int main(int argc, char **argv) {
     const int ABSTRACT_SYNTAX_TREE = 6;
     const int INTERPRETER = 7;
     const int CODE_GENERATOR = 8;
+    const int ADVANCED_CODE_GENERATOR = 9;
 
     try {
 
@@ -98,6 +100,8 @@ int main(int argc, char **argv) {
                     option = ABSTRACT_SYNTAX_TREE;
                 } else if (argv[1][1] == 'i') {
                     option = INTERPRETER;
+                } else if (argv[1][1] == 'x') {
+                    option = ADVANCED_CODE_GENERATOR;
                 } else {
                     throw INVALID_OPTIONS;
                 }
@@ -233,7 +237,7 @@ int main(int argc, char **argv) {
                 parser = unique_ptr<Parser>(new Parser(&scanner, false));
                 try {
                     parser->parse();
-                    CodeGenerator codeGenerator(
+                    BasicCodeGenerator codeGenerator(
                             parser->getSymbolTable(),
                             parser->getAbstractSyntaxTree());
                     cout << codeGenerator.getContent();
@@ -244,6 +248,20 @@ int main(int argc, char **argv) {
                     cerr << "error: " << e.getMessage() << endl;
                 }
                 break;
+            case ADVANCED_CODE_GENERATOR:
+                parser = unique_ptr<Parser>(new Parser(&scanner, false));
+                try {
+                    parser->parse();
+                    CodeGenerator codeGenerator(
+                            parser->getSymbolTable(),
+                            parser->getAbstractSyntaxTree());
+                    cout << codeGenerator.getContent();
+
+                } catch (ParseException& e) {
+                    cerr << "error: " << e.getMessage() << endl;
+                } catch (CodeGenerationException& e) {
+                    cerr << "error: " << e.getMessage() << endl;
+                }
         }
         
         
