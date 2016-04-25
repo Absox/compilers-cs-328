@@ -49,7 +49,9 @@ set(SOURCE_FILES
         CodeGenerator.cpp
         CodeGenerationException.cpp
         CodeGenerationMessage.cpp
-        BasicCodeGenerator.cpp)
+        BasicCodeGenerator.cpp
+        Procedure.cpp
+        Formal.cpp)
 
 set(HEADER_FILES
         Array.h
@@ -99,6 +101,8 @@ set(HEADER_FILES
         CodeGenerator.h
         CodeGenerationException.h
         CodeGenerationMessage.h
-        BasicCodeGenerator.h)
+        BasicCodeGenerator.h
+        Procedure.h
+        Formal.h)
 
 add_library(compilers5_lib STATIC ${SOURCE_FILES} ${HEADER_FILES})

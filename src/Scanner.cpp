@@ -148,7 +148,9 @@ bool Scanner::isKeyword(const string& s) {
            || s == "WHILE"
            || s == "DO"
            || s == "READ"
-           || s == "WRITE";
+           || s == "WRITE"
+           || s == "PROCEDURE"
+           || s == "RETURN";
 }
 
 bool Scanner::isStandaloneToken(const char& c) {

@@ -70,6 +70,9 @@ private:
     void constDecl() throw(ParseException);
     void typeDecl() throw(ParseException);
     void varDecl() throw(ParseException);
+    void procDecl();
+    void formals();
+    void formal();
     std::shared_ptr<Expression> expression() throw(ParseException);
     std::shared_ptr<Expression> term() throw(ParseException);
     std::shared_ptr<Expression> factor() throw(ParseException);

@@ -14,6 +14,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/IfInstruction.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Scanner.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Scope.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Variable.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Condition.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Interpreter.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Condition.h" isTestSource="false" />
@@ -53,9 +54,10 @@
       <sourceFolder url="file://$MODULE_DIR$/src/CodeGenerationMessage.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/GraphicalAbstractSyntaxTreeBuilder.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/CodeGenerationException.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Procedure.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/VariableLocation.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/RuntimeException.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/Variable.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Procedure.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/GraphicalSymbolTree.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/AbstractSyntaxTreeNode.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/IntegerBox.h" isTestSource="false" />
@@ -75,11 +77,13 @@
       <sourceFolder url="file://$MODULE_DIR$/src/RecordBox.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Parser.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/NumberExpression.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Formal.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Index.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Index.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/CodeGenerationException.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Write.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/ScannerException.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Formal.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Assign.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/ArrayBox.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Assign.cpp" isTestSource="false" />

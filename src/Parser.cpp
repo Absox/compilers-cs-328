@@ -7,7 +7,6 @@
  */
 
 #include <iostream>
-#include <stack>
 
 #include "Parser.h"
 #include "Constant.h"
@@ -22,7 +21,6 @@
 using std::cout;
 using std::endl;
 
-using std::stack;
 using std::shared_ptr;
 using std::string;
 using std::to_string;
@@ -148,17 +146,95 @@ void Parser::declarations() throw(ParseException) {
     setState("Declarations");
     indent();
 
-    while (match("CONST") || match("TYPE") || match("VAR")) {
+    while (match("CONST") || match("TYPE") || match("VAR") || match("PROCEDURE")) {
         if (match("CONST")) {
             constDecl();
         } else if (match("TYPE")) {
             typeDecl();
-        } else {
+        } else if (match("VAR")){
             varDecl();
+        } else if (match("PROCEDURE")) {
+            procDecl();
         }
     }
     deindent();
 }
+
+void Parser::procDecl() {
+    setState("ProcDecl");
+    indent();
+
+
+    processToken("PROCEDURE");
+    processToken("identifier");
+
+    auto proc_scope = new Scope(symbolTable.getCurrentScope());
+    symbolTable.setCurrentScope(proc_scope);
+
+    processToken("(");
+    if (match("identifier")) formals();
+    processToken(")");
+
+    if (match(":")) {
+        processToken(":");
+        type(); // Return type
+    }
+
+    processToken(";");
+
+    while (match("VAR")) varDecl();
+
+    if (match("BEGIN")) {
+        processToken("BEGIN");
+        instructions();
+    }
+
+    if (match("RETURN")) {
+        processToken("RETURN");
+        expression();
+    }
+
+    processToken("END");
+    processToken("identifier");
+    processToken(";");
+
+    symbolTable.setCurrentScope(proc_scope->getOuter());
+
+    deindent();
+}
+
+void Parser::formals() {
+    setState("Formals");
+    indent();
+
+    formal();
+    while (match("identifier")) {
+        processToken(";");
+        formal();
+    }
+
+    deindent();
+}
+
+void Parser::formal() {
+    setState("Formal");
+    indent();
+
+    auto identifiers = identifierList();
+    processToken(":");
+    auto type = type();
+
+    for (unsigned int c = 0; c < identifiers.size(); c++) {
+        if (symbolTable.getCurrentScope()->scopeContainsEntry(identifiers[c].getValue())) {
+            throw ParseException("Context violation: duplicate " + identifiers[c].toString());
+        } else {
+
+        }
+    }
+
+    deindent();
+}
+
 
 void Parser::constDecl() throw(ParseException) {
     setState("ConstDecl");
