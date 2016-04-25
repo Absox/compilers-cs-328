@@ -6,8 +6,10 @@
 
 using std::string;
 
-VariableLocation::VariableLocation(const string& identifier) {
+VariableLocation::VariableLocation(
+        const string& identifier, const bool& local) {
     this->identifier = identifier;
+    this->local = local;
 }
 
 VariableLocation::~VariableLocation() {

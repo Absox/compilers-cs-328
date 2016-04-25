@@ -10,13 +10,14 @@
 
 class VariableLocation : public Location {
 public:
-    VariableLocation(const std::string& identifier);
+    VariableLocation(const std::string& identifier, const bool& local = false);
     virtual ~VariableLocation();
     virtual std::string getLabel();
 
     std::string getIdentifier() const;
 private:
     std::string identifier;
+    bool local;
 
 };
 

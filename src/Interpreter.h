@@ -29,6 +29,7 @@ public:
         throw (RuntimeException);
     virtual ~Interpreter();
 private:
+    const SymbolTable& symbolTable;
     std::shared_ptr<Environment> environment;
 
     void buildEnvironment(const SymbolTable& symbolTable);

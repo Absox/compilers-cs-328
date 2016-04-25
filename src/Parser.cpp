@@ -241,7 +241,11 @@ vector<shared_ptr<Formal>> Parser::formals() {
     setState("Formals");
     indent();
 
-    formal();
+    auto first_list = formal();
+    for (unsigned int c = 0; c < first_list.size(); c++) {
+        result.push_back(first_list[c]);
+    }
+
     while (match("identifier")) {
         processToken(";");
         auto list = formal();

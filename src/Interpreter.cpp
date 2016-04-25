@@ -7,6 +7,7 @@
 #include "IntegerBox.h"
 #include "ArrayBox.h"
 #include "RecordBox.h"
+#include "Call.h"
 
 #include <iostream>
 #include <limits>
@@ -22,7 +23,7 @@ using std::endl;
 
 Interpreter::Interpreter(const SymbolTable &symbolTable,
                          const vector<shared_ptr<Instruction>> &instructions)
-    throw (RuntimeException) {
+    throw (RuntimeException) : symbolTable(symbolTable) {
     buildEnvironment(symbolTable);
     run(instructions);
 }
@@ -52,6 +53,7 @@ void Interpreter::runInstruction(
     auto repeat = dynamic_pointer_cast<Repeat>(instruction);
     auto read = dynamic_pointer_cast<Read>(instruction);
     auto write = dynamic_pointer_cast<Write>(instruction);
+    auto call = dynamic_pointer_cast<Call>(instruction);
 
     if (assign != 0) {
         runAssign(assign);
@@ -63,6 +65,8 @@ void Interpreter::runInstruction(
         runRead(read);
     } else if (write != 0) {
         runWrite(write);
+    } else if (call != 0) {
+        // TODO
     }
 }
 
