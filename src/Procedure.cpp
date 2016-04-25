@@ -16,6 +16,8 @@ std::string Procedure::getEntryType() const {
 
 
 void Procedure::acceptVisitor(ScopeVisitor &visitor) {
-
+    visitor.writeWithIndent("PROCEDURE BEGIN");
+    visitor.indent();
+    visitor.deindent();
+    visitor.writeWithIndent("PROCEDURE END");
 }
-

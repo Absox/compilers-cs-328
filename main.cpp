@@ -150,7 +150,7 @@ int main(int argc, char **argv) {
                 }
                 break;
             case PARSER:
-                parser = unique_ptr<Parser>(new Parser(&scanner));
+                parser = unique_ptr<Parser>(new Parser(&scanner, false));
                 if (graphical) {
                     GraphObserver observer;
                     parser->addObserver(&observer);

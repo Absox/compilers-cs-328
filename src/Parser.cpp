@@ -195,16 +195,22 @@ void Parser::procDecl() {
 
     if (match("BEGIN")) {
         processToken("BEGIN");
-        instructions();
+        procedure->instructions = instructions();
     }
 
     if (match("RETURN")) {
         processToken("RETURN");
-        expression();
+        procedure->return_expression = expression();
     }
 
     processToken("END");
-    processToken("identifier");
+    auto end_identifier = processToken("identifier");
+    if (end_identifier.getValue() != proc_identifier.getValue()) {
+        throw ParseException("Context error: "
+                             + proc_identifier.toString()
+                             + " expected, actual: "
+                             + end_identifier.toString());
+    }
     processToken(";");
 
     symbolTable.setCurrentScope(proc_scope->getOuter());
@@ -240,12 +246,17 @@ vector<shared_ptr<Formal>> Parser::formal() {
     auto parameter_type = type();
 
     for (unsigned int c = 0; c < identifiers.size(); c++) {
-        if (symbolTable.getCurrentScope()->scopeContainsEntry(identifiers[c].getValue())) {
-            throw ParseException("Context violation: duplicate " + identifiers[c].toString());
+        if (symbolTable.getCurrentScope()->scopeContainsEntry(
+                identifiers[c].getValue())) {
+            throw ParseException(
+                    "Context violation: duplicate " + identifiers[c].toString());
         } else {
-            result.push_back(shared_ptr<Formal>(new Formal(identifiers[c].getValue(), parameter_type)));
-            auto local_variable_entry = shared_ptr<LocalVariable>(new LocalVariable(parameter_type));
-            symbolTable.getCurrentScope()->addEntry(identifiers[c].getValue(), local_variable_entry);
+            result.push_back(shared_ptr<Formal>(
+                    new Formal(identifiers[c].getValue(), parameter_type)));
+            auto local_variable_entry = shared_ptr<LocalVariable>(
+                    new LocalVariable(parameter_type));
+            symbolTable.getCurrentScope()->addEntry(
+                    identifiers[c].getValue(), local_variable_entry);
         }
     }
 

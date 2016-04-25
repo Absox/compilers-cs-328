@@ -9,6 +9,8 @@
 #include "Entry.h"
 #include "Scope.h"
 #include "Formal.h"
+#include "Expression.h"
+#include "Instruction.h"
 
 class Procedure : public Entry {
 public:
@@ -21,6 +23,8 @@ private:
     std::shared_ptr<Scope> scope;
     std::vector<std::shared_ptr<Formal>> parameters;
     std::shared_ptr<Type> return_type;
+    std::shared_ptr<Expression> return_expression;
+    std::vector<std::shared_ptr<Instruction>> instructions;
 
     friend class Parser;
 };
