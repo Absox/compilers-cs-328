@@ -28,6 +28,8 @@
 #include "IfInstruction.h"
 #include "Repeat.h"
 #include "Formal.h"
+#include "Procedure.h"
+#include "Call.h"
 
 class Observer;
 
@@ -50,6 +52,7 @@ private:
     bool suppressContextErrors;
     SymbolTable symbolTable;
     std::vector<std::shared_ptr<Instruction>> ast;
+    std::shared_ptr<Type> universalInt;
 
     ParseState state;
     Token currentToken;
@@ -94,6 +97,7 @@ private:
     std::shared_ptr<IfInstruction> parseWhile() throw(ParseException);
     std::shared_ptr<Read> read() throw(ParseException);
     std::shared_ptr<Write> write() throw(ParseException);
+    std::shared_ptr<Call> call();
 
     std::shared_ptr<Type> findType(const std::string& identifier);
     bool isExpressionNumeric(const std::shared_ptr<Expression>& expression);
@@ -101,6 +105,8 @@ private:
             const std::shared_ptr<Expression>& expression);
     std::shared_ptr<Type> getLocationType(
             const std::shared_ptr<Location>& location);
+    std::shared_ptr<Procedure> findProcedure(const std::string& identifier);
+    bool isCall();
     
 };
 

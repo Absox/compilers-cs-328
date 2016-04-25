@@ -15,6 +15,8 @@ public:
 private:
     std::string identifier;
     std::shared_ptr<Type> type;
+
+    friend class Parser;
 };
 
 

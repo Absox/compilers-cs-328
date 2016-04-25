@@ -18,7 +18,7 @@
 #include "Index.h"
 #include "Field.h"
 #include "LocalVariable.h"
-#include "Procedure.h"
+#include "CallExpression.h"
 
 using std::cout;
 using std::endl;
@@ -35,6 +35,8 @@ Parser::Parser(Scanner *scanner, const bool &suppressContextErrors)
     this->scanner = scanner;
     this->suppressContextErrors = suppressContextErrors;
     indentLevel = 0;
+    universalInt = dynamic_pointer_cast<Type>(
+            symbolTable.getCurrentScope()->getEntry("INTEGER"));
 }
 
 Parser::~Parser() {
@@ -187,6 +189,9 @@ void Parser::procDecl() {
     if (match(":")) {
         processToken(":");
         procedure->return_type = type(); // Return type
+        if (procedure->return_type != universalInt) {
+            throw ParseException("Context error; return type must be INTEGER");
+        }
     }
 
     processToken(";");
@@ -199,8 +204,21 @@ void Parser::procDecl() {
     }
 
     if (match("RETURN")) {
+        if (procedure->return_type == 0) {
+            throw ParseException("Context error; return statement for void");
+        }
         processToken("RETURN");
         procedure->return_expression = expression();
+        if (getExpressionType(procedure->return_expression)
+            != procedure->return_type) {
+            throw ParseException(
+                    "Context error; return expression type does not match");
+        }
+    } else {
+        if (procedure->return_type != 0) {
+            throw ParseException(
+                    "Context error; no return statement for function procedure");
+        }
     }
 
     processToken("END");
@@ -481,28 +499,39 @@ shared_ptr<Expression> Parser::factor() throw(ParseException) {
         result = shared_ptr<NumberExpression>(new NumberExpression(value));
     } else if (match("identifier")) {
 
-        auto designatorLocation = designator();
-        result = designatorLocation;
-        auto type = getLocationType(designatorLocation);
+        if (isCall()) {
+            auto function_call = call();
+            result = shared_ptr<CallExpression>(
+                    new CallExpression(function_call));
+            if (function_call->procedure->return_type == 0) {
+                throw ParseException(
+                        "Context error: proper procedure called as expression");
+            }
 
-        /*
-         * For now, this seems to be an unreachable case.
-         */
-        // Check that this denotes either a constant or variable.
-        if (!suppressContextErrors && type == 0) {
-            throw ParseException(
-                    "Context error: designator must denote var or const!");
-        }
+        } else {
+            auto designatorLocation = designator();
+            result = designatorLocation;
+            auto type = getLocationType(designatorLocation);
 
-        // Check if we can do constant folding with this designator.
-        auto variable = dynamic_pointer_cast<VariableLocation>(result);
-        if (variable != 0) {
-            auto entry = symbolTable.getCurrentScope()
-                    ->getEntry(variable->getLabel());
-            auto constant = dynamic_pointer_cast<Constant>(entry);
-            if (constant != 0) {
-                result = shared_ptr<NumberExpression>(
-                        new NumberExpression(constant->getValue()));
+            /*
+             * For now, this seems to be an unreachable case.
+             */
+            // Check that this denotes either a constant or variable.
+            if (!suppressContextErrors && type == 0) {
+                throw ParseException(
+                        "Context error: designator must denote var or const!");
+            }
+
+            // Check if we can do constant folding with this designator.
+            auto variable = dynamic_pointer_cast<VariableLocation>(result);
+            if (variable != 0) {
+                auto entry = symbolTable.getCurrentScope()
+                        ->getEntry(variable->getLabel());
+                auto constant = dynamic_pointer_cast<Constant>(entry);
+                if (constant != 0) {
+                    result = shared_ptr<NumberExpression>(
+                            new NumberExpression(constant->getValue()));
+                }
             }
         }
 
@@ -723,7 +752,6 @@ shared_ptr<Type> Parser::type() throw(ParseException) {
                     }
                 }
             }
-
         }
         processToken("END");
 
@@ -783,7 +811,16 @@ shared_ptr<Instruction> Parser::instruction() throw(ParseException) {
     indent();
 
     if (match("identifier")) {
-        result = assign();
+        if (isCall()) {
+            auto call_instruction = call();
+            if (call_instruction->procedure->return_type != 0) {
+                throw ParseException(
+                        "Context error: function procedure called as instruction");
+            }
+            result = call_instruction;
+        } else {
+            result = assign();
+        }
     } else if (match("IF")) {
         result = parseIf();
     } else if (match("REPEAT")) {
@@ -1011,6 +1048,42 @@ shared_ptr<Write> Parser::write() throw(ParseException) {
     return result;
 }
 
+shared_ptr<Call> Parser::call() {
+    setState("Call");
+    indent();
+
+    auto call_identifier = processToken("identifier");
+    auto procedure = dynamic_pointer_cast<Procedure>(
+            symbolTable.getCurrentScope()->getEntry(call_identifier.getValue()));
+    auto result = shared_ptr<Call>(
+            new Call(call_identifier.getValue(), procedure));
+
+    processToken("(");
+    if (!match(")")) {
+        result->actuals = expressionList();
+        if (result->actuals.size() != procedure->parameters.size()) {
+            throw ParseException("Length of parameters passed doesn't match!");
+        }
+
+        for (unsigned int c = 0; c < result->actuals.size(); c++) {
+            if (getExpressionType(result->actuals[c]
+            ) != procedure->parameters[c]->type) {
+                throw ParseException("Type of parameter passed doesn't match!");
+            }
+        }
+    } else {
+        if (procedure->parameters.size() != 0) {
+            throw ParseException("Length of parameters passed doesn't match!");
+        }
+    }
+    processToken(")");
+
+    deindent();
+
+    return result;
+}
+
+
 SymbolTable &Parser::getSymbolTable() {
     return symbolTable;
 }
@@ -1030,16 +1103,12 @@ std::shared_ptr<Type> Parser::findType(const string &identifier) {
  * operators can only be worked on integers.
  */
 bool Parser::isExpressionNumeric(const shared_ptr<Expression> &expression) {
-    static auto universalInt = dynamic_pointer_cast<Type>(
-            symbolTable.getCurrentScope()->getOuter()->getEntry("INTEGER"));
     return getExpressionType(expression) == universalInt;
 }
 
 // Checks the type of an expression.
 std::shared_ptr<Type> Parser::getExpressionType(
         const std::shared_ptr<Expression> &expression) {
-    static auto universalInt = dynamic_pointer_cast<Type>(
-            symbolTable.getCurrentScope()->getOuter()->getEntry("INTEGER"));
     auto location = dynamic_pointer_cast<Location>(expression);
 
     // If we're not a location, we're binary (which must be integer) or number.
@@ -1088,3 +1157,15 @@ shared_ptr<Type> Parser::getLocationType(const shared_ptr<Location> &location) {
 
     return 0;
 }
+
+shared_ptr<Procedure> Parser::findProcedure(const std::string &identifier) {
+    auto entry = symbolTable.getCurrentScope()->getEntry(identifier);
+    auto procedure = dynamic_pointer_cast<Procedure>(entry);
+
+    return procedure;
+}
+
+bool Parser::isCall() {
+    return findProcedure(currentToken.getValue()) != 0;
+}
+
