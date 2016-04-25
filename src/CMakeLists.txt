@@ -103,6 +103,6 @@ set(HEADER_FILES
         CodeGenerationMessage.h
         BasicCodeGenerator.h
         Procedure.h
-        Formal.h)
+        Formal.h LocalVariable.cpp LocalVariable.h)
 
 add_library(compilers5_lib STATIC ${SOURCE_FILES} ${HEADER_FILES})

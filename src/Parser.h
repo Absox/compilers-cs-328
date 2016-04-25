@@ -27,6 +27,7 @@
 #include "Assign.h"
 #include "IfInstruction.h"
 #include "Repeat.h"
+#include "Formal.h"
 
 class Observer;
 
@@ -69,10 +70,10 @@ private:
     void declarations() throw(ParseException);
     void constDecl() throw(ParseException);
     void typeDecl() throw(ParseException);
-    void varDecl() throw(ParseException);
+    void varDecl(const bool& local) throw(ParseException);
     void procDecl();
-    void formals();
-    void formal();
+    std::vector<std::shared_ptr<Formal>> formals();
+    std::vector<std::shared_ptr<Formal>> formal();
     std::shared_ptr<Expression> expression() throw(ParseException);
     std::shared_ptr<Expression> term() throw(ParseException);
     std::shared_ptr<Expression> factor() throw(ParseException);

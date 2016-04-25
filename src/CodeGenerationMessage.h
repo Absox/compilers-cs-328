@@ -5,7 +5,6 @@
 #ifndef COMPILERS_HWK5_CODEGENERATIONMESSAGE_H
 #define COMPILERS_HWK5_CODEGENERATIONMESSAGE_H
 
-
 class CodeGenerationMessage {
 public:
     CodeGenerationMessage(const bool &is_offset, const bool &is_register,

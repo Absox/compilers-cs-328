@@ -17,6 +17,8 @@
 #include "BinaryExpression.h"
 #include "Index.h"
 #include "Field.h"
+#include "LocalVariable.h"
+#include "Procedure.h"
 
 using std::cout;
 using std::endl;
@@ -152,7 +154,7 @@ void Parser::declarations() throw(ParseException) {
         } else if (match("TYPE")) {
             typeDecl();
         } else if (match("VAR")){
-            varDecl();
+            varDecl(false);
         } else if (match("PROCEDURE")) {
             procDecl();
         }
@@ -161,28 +163,35 @@ void Parser::declarations() throw(ParseException) {
 }
 
 void Parser::procDecl() {
+
     setState("ProcDecl");
     indent();
 
-
     processToken("PROCEDURE");
-    processToken("identifier");
+    auto proc_identifier = processToken("identifier");
+    auto procedure = shared_ptr<Procedure>(new Procedure);
 
-    auto proc_scope = new Scope(symbolTable.getCurrentScope());
+    symbolTable.getCurrentScope()->addEntry(proc_identifier.getValue(), procedure);
+
+    auto proc_scope = shared_ptr<Scope>(new Scope(symbolTable.getCurrentScope()));
+    procedure->scope = proc_scope;
     symbolTable.setCurrentScope(proc_scope);
 
+
     processToken("(");
-    if (match("identifier")) formals();
+    if (match("identifier")) {
+        procedure->parameters = formals();
+    }
     processToken(")");
 
     if (match(":")) {
         processToken(":");
-        type(); // Return type
+        procedure->return_type = type(); // Return type
     }
 
     processToken(";");
 
-    while (match("VAR")) varDecl();
+    while (match("VAR")) varDecl(true);
 
     if (match("BEGIN")) {
         processToken("BEGIN");
@@ -203,36 +212,45 @@ void Parser::procDecl() {
     deindent();
 }
 
-void Parser::formals() {
+vector<shared_ptr<Formal>> Parser::formals() {
+    vector<shared_ptr<Formal>> result;
     setState("Formals");
     indent();
 
     formal();
     while (match("identifier")) {
         processToken(";");
-        formal();
+        auto list = formal();
+        for (unsigned int c = 0; c < list.size(); c++) {
+            result.push_back(list[c]);
+        }
     }
 
     deindent();
+    return result;
 }
 
-void Parser::formal() {
+vector<shared_ptr<Formal>> Parser::formal() {
+    vector<shared_ptr<Formal>> result;
     setState("Formal");
     indent();
 
     auto identifiers = identifierList();
     processToken(":");
-    auto type = type();
+    auto parameter_type = type();
 
     for (unsigned int c = 0; c < identifiers.size(); c++) {
         if (symbolTable.getCurrentScope()->scopeContainsEntry(identifiers[c].getValue())) {
             throw ParseException("Context violation: duplicate " + identifiers[c].toString());
         } else {
-
+            result.push_back(shared_ptr<Formal>(new Formal(identifiers[c].getValue(), parameter_type)));
+            auto local_variable_entry = shared_ptr<LocalVariable>(new LocalVariable(parameter_type));
+            symbolTable.getCurrentScope()->addEntry(identifiers[c].getValue(), local_variable_entry);
         }
     }
 
     deindent();
+    return result;
 }
 
 
@@ -303,7 +321,7 @@ void Parser::typeDecl() throw(ParseException) {
     deindent();
 }
 
-void Parser::varDecl() throw(ParseException) {
+void Parser::varDecl(const bool& local) throw(ParseException) {
     setState("VarDecl");
     indent();
 
@@ -322,9 +340,16 @@ void Parser::varDecl() throw(ParseException) {
                     throw ParseException("Context violation: duplicate "
                                          + identifiers[c].toString());
                 } else {
-                    shared_ptr<Entry> varEntry(new Variable(varType));
-                    symbolTable.getCurrentScope()->addEntry(
-                            identifiers[c].getValue(), varEntry);
+                    if (local) {
+                        shared_ptr<Entry> local_var(new LocalVariable(varType));
+                        symbolTable.getCurrentScope()->addEntry(
+                                identifiers[c].getValue(), local_var);
+                    } else {
+                        shared_ptr<Entry> varEntry(new Variable(varType));
+                        symbolTable.getCurrentScope()->addEntry(
+                                identifiers[c].getValue(), varEntry);
+                    }
+
                 }
             }
         }
