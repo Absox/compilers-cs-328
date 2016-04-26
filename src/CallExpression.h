@@ -18,6 +18,7 @@ private:
     std::shared_ptr<Call> call;
 
     friend class Interpreter;
+    friend class CodeGenerator;
 
 };
 

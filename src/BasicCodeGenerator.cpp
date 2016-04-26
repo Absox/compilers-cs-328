@@ -12,7 +12,6 @@
 #include "Field.h"
 #include "Index.h"
 
-
 using std::string;
 using std::dynamic_pointer_cast;
 using std::vector;

@@ -6,19 +6,6 @@ haven't the slightest clue how; valgrind seems to think that it's in the parser.
 However, I only ever use smart pointers to allocate memory.
 
 I do some ugly symbol table lookup and use polymorphism to differentiate local
-variables. I also introduce some inefficiency by pushing all the parameters,
-then popping them off at the beginning of the procedure into the intended
-locations.
+variables. I also immediately move the parameters from their original locations
+onto the stack, so that the offsets that the code generator gets make sense.
 
-As far as I can tell, I implement all the language options.
-I've implemented procedures for the interpreter, as well as the advanced
-code generator.
-
-I'd like to refactor my entire program, but the time limitations of this course
-prevent me from doing that, especially now that we're at the point that I have
-nearly 10k lines of code.
-
-As a digression- if we rely on direct access granted to friend classes rather
-than using mutators/accessors, how do we unit test our classes? I suppose we
-can unit test only what we expose as a public interface, but we don't write in
-any public interfaces... I suppose then we essentially just have a struct.

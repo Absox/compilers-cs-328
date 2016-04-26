@@ -13,6 +13,7 @@
 #include "Index.h"
 #include "ParameterVariable.h"
 #include "LocalVariable.h"
+#include "CallExpression.h"
 
 
 using std::string;
@@ -64,10 +65,21 @@ unsigned long long CodeGenerator::calculateScopeOffsets(
         auto variable = dynamic_pointer_cast<Variable>(
                 scope->getEntryInScope(identifiers[c]));
         if (variable != 0) {
+            auto local = dynamic_pointer_cast<LocalVariable>(variable);
+            auto param = dynamic_pointer_cast<ParameterVariable>(variable);
 
-            variable->setOffset(nextOffset);
-            unsigned long long size = getTypeSize(variable->getType());
-            nextOffset += size;
+            if (local != 0) {
+                local->setOffset(nextOffset);
+                unsigned long long size = getTypeSize(variable->getType());
+                nextOffset += size;
+            } else if (param != 0) {
+                param->setOffset(nextOffset);
+                nextOffset += 4;
+            } else {
+                variable->setOffset(nextOffset);
+                unsigned long long size = getTypeSize(variable->getType());
+                nextOffset += size;
+            }
         }
     }
 
@@ -162,31 +174,74 @@ void CodeGenerator::processProcedures() {
     }
 }
 
-
 void CodeGenerator::processProcedure(
         const std::string &identifier,
         const std::shared_ptr<Procedure> &procedure) {
-    // Calculate scope offsets.
-    auto identifiers = procedure->scope->getIdentifiersSorted();
-    for (auto c = 0; c < 3 && c < procedure->parameters.size(); c++) {
-        auto parameter = dynamic_pointer_cast<ParameterVariable>(
-                procedure->scope->getEntry(identifiers[c]));
-        parameter->setOffset(c);
-        parameter->is_register = true;
-    }
-
-    for (auto c = 3; c < procedure->parameters.size(); c++) {
-
-    }
-
     deindent();
     writeWithIndent(identifier + ":");
     indent();
+
+    // Calculate scope offsets.
+    auto total_proc_scope_size = calculateScopeOffsets(procedure->scope);
+    // Move the parameters into their offsets.
+    for (auto c = 3; c < procedure->parameters.size(); c++) {
+        auto register_number = push();
+        writeWithIndent("pop {r" + to_string(register_number) + "}");
+    }
+
+    writeWithIndent("push {lr}");
+
+    if (canImmediateValue(total_proc_scope_size)) {
+        writeWithIndent("sub sp, sp, #" + to_string(total_proc_scope_size));
+    } else {
+        auto scratch_register = push();
+        writeWithIndent("ldr r" + to_string(scratch_register) + ", ="
+                        + to_string(total_proc_scope_size));
+        writeWithIndent("sub sp, sp, r" + to_string(scratch_register));
+        pop();
+    }
+
+    for (auto c = 0; c < procedure->parameters.size(); c++) {
+        auto offset = dynamic_pointer_cast<ParameterVariable>(
+                procedure->scope->getEntry(
+                        procedure->parameters[c]->identifier))->getOffset();
+        if (c < 3) {
+            writeWithIndent("str r" + to_string(c)
+                            + ", [sp, #" + to_string(offset) + "]");
+        } else {
+            auto register_number = pop();
+            writeWithIndent("str r" + to_string(register_number)
+                            + ", [sp, #" + to_string(offset) + "]");
+        }
+    }
     symbolTable.setCurrentScope(procedure->scope);
 
     processInstructions(procedure->instructions);
 
+    if (procedure->return_type != 0) {
+        auto return_value = resolveExpressionValue(procedure->return_expression);
+        if (return_value.is_register) {
+            writeWithIndent("mov r0, r" + to_string(return_value.value));
+            pop();
+        } else {
+            if (canImmediateValue(return_value.value)) {
+                writeWithIndent("mov r0, #" + to_string(return_value.value));
+            } else {
+                writeWithIndent("lrd r0, =" + to_string(return_value.value));
+            }
+        }
+    }
+
     symbolTable.setCurrentScope(procedure->scope->getOuter());
+
+    if (canImmediateValue(total_proc_scope_size)) {
+        writeWithIndent("add sp, sp, #" + to_string(total_proc_scope_size));
+    } else {
+        writeWithIndent("ldr r1, =" + to_string(total_proc_scope_size));
+        writeWithIndent("add sp, sp, r1");
+    }
+    writeWithIndent("pop {lr}");
+    writeWithIndent("bx lr");
 }
 
 void CodeGenerator::finalizeProgram() {
@@ -270,6 +325,7 @@ void CodeGenerator::processInstruction(
         writeWithIndent("@Write");
         processWrite(write);
     } else if (call != 0) {
+        writeWithIndent("@Call " + call->identifier + "()");
         processCall(call);
     }
     // Pad with extra line.
@@ -281,10 +337,54 @@ void CodeGenerator::processCall(const std::shared_ptr<Call> &call) {
     for (auto c = 0; c < call->procedure->parameters.size(); c++) {
         auto parameter_type = call->procedure->parameters[c]->type;
         if (parameter_type == universalInt) {
+            writeWithIndent("@parameter is numeric");
             auto parameter = resolveExpressionValue(call->actuals[c]);
+
+            if (parameter.is_register) {
+                if (c < 3) {
+                    writeWithIndent(
+                            "mov r" + to_string(c) + ", r"
+                            + to_string(parameter.value));
+                } else {
+                    writeWithIndent(
+                            "push {r" + to_string(parameter.value) + "}");
+                }
+                pop();
+            } else {
+                if (c < 3) {
+                    if (canImmediateValue(parameter.value)) {
+                        writeWithIndent("mov r" + to_string(c)
+                                        + ", #" + to_string(parameter.value));
+                    } else {
+                        writeWithIndent("lrd r" + to_string(c)
+                                        + ", =" + to_string(parameter.value));
+                    }
+                } else {
+                    auto spare_register = push();
+                    if (canImmediateValue(parameter.value)) {
+                        writeWithIndent("mov r" + to_string(spare_register) + ", #" + to_string(parameter.value));
+                    } else {
+                        writeWithIndent("ldr r" + to_string(spare_register) + ", =" + to_string(parameter.value));
+                    }
+                    writeWithIndent("push {" +to_string(spare_register) + "}");
+                    pop();
+                }
+            }
         } else {
+            writeWithIndent("@parameter is array or record");
             auto location = dynamic_pointer_cast<Location>(call->actuals[c]);
             auto parameter = resolveLocationOffset(location);
+            if (parameter.is_register) {
+                if (c < 3) {
+
+                } else {
+
+                }
+                pop();
+            } else {
+
+            }
+            // TODO
         }
     }
 
@@ -371,34 +471,72 @@ void CodeGenerator::processAssign(const shared_ptr<Assign>& assign) {
 
         if (locationOffset.is_register) {
             if (expressionValue.is_register) {
-                writeWithIndent("str r" + to_string(expressionValue.value)
-                                + ", [r11, r" + to_string(locationOffset.value)
-                                + "]");
+                if (locationOffset.is_stack) {
+                    writeWithIndent(
+                            "str r" + to_string(expressionValue.value)
+                            + ", [sp, r" + to_string(locationOffset.value)
+                            + "]");
+                } else {
+                    writeWithIndent("str r" + to_string(expressionValue.value)
+                                    + ", [r11, r" + to_string(locationOffset.value)
+                                    + "]");
+                }
                 pop();
             } else {
-                writeWithIndent("str r0, [r11, r"
-                                + to_string(locationOffset.value) + "]");
+                if (locationOffset.is_stack) {
+                    writeWithIndent("str r0, [sp, r"
+                                    + to_string(locationOffset.value) + "]");
+                } else {
+                    writeWithIndent("str r0, [r11, r"
+                                    + to_string(locationOffset.value) + "]");
+                }
+
             }
             pop();
         } else {
             if (canImmediateValue(locationOffset.value)) {
                 if (expressionValue.is_register) {
-                    writeWithIndent("str r" + to_string(expressionValue.value)
-                                    + ", [r11, #"
-                                    + to_string(locationOffset.value) + "]");
+                    if (locationOffset.is_stack) {
+                        writeWithIndent(
+                                "str r" + to_string(expressionValue.value)
+                                + ", [sp, #" + to_string(locationOffset.value)
+                                + "]");
+                    } else {
+                        writeWithIndent("str r" + to_string(expressionValue.value)
+                                        + ", [r11, #"
+                                        + to_string(locationOffset.value) + "]");
+                    }
+
                     pop();
                 } else {
-                    writeWithIndent("str r0, [r11, #"
-                                    + to_string(locationOffset.value) + "]");
+                    if (locationOffset.is_stack) {
+                        writeWithIndent("str r0, [sp, #"
+                                        + to_string(locationOffset.value) + "]");
+                    } else {
+                        writeWithIndent("str r0, [r11, #"
+                                        + to_string(locationOffset.value) + "]");
+                    }
+
                 }
             } else {
                 writeWithIndent("ldr r1, =" + to_string(locationOffset.value));
                 if (expressionValue.is_register) {
-                    writeWithIndent("str r" + to_string(expressionValue.value)
-                                    + ", [r11, r1]");
+                    if (locationOffset.is_stack) {
+                        writeWithIndent("str r" + to_string(expressionValue.value)
+                                        + ", [sp, r1]");
+                    } else {
+                        writeWithIndent("str r" + to_string(expressionValue.value)
+                                        + ", [r11, r1]");
+                    }
+
                     pop();
                 } else {
-                    writeWithIndent("str r0, [r11, r1]");
+                    if (locationOffset.is_stack) {
+                        writeWithIndent("str r0, [sp, r1]");
+                    } else {
+                        writeWithIndent("str r0, [r11, r1]");
+
+                    }
                 }
             }
         }
@@ -466,14 +604,26 @@ void CodeGenerator::processRead(const shared_ptr<Read> &read) {
 
     // Put address into r1.
     if (location.is_register) {
-        writeWithIndent("add r1, r" + to_string(location.value) + ", r11");
+        if (location.is_stack) {
+            writeWithIndent("add r1, r" + to_string(location.value) + ", sp");
+        } else {
+            writeWithIndent("add r1, r" + to_string(location.value) + ", r11");
+        }
         pop();
     } else {
         if (canImmediateValue(location.value)) {
-            writeWithIndent("add r1, r11, #" + to_string(location.value));
+            if (location.is_stack) {
+                writeWithIndent("add r1, sp, #" + to_string(location.value));
+            } else {
+                writeWithIndent("add r1, r11, #" + to_string(location.value));
+            }
         } else {
             writeWithIndent("ldr r1, =" + to_string(location.value));
-            writeWithIndent("add r1, r1, r11");
+            if (location.is_stack) {
+                writeWithIndent("add r1, r1, sp");
+            } else {
+                writeWithIndent("add r1, r1, r11");
+            }
         }
     }
 
@@ -485,7 +635,6 @@ void CodeGenerator::processWrite(const shared_ptr<Write>& write) {
 
     auto expression = resolveExpressionValue(write->getExpression());
     writeWithIndent("ldr r0, =output_format");
-
 
     if (expression.is_register) {
         writeWithIndent("mov r1, r" + to_string(expression.value));
@@ -630,7 +779,10 @@ CodeGenerationMessage CodeGenerator::resolveLocationOffset(
         auto isLocal = dynamic_pointer_cast<LocalVariable>(variableEntry);
         auto isParam = dynamic_pointer_cast<ParameterVariable>(variableEntry);
 
-        return CodeGenerationMessage(true, false, variableEntry->getOffset());
+        auto stack = (isLocal != 0 || isParam != 0);
+
+        if (stack) writeWithIndent("@Local variable resolved!");
+        return CodeGenerationMessage(true, false, variableEntry->getOffset(), stack);
     } else if (index != 0) {
         auto locationOffset = resolveLocationOffset(index->getLocation());
         auto expressionValue = resolveExpressionValue(index->getExpression());
@@ -753,6 +905,8 @@ CodeGenerationMessage CodeGenerator::resolveLocationOffset(
             return CodeGenerationMessage(true, false, newOffset);
         }
     }
+
+    throw CodeGenerationException("End of control. Unrecognized location");
 }
 
 // Copied verbatim from Parser.cpp
@@ -802,6 +956,7 @@ CodeGenerationMessage CodeGenerator::resolveExpressionValue(
     auto number = dynamic_pointer_cast<NumberExpression>(expression);
     auto location = dynamic_pointer_cast<Location>(expression);
     auto binary = dynamic_pointer_cast<BinaryExpression>(expression);
+    auto call = dynamic_pointer_cast<CallExpression>(expression);
 
     if (number != 0) {
         auto value = number->getValue();
@@ -814,22 +969,42 @@ CodeGenerationMessage CodeGenerator::resolveExpressionValue(
     } else if (location != 0) {
         auto message = resolveLocationOffset(location);
         if (message.is_register) {
-            writeWithIndent("ldr r" + to_string(message.value)
-                            + ", [r" + to_string(message.value) + ", r11]");
+            if (message.is_stack) {
+                writeWithIndent("ldr r" + to_string(message.value)
+                                + ", [sp, r" + to_string(message.value) + "]");
+            } else {
+                writeWithIndent("ldr r" + to_string(message.value)
+                                + ", [r" + to_string(message.value) + ", r11]");
+            }
             return CodeGenerationMessage(false, true, message.value);
         } else {
             // We need to ask for a new register to store the value.
             auto register_number = push();
 
             if (canImmediateValue(message.value)) {
-                writeWithIndent("ldr r" + to_string(register_number)
-                                + ", [r11, #" + to_string(message.value) + "]");
+                if (message.is_stack) {
+                    writeWithIndent(
+                            "ldr r" + to_string(register_number)
+                            + ", [sp, #" + to_string(message.value) + "]");
+                } else {
+                    writeWithIndent(
+                            "ldr r" + to_string(register_number)
+                            + ", [r11, #" + to_string(message.value) + "]");
+                }
+
             } else {
                 writeWithIndent("ldr r" + to_string(register_number)
                                 + ", =" + to_string(message.value));
-                writeWithIndent("ldr r" + to_string(register_number)
-                                + ", [r11, r"
-                                + to_string(register_number) + "]");
+                if (message.is_stack) {
+                    writeWithIndent("ldr r" + to_string(register_number)
+                                    + ", [sp, r" + to_string(register_number)
+                                    + "]");
+                } else {
+                    writeWithIndent("ldr r" + to_string(register_number)
+                                    + ", [r11, r"
+                                    + to_string(register_number) + "]");
+                }
+
             }
             return CodeGenerationMessage(false, true, register_number);
         }
@@ -1126,6 +1301,11 @@ CodeGenerationMessage CodeGenerator::resolveExpressionValue(
                 }
             }
         }
+    } else if (call != 0) {
+        processCall(call->call);
+        auto return_register = push();
+        writeWithIndent("mov r" + to_string(return_register) + ", r0");
+        return CodeGenerationMessage(false, true, return_register);
     }
 }
 

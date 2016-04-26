@@ -51,7 +51,11 @@ set(SOURCE_FILES
         CodeGenerationMessage.cpp
         BasicCodeGenerator.cpp
         Procedure.cpp
-        Formal.cpp)
+        Formal.cpp
+        LocalVariable.cpp
+        Call.cpp
+        CallExpression.cpp
+        ParameterVariable.cpp)
 
 set(HEADER_FILES
         Array.h
@@ -103,6 +107,10 @@ set(HEADER_FILES
         CodeGenerationMessage.h
         BasicCodeGenerator.h
         Procedure.h
-        Formal.h LocalVariable.cpp LocalVariable.h Call.cpp Call.h CallExpression.cpp CallExpression.h ParameterVariable.cpp ParameterVariable.h)
+        Formal.h
+        LocalVariable.h
+        Call.h
+        CallExpression.h
+        ParameterVariable.h)
 
 add_library(compilers5_lib STATIC ${SOURCE_FILES} ${HEADER_FILES})
