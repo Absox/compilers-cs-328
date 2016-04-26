@@ -214,6 +214,22 @@ void CodeGenerator::processProcedure(
                             + ", [sp, #" + to_string(offset) + "]");
         }
     }
+
+    // Initialize local variables with zeros.
+    writeWithIndent("mov r0, #0");
+    auto identifiers = procedure->scope->getIdentifiersSorted();
+    for (auto c = 0; c < identifiers.size(); c++) {
+        auto localVariable = dynamic_pointer_cast<LocalVariable>(
+                procedure->scope->getEntry(identifiers[c]));
+        if (localVariable != 0) {
+            auto offset = localVariable->getOffset();
+            auto var_size = getTypeSize(localVariable->getType());
+            for (auto d = 0; d < var_size; d += 4) {
+                writeWithIndent("str r0, [sp, #" + to_string(offset + d) + "]");
+            }
+        }
+    }
+
     symbolTable.setCurrentScope(procedure->scope);
 
     processInstructions(procedure->instructions);
