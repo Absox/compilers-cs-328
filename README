@@ -3,9 +3,21 @@ Ran Liu (rliu14@jhu.edu)
 
 Somehow, I seem to have introduced a 72-byte memory leak into my program. I
 haven't the slightest clue how; valgrind seems to think that it's in the parser.
-However, I only ever use smart pointers to allocate memory.
+However, I only ever use smart pointers to allocate memory. Also it's always
+the same 72 bytes.
 
 I do some ugly symbol table lookup and use polymorphism to differentiate local
 variables. I also immediately move the parameters from their original locations
 onto the stack, so that the offsets that the code generator gets make sense.
 
+Language Options:
+All
+
+I implement procedures for:
+Interpreter (Complete)
+Advanced Code Generator (Complete with Integer parameters; working on Array
+and Record parameters)
+Basic Code Generator (Not started)
+
+10k lines into software development is generally a bad time to realize you
+should have refactored a long time ago. I wish I were better at C++ back then.

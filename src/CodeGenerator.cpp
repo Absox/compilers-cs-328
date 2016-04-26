@@ -382,7 +382,7 @@ void CodeGenerator::processCall(const std::shared_ptr<Call> &call) {
                     } else {
                         writeWithIndent("ldr r" + to_string(spare_register) + ", =" + to_string(parameter.value));
                     }
-                    writeWithIndent("push {" +to_string(spare_register) + "}");
+                    writeWithIndent("push {r" + to_string(spare_register) + "}");
                     pop();
                 }
             }
@@ -392,15 +392,28 @@ void CodeGenerator::processCall(const std::shared_ptr<Call> &call) {
             auto parameter = resolveLocationOffset(location);
             if (parameter.is_register) {
                 if (c < 3) {
-
+                    writeWithIndent("mov r" + to_string(c) + ", r" + to_string(parameter.value));
                 } else {
-
+                    writeWithIndent("push {r" + to_string(parameter.value) + "}");
                 }
                 pop();
             } else {
-
+                if (c < 3) {
+                    if (canImmediateValue(parameter.value)) {
+                        writeWithIndent("mov r" + to_string(c) + ", #" + to_string(parameter.value));
+                    } else {
+                        writeWithIndent("ldr r" + to_string(c) + ", =" + to_string(parameter.value));
+                    }
+                } else {
+                    auto spare_register = push();
+                    if (canImmediateValue(parameter.value)) {
+                        writeWithIndent("mov r" + to_string(spare_register) + ", #" + to_string(parameter.value));
+                    } else {
+                        writeWithIndent("ldr r" + to_string(spare_register) + ", =" + to_string(parameter.value));
+                    }
+                    writeWithIndent("push {r" + to_string(spare_register) + "}");
+                }
             }
-            // TODO
         }
     }
 
@@ -423,37 +436,71 @@ void CodeGenerator::processAssign(const shared_ptr<Assign>& assign) {
         // Need to copy the memory word by word
         // Move origin address into r0
         if (origin_location.is_register) {
-            writeWithIndent("add r0, r11, r"
-                            + to_string(origin_location.value));
+            if (origin_location.is_stack) {
+                writeWithIndent("add r0, sp, r"
+                                + to_string(origin_location.value));
+            } else {
+                writeWithIndent("add r0, r11, r"
+                                + to_string(origin_location.value));
+            }
+
             pop();
         } else {
             if (canImmediateValue(origin_location.value)) {
-                writeWithIndent("add r0, r11, #"
-                                + to_string(origin_location.value));
+                if (origin_location.is_stack) {
+                    writeWithIndent("add r0, sp, #"
+                                    + to_string(origin_location.value));
+                } else {
+                    writeWithIndent("add r0, r11, #"
+                                    + to_string(origin_location.value));
+                }
+
             } else {
                 writeWithIndent("ldr r0, =" + to_string(origin_location.value));
-                writeWithIndent("add r0, r0, r11");
+                if (origin_location.is_stack) {
+                    writeWithIndent("add r0, r0, sp");
+                } else {
+                    writeWithIndent("add r0, r0, r11");
+                }
             }
         }
 
         unsigned int destination_register = 0;
         if (locationOffset.is_register) {
             destination_register = locationOffset.value;
-            writeWithIndent("add r" + to_string(destination_register)
-                            + ", r" + to_string(destination_register)
-                            + ", r11");
-        } else {
-            destination_register = push();
-            if (canImmediateValue(locationOffset.value)) {
+            if (locationOffset.is_stack) {
                 writeWithIndent("add r" + to_string(destination_register)
-                                + ", r11, #"
-                                + to_string(locationOffset.value));
+                                + ", r" + to_string(destination_register)
+                                + ", sp");
             } else {
-                writeWithIndent("ldr r" + to_string(destination_register)
-                                + ", =" + to_string(locationOffset.value));
                 writeWithIndent("add r" + to_string(destination_register)
                                 + ", r" + to_string(destination_register)
                                 + ", r11");
+            }
+        } else {
+            destination_register = push();
+            if (canImmediateValue(locationOffset.value)) {
+                if (locationOffset.is_stack) {
+                    writeWithIndent("add r" + to_string(destination_register)
+                                    + ", sp, #"
+                                    + to_string(locationOffset.value));
+                } else {
+                    writeWithIndent("add r" + to_string(destination_register)
+                                    + ", r11, #"
+                                    + to_string(locationOffset.value));
+                }
+            } else {
+                writeWithIndent("ldr r" + to_string(destination_register)
+                                + ", =" + to_string(locationOffset.value));
+                if (locationOffset.is_stack) {
+                    writeWithIndent("add r" + to_string(destination_register)
+                                    + ", r" + to_string(destination_register)
+                                    + ", sp");
+                } else {
+                    writeWithIndent("add r" + to_string(destination_register)
+                                    + ", r" + to_string(destination_register)
+                                    + ", r11");
+                }
             }
         }
 
@@ -795,9 +842,32 @@ CodeGenerationMessage CodeGenerator::resolveLocationOffset(
         auto isLocal = dynamic_pointer_cast<LocalVariable>(variableEntry);
         auto isParam = dynamic_pointer_cast<ParameterVariable>(variableEntry);
 
-        auto stack = (isLocal != 0 || isParam != 0);
+        bool stack = false;
+        if (isLocal != 0) {
+            stack = true;
+        }
+        if (isParam != 0) {
+            if (variableEntry->getType() == universalInt) {
+                stack = true;
+            } else {
+                // We pull the offset from the stack, and put it in a register.
+                auto offset = variableEntry->getOffset();
+                auto resolve_register = push();
+                if (canImmediateValue(offset)) {
+                    writeWithIndent("ldr r" + to_string(resolve_register)
+                                    + ", [sp, #" + to_string(offset) + "]");
+                } else {
+                    writeWithIndent("ldr r0, =" + to_string(offset));
+                    writeWithIndent("ldr r" + to_string(resolve_register)
+                                    + ", [sp, r0]");
+                }
+                return CodeGenerationMessage(true, true, resolve_register);
+            }
+        }
 
-        if (stack) writeWithIndent("@Local variable resolved!");
+        if (stack) {
+            writeWithIndent("@Local variable resolved!");
+        }
         return CodeGenerationMessage(true, false, variableEntry->getOffset(), stack);
     } else if (index != 0) {
         auto locationOffset = resolveLocationOffset(index->getLocation());
@@ -863,7 +933,7 @@ CodeGenerationMessage CodeGenerator::resolveLocationOffset(
                                             ", r0");
                 }
             }
-            return CodeGenerationMessage(true, true, locationOffset.value);
+            return CodeGenerationMessage(true, true, locationOffset.value, locationOffset.is_stack);
 
         } else {
             // The offset is a constant if the index is a constant.
@@ -892,7 +962,7 @@ CodeGenerationMessage CodeGenerator::resolveLocationOffset(
             } else {
                 auto newOffset = locationOffset.value
                                  + expressionValue.value * elementSize;
-                return CodeGenerationMessage(true, false, newOffset);
+                return CodeGenerationMessage(true, false, newOffset, locationOffset.is_stack);
             }
         }
 
@@ -915,10 +985,10 @@ CodeGenerationMessage CodeGenerator::resolveLocationOffset(
                                 + ", r" + to_string(locationOffset.value)
                                 + ", r0");
             }
-            return CodeGenerationMessage(true, true, locationOffset.value);
+            return CodeGenerationMessage(true, true, locationOffset.value, locationOffset.is_stack);
         } else {
             auto newOffset = locationOffset.value + fieldOffset;
-            return CodeGenerationMessage(true, false, newOffset);
+            return CodeGenerationMessage(true, false, newOffset, locationOffset.is_stack);
         }
     }
 
