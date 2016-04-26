@@ -12,6 +12,7 @@
 #include "Field.h"
 #include "Index.h"
 #include "ParameterVariable.h"
+#include "LocalVariable.h"
 
 
 using std::string;
@@ -30,6 +31,9 @@ CodeGenerator::CodeGenerator(
     labelCounter = 0;
     stackSize = 0;
 
+    universalInt = dynamic_pointer_cast<Type>(
+            symbolTable.getCurrentScope()->getOuter()->getEntry("INTEGER"));
+
     calculateOffsets();
     initializeProgram();
     processInstructions(instructions);
@@ -42,8 +46,6 @@ string CodeGenerator::getContent() {
 
 void CodeGenerator::calculateOffsets() throw (CodeGenerationException) {
     // First, register the universal integer as 4 bytes.
-    auto universalInt = dynamic_pointer_cast<Type>(
-            symbolTable.getCurrentScope()->getOuter()->getEntry("INTEGER"));
     typeSizes[universalInt] = 4;
 
     totalBytes = calculateScopeOffsets(symbolTable.getCurrentScope());
@@ -135,7 +137,7 @@ void CodeGenerator::initializeProgram() {
 
     writeWithIndent(".text");
 
-    processDeclarations();
+    processProcedures();
 
     writeWithIndent(".global main");
     deindent();
@@ -149,19 +151,19 @@ void CodeGenerator::initializeProgram() {
     writeWithIndent("");
 }
 
-void CodeGenerator::processDeclarations() {
+void CodeGenerator::processProcedures() {
     auto identifiers = symbolTable.getCurrentScope()->getIdentifiersSorted();
     for (auto c = 0; c < identifiers.size(); c++) {
         auto procedure = dynamic_pointer_cast<Procedure>(
                 symbolTable.getCurrentScope()->getEntry(identifiers[c]));
         if (procedure != 0) {
-            processDeclaration(identifiers[c], procedure);
+            processProcedure(identifiers[c], procedure);
         }
     }
 }
 
 
-void CodeGenerator::processDeclaration(
+void CodeGenerator::processProcedure(
         const std::string &identifier,
         const std::shared_ptr<Procedure> &procedure) {
     // Calculate scope offsets.
@@ -250,6 +252,7 @@ void CodeGenerator::processInstruction(
     auto repeat = dynamic_pointer_cast<Repeat>(instruction);
     auto read = dynamic_pointer_cast<Read>(instruction);
     auto write = dynamic_pointer_cast<Write>(instruction);
+    auto call = dynamic_pointer_cast<Call>(instruction);
 
     if (assign != 0) {
         writeWithIndent("@Assign");
@@ -266,10 +269,28 @@ void CodeGenerator::processInstruction(
     } else if (write != 0) {
         writeWithIndent("@Write");
         processWrite(write);
+    } else if (call != 0) {
+        processCall(call);
     }
     // Pad with extra line.
     writeWithIndent("");
 }
+
+
+void CodeGenerator::processCall(const std::shared_ptr<Call> &call) {
+    for (auto c = 0; c < call->procedure->parameters.size(); c++) {
+        auto parameter_type = call->procedure->parameters[c]->type;
+        if (parameter_type == universalInt) {
+            auto parameter = resolveExpressionValue(call->actuals[c]);
+        } else {
+            auto location = dynamic_pointer_cast<Location>(call->actuals[c]);
+            auto parameter = resolveLocationOffset(location);
+        }
+    }
+
+    writeWithIndent("bl " + call->identifier);
+}
+
 
 void CodeGenerator::processAssign(const shared_ptr<Assign>& assign) {
     auto locationOffset = resolveLocationOffset(assign->getLocation());
@@ -606,6 +627,9 @@ CodeGenerationMessage CodeGenerator::resolveLocationOffset(
         auto variableEntry = dynamic_pointer_cast<Variable>(
                 symbolTable.getCurrentScope()->getEntry
                         (variable->getIdentifier()));
+        auto isLocal = dynamic_pointer_cast<LocalVariable>(variableEntry);
+        auto isParam = dynamic_pointer_cast<ParameterVariable>(variableEntry);
+
         return CodeGenerationMessage(true, false, variableEntry->getOffset());
     } else if (index != 0) {
         auto locationOffset = resolveLocationOffset(index->getLocation());

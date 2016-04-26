@@ -20,6 +20,7 @@
 #include "CodeGenerationException.h"
 #include "CodeGenerationMessage.h"
 #include "Procedure.h"
+#include "Call.h"
 
 class CodeGenerator {
 public:
@@ -29,6 +30,8 @@ public:
             throw (CodeGenerationException);
     std::string getContent();
 private:
+    std::shared_ptr<Type> universalInt;
+
     unsigned int stackSize;
     const unsigned int numRegisters = 7;
     const unsigned int startRegister = 4;
@@ -51,9 +54,9 @@ private:
 
     void initializeProgram();
     void finalizeProgram();
-    void processDeclarations();
-    void processDeclaration(const std::string& identifier,
-                            const std::shared_ptr<Procedure>& procedure);
+    void processProcedures();
+    void processProcedure(const std::string &identifier,
+                          const std::shared_ptr<Procedure> &procedure);
     void processInstructions(
             const std::vector<std::shared_ptr<Instruction>>& instructions);
     void processInstruction(const std::shared_ptr<Instruction>& instruction);
@@ -63,6 +66,7 @@ private:
     void processRepeat(const std::shared_ptr<Repeat>& repeat);
     void processRead(const std::shared_ptr<Read>& read);
     void processWrite(const std::shared_ptr<Write>& write);
+    void processCall(const std::shared_ptr<Call>& call);
 
     CodeGenerationMessage resolveCondition(
             const std::shared_ptr<Condition>& condition);

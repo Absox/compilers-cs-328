@@ -8,7 +8,7 @@
 class CodeGenerationMessage {
 public:
     CodeGenerationMessage(const bool &is_offset, const bool &is_register,
-                          const long long &value);
+                          const long long &value, const bool &is_stack = false);
 private:
     bool is_offset;
     bool is_register;
