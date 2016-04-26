@@ -26,6 +26,7 @@ private:
     std::shared_ptr<Procedure> procedure;
 
     friend class Parser;
+    friend class Interpreter;
 };
 
 

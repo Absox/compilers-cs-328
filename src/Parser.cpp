@@ -246,7 +246,7 @@ vector<shared_ptr<Formal>> Parser::formals() {
         result.push_back(first_list[c]);
     }
 
-    while (match("identifier")) {
+    while (match(";")) {
         processToken(";");
         auto list = formal();
         for (unsigned int c = 0; c < list.size(); c++) {

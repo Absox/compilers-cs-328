@@ -20,19 +20,25 @@
 #include "NumberExpression.h"
 #include "Index.h"
 #include "Field.h"
+#include "Call.h"
 
 class Interpreter {
 
 public:
-    Interpreter(const SymbolTable& symbolTable,
+    Interpreter(SymbolTable& symbolTable,
                 const std::vector<std::shared_ptr<Instruction>>& instructions)
         throw (RuntimeException);
     virtual ~Interpreter();
 private:
-    const SymbolTable& symbolTable;
+    SymbolTable& symbolTable;
     std::shared_ptr<Environment> environment;
+    std::shared_ptr<Environment> localEnvironment;
+
+    std::shared_ptr<Type> universalInt;
 
     void buildEnvironment(const SymbolTable& symbolTable);
+    void buildCallEnvironment(const std::shared_ptr<Call>& call);
+
     void run(const std::vector<std::shared_ptr<Instruction>>& instructions)
             throw (RuntimeException);
     void runInstruction(const std::shared_ptr<Instruction>& instruction)
@@ -57,6 +63,7 @@ private:
     long long int resolveNumericExpression(
             const std::shared_ptr<Expression> &expression)
             throw (RuntimeException);
+    long long int resolveCall(const std::shared_ptr<Call> & call);
     bool isNumeric(const std::shared_ptr<Expression>& expression)
             throw (RuntimeException);
 

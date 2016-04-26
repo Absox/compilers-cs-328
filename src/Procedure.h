@@ -27,6 +27,7 @@ private:
     std::vector<std::shared_ptr<Instruction>> instructions;
 
     friend class Parser;
+    friend class Interpreter;
 };
 
 

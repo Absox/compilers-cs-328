@@ -3,7 +3,7 @@ set(CMAKE_CXX_COMPILER g++)
 
 project(compilers_hwk5)
 
-add_definitions(-std=c++11 -Os)
+add_definitions(-g -std=c++11)
 
 include_directories(src)
 set(SOURCE_FILES main.cpp)

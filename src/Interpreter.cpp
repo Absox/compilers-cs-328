@@ -7,7 +7,8 @@
 #include "IntegerBox.h"
 #include "ArrayBox.h"
 #include "RecordBox.h"
-#include "Call.h"
+#include "LocalVariable.h"
+#include "CallExpression.h"
 
 #include <iostream>
 #include <limits>
@@ -21,11 +22,14 @@ using std::cin;
 using std::endl;
 
 
-Interpreter::Interpreter(const SymbolTable &symbolTable,
+Interpreter::Interpreter(SymbolTable &symbolTable,
                          const vector<shared_ptr<Instruction>> &instructions)
     throw (RuntimeException) : symbolTable(symbolTable) {
+    universalInt = dynamic_pointer_cast<Type>(
+            symbolTable.getCurrentScope()->getOuter()->getEntry("INTEGER"));
     buildEnvironment(symbolTable);
     run(instructions);
+
 }
 
 Interpreter::~Interpreter() {
@@ -36,6 +40,31 @@ void Interpreter::buildEnvironment(const SymbolTable &symbolTable) {
     this->environment = shared_ptr<Environment>(
             new Environment(symbolTable.getCurrentScope()->buildEnvironment()));
 }
+
+
+void Interpreter::buildCallEnvironment(const std::shared_ptr<Call> &call) {
+    auto new_env = call->procedure->scope->buildEnvironment();
+    auto parameters = call->procedure->parameters;
+
+    for (unsigned int c = 0; c < parameters.size(); c++) {
+        if (parameters[c]->type != universalInt) {
+            // Pass by reference instead.
+            new_env[parameters[c]->identifier] =
+                    resolveLocation(dynamic_pointer_cast<Location>(
+                            call->actuals[c]));
+            // Initialize integer boxes to values passed in.
+        } else {
+            auto integer_box = dynamic_pointer_cast<IntegerBox>(
+                    new_env[parameters[c]->identifier]);
+            integer_box->setValue(resolveNumericExpression(call->actuals[c]));
+        }
+    }
+
+    localEnvironment = shared_ptr<Environment>(
+            new Environment(new_env));
+
+}
+
 
 void Interpreter::run(const vector<shared_ptr<Instruction>> &instructions)
     throw (RuntimeException) {
@@ -66,7 +95,12 @@ void Interpreter::runInstruction(
     } else if (write != 0) {
         runWrite(write);
     } else if (call != 0) {
-        // TODO
+        auto prev_local = localEnvironment;
+        buildCallEnvironment(call);
+        symbolTable.setCurrentScope(call->procedure->scope);
+        run(call->procedure->instructions);
+        localEnvironment = prev_local;
+        symbolTable.setCurrentScope(symbolTable.getCurrentScope()->getOuter());
     }
 }
 
@@ -162,12 +196,21 @@ std::shared_ptr<Box> Interpreter::resolveLocation(
     auto field = dynamic_pointer_cast<Field>(location);
 
     if (variable != 0) {
-        return environment->getBox(variable->getIdentifier());
+        auto local = dynamic_pointer_cast<LocalVariable>(
+                symbolTable.getCurrentScope()->getEntry(
+                        variable->getIdentifier()));
+        if (local != 0) {
+            return localEnvironment->getBox(variable->getIdentifier());
+        } else {
+            return environment->getBox(variable->getIdentifier());
+        }
     } else if (index != 0) {
         return resolveIndex(index);
-    } else {
+    } else if (field != 0) {
         return resolveField(field);
     }
+
+    throw RuntimeException("Undefined location encountered!");
 }
 
 
@@ -199,6 +242,7 @@ long long int Interpreter::resolveNumericExpression(
     auto location = dynamic_pointer_cast<Location>(expression);
     auto number = dynamic_pointer_cast<NumberExpression>(expression);
     auto binary = dynamic_pointer_cast<BinaryExpression>(expression);
+    auto call = dynamic_pointer_cast<CallExpression>(expression);
 
     if (number != 0) {
         return number->getValue();
@@ -206,7 +250,7 @@ long long int Interpreter::resolveNumericExpression(
         auto numberBox = dynamic_pointer_cast<IntegerBox>(
                 resolveLocation(location));
         return numberBox->getValue();
-    } else {
+    } else if (binary != 0) {
         auto left = resolveNumericExpression(binary->getExpressionLeft());
         auto right = resolveNumericExpression(binary->getExpressionRight());
 
@@ -229,9 +273,29 @@ long long int Interpreter::resolveNumericExpression(
         } else {
             throw RuntimeException("Undefined operator encountered!");
         }
+    } else if (call != 0) {
+        return resolveCall(call->call);
     }
+    throw RuntimeException("Control flow hit end; unhandled case");
 }
 
+long long int Interpreter::resolveCall(const std::shared_ptr<Call> &call) {
+    auto previous_local_env = localEnvironment;
+    auto procedure = dynamic_pointer_cast<Procedure>(
+            symbolTable.getCurrentScope()->getEntry(call->identifier));
+
+    buildCallEnvironment(call);
+    symbolTable.setCurrentScope(procedure->scope);
+
+    run(call->procedure->instructions);
+
+    auto result = resolveNumericExpression(call->procedure->return_expression);
+
+    localEnvironment = previous_local_env;
+    symbolTable.setCurrentScope(symbolTable.getCurrentScope()->getOuter());
+
+    return result;
+}
 
 bool Interpreter::isNumeric(const shared_ptr<Expression> &expression)
         throw (RuntimeException) {

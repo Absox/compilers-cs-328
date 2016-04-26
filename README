@@ -1,3 +1,19 @@
 600.328 Compilers & Intepreters, Homework 9
 Ran Liu (rliu14@jhu.edu)
 
+Somehow, I seem to have introduced a 72-byte memory leak into my program. I
+haven't the slightest clue how; valgrind seems to think that it's in the parser.
+However, I only ever use smart pointers to allocate memory.
+
+I do some ugly symbol table lookup and use polymorphism to differentiate local
+variables. I also introduce some inefficiency by pushing all the parameters,
+then popping them off at the beginning of the procedure into the intended
+locations.
+
+As far as I can tell, I implement all the language options.
+I've implemented procedures for the interpreter, as well as the advanced
+code generator.
+
+I'd like to refactor my entire program, but the time limitations of this course
+prevent me from doing that, especially now that we're at the point that I have
+nearly 10k lines of code.

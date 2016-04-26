@@ -17,6 +17,7 @@ private:
     std::shared_ptr<Type> type;
 
     friend class Parser;
+    friend class Interpreter;
 };
 
 
