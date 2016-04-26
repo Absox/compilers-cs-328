@@ -19,6 +19,7 @@
 #include "Repeat.h"
 #include "CodeGenerationException.h"
 #include "CodeGenerationMessage.h"
+#include "Procedure.h"
 
 class CodeGenerator {
 public:
@@ -50,6 +51,9 @@ private:
 
     void initializeProgram();
     void finalizeProgram();
+    void processDeclarations();
+    void processDeclaration(const std::string& identifier,
+                            const std::shared_ptr<Procedure>& procedure);
     void processInstructions(
             const std::vector<std::shared_ptr<Instruction>>& instructions);
     void processInstruction(const std::shared_ptr<Instruction>& instruction);

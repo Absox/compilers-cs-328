@@ -18,6 +18,7 @@ private:
 
     friend class Parser;
     friend class Interpreter;
+    friend class CodeGenerator;
 };
 
 

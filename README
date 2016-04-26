@@ -17,3 +17,8 @@ code generator.
 I'd like to refactor my entire program, but the time limitations of this course
 prevent me from doing that, especially now that we're at the point that I have
 nearly 10k lines of code.
+
+As a digression- if we rely on direct access granted to friend classes rather
+than using mutators/accessors, how do we unit test our classes? I suppose we
+can unit test only what we expose as a public interface, but we don't write in
+any public interfaces... I suppose then we essentially just have a struct.

@@ -9,6 +9,7 @@
 #include "RecordBox.h"
 #include "LocalVariable.h"
 #include "CallExpression.h"
+#include "ParameterVariable.h"
 
 #include <iostream>
 #include <limits>
@@ -164,7 +165,6 @@ void Interpreter::runWrite(const shared_ptr<Write> &write)
     cout << value << endl;
 }
 
-
 bool Interpreter::resolveCondition(
         const shared_ptr<Condition> &condition)
         throw (RuntimeException) {
@@ -199,7 +199,10 @@ std::shared_ptr<Box> Interpreter::resolveLocation(
         auto local = dynamic_pointer_cast<LocalVariable>(
                 symbolTable.getCurrentScope()->getEntry(
                         variable->getIdentifier()));
-        if (local != 0) {
+        auto parameter = dynamic_pointer_cast<ParameterVariable>(
+                symbolTable.getCurrentScope()->getEntry(
+                        variable->getIdentifier()));
+        if (local != 0 || parameter != 0) {
             return localEnvironment->getBox(variable->getIdentifier());
         } else {
             return environment->getBox(variable->getIdentifier());
@@ -212,7 +215,6 @@ std::shared_ptr<Box> Interpreter::resolveLocation(
 
     throw RuntimeException("Undefined location encountered!");
 }
-
 
 std::shared_ptr<Box> Interpreter::resolveIndex(
         const std::shared_ptr<Index> &index) throw (RuntimeException) {
@@ -227,14 +229,12 @@ std::shared_ptr<Box> Interpreter::resolveIndex(
     return location->getEntry(indexValue);
 }
 
-
 std::shared_ptr<Box> Interpreter::resolveField(
         const std::shared_ptr<Field> &field) throw (RuntimeException) {
     auto location = dynamic_pointer_cast<RecordBox>(
             resolveLocation(field->getLocation()));
     return location->getEntry(field->getVariable()->getIdentifier());
 }
-
 
 long long int Interpreter::resolveNumericExpression(
         const shared_ptr<Expression> &expression)

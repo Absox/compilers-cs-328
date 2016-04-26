@@ -12,6 +12,7 @@ public:
 private:
     bool is_offset;
     bool is_register;
+    bool is_stack;
     long long value;
 
     friend class CodeGenerator;

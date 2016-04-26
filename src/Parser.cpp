@@ -19,6 +19,7 @@
 #include "Field.h"
 #include "LocalVariable.h"
 #include "CallExpression.h"
+#include "ParameterVariable.h"
 
 using std::cout;
 using std::endl;
@@ -275,8 +276,8 @@ vector<shared_ptr<Formal>> Parser::formal() {
         } else {
             result.push_back(shared_ptr<Formal>(
                     new Formal(identifiers[c].getValue(), parameter_type)));
-            auto local_variable_entry = shared_ptr<LocalVariable>(
-                    new LocalVariable(parameter_type));
+            auto local_variable_entry = shared_ptr<ParameterVariable>(
+                    new ParameterVariable(parameter_type));
             symbolTable.getCurrentScope()->addEntry(
                     identifiers[c].getValue(), local_variable_entry);
         }

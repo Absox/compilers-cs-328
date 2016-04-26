@@ -11,6 +11,7 @@
 #include "Constant.h"
 #include "Field.h"
 #include "Index.h"
+#include "ParameterVariable.h"
 
 
 using std::string;
@@ -71,7 +72,6 @@ unsigned long long CodeGenerator::calculateScopeOffsets(
     return nextOffset;
 }
 
-
 unsigned long long CodeGenerator::getTypeSize(const shared_ptr<Type> &type) {
 
     // If found in the hashmap, store its size.
@@ -95,7 +95,6 @@ unsigned long long CodeGenerator::getTypeSize(const shared_ptr<Type> &type) {
     }
 
 }
-
 
 void CodeGenerator::initializeProgram() {
     indent();
@@ -135,6 +134,9 @@ void CodeGenerator::initializeProgram() {
     }
 
     writeWithIndent(".text");
+
+    processDeclarations();
+
     writeWithIndent(".global main");
     deindent();
 
@@ -147,6 +149,43 @@ void CodeGenerator::initializeProgram() {
     writeWithIndent("");
 }
 
+void CodeGenerator::processDeclarations() {
+    auto identifiers = symbolTable.getCurrentScope()->getIdentifiersSorted();
+    for (auto c = 0; c < identifiers.size(); c++) {
+        auto procedure = dynamic_pointer_cast<Procedure>(
+                symbolTable.getCurrentScope()->getEntry(identifiers[c]));
+        if (procedure != 0) {
+            processDeclaration(identifiers[c], procedure);
+        }
+    }
+}
+
+
+void CodeGenerator::processDeclaration(
+        const std::string &identifier,
+        const std::shared_ptr<Procedure> &procedure) {
+    // Calculate scope offsets.
+    auto identifiers = procedure->scope->getIdentifiersSorted();
+    for (auto c = 0; c < 3 && c < procedure->parameters.size(); c++) {
+        auto parameter = dynamic_pointer_cast<ParameterVariable>(
+                procedure->scope->getEntry(identifiers[c]));
+        parameter->setOffset(c);
+        parameter->is_register = true;
+    }
+
+    for (auto c = 3; c < procedure->parameters.size(); c++) {
+
+    }
+
+    deindent();
+    writeWithIndent(identifier + ":");
+    indent();
+    symbolTable.setCurrentScope(procedure->scope);
+
+    processInstructions(procedure->instructions);
+
+    symbolTable.setCurrentScope(procedure->scope->getOuter());
+}
 
 void CodeGenerator::finalizeProgram() {
 
@@ -196,7 +235,6 @@ void CodeGenerator::finalizeProgram() {
     writeWithIndent(".word stderr");
     deindent();
 }
-
 
 void CodeGenerator::processInstructions(
         const vector<shared_ptr<Instruction>> &instructions) {

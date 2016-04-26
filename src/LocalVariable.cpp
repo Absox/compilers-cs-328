@@ -5,7 +5,8 @@
 #include "LocalVariable.h"
 
 
-LocalVariable::LocalVariable(const std::shared_ptr<Type> &type) : Variable(type) {
+LocalVariable::LocalVariable(const std::shared_ptr<Type> &type)
+        : Variable(type) {
 
 }
 
