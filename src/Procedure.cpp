@@ -10,6 +10,11 @@ Procedure::Procedure() {
 }
 
 
+Procedure::~Procedure() {
+
+}
+
+
 std::string Procedure::getEntryType() const {
     return "PROCEDURE";
 }

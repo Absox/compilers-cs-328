@@ -262,6 +262,7 @@ int main(int argc, char **argv) {
                 } catch (CodeGenerationException& e) {
                     cerr << "error: " << e.getMessage() << endl;
                 }
+                break;
         }
         
         

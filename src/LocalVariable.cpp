@@ -10,3 +10,8 @@ LocalVariable::LocalVariable(const std::shared_ptr<Type> &type)
 
 }
 
+
+LocalVariable::~LocalVariable() {
+
+}
+

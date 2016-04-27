@@ -15,6 +15,7 @@
 class Procedure : public Entry {
 public:
     Procedure();
+    virtual ~Procedure();
 
     virtual void acceptVisitor(ScopeVisitor &visitor) override;
     virtual std::string getEntryType() const override;

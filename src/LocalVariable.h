@@ -12,6 +12,7 @@ class LocalVariable : public Variable {
 
 public:
     LocalVariable(const std::shared_ptr<Type> &type);
+    virtual ~LocalVariable();
 };
 
 
